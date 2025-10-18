@@ -1,0 +1,84 @@
+.song-request-card {
+    border-left: 5px solid var(--primary-color);
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s;
+}
+
+/* Estilos por status */
+.song-request-card.pending {
+    border-left-color: #fbc02d;
+    /* Amarelo */
+}
+
+.song-request-card.played {
+    border-left-color: #43a047;
+    /* Verde */
+    opacity: 0.7;
+}
+
+.song-request-card.canceled {
+    border-left-color: #e53935;
+    /* Vermelho */
+    opacity: 0.6;
+}
+
+.card-header {
+    margin-bottom: 1rem;
+}
+
+.song-title {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.song-artist {
+    font-size: 1.1rem;
+    color: #555;
+    font-style: italic;
+}
+
+.client-message {
+    background-color: #f9f9f9;
+    border: 1px dashed #eee;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.client-message strong {
+    display: block;
+    font-style: normal;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.tip-amount {
+    font-weight: bold;
+    color: #00796b;
+    /* Verde escuro para gorjeta */
+}
+
+.request-status {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.card-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}

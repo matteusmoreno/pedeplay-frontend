@@ -1,0 +1,46 @@
+.header {
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-logo {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.header nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-welcome {
+    font-style: italic;
+    color: #555;
+}
+
+.header-link {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.header-link:hover {
+    opacity: 0.7;
+}

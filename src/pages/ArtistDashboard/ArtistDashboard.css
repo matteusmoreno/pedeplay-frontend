@@ -1,0 +1,53 @@
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.dashboard-header h1 {
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.show-controls {
+    text-align: right;
+}
+
+.show-status {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.show-status.active {
+    color: #43a047;
+    /* Verde */
+}
+
+.show-status.inactive {
+    color: #777;
+}
+
+.dashboard-error {
+    width: 100%;
+    color: #c62828;
+    background-color: #ffebee;
+    border: 1px solid #c62828;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.requests-list {
+    margin-top: 2rem;
+}
+
+.requests-list h2 {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
