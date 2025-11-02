@@ -72,13 +72,11 @@ select {
     font-size: 1rem;
     line-height: 1.6;
     font-family: 'Inter', sans-serif;
-    /* Garante a mesma fonte */
 }
 
 /* Ajuste específico para select */
 select {
     cursor: pointer;
-    /* Remove a seta padrão do navegador */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -110,9 +108,7 @@ select:focus {
     cursor: pointer;
     transition: background-color 0.2s;
     text-decoration: none;
-    /* Remove o sublinhado de links */
     display: inline-block;
-    /* Garante que o padding seja aplicado corretamente em links */
 }
 
 .btn-primary:hover {
@@ -136,9 +132,7 @@ select:focus {
     cursor: pointer;
     transition: background-color 0.2s;
     text-decoration: none;
-    /* Remove o sublinhado de links */
     display: inline-block;
-    /* Garante que o padding seja aplicado corretamente em links */
 }
 
 .btn-secondary:hover {
@@ -156,9 +150,7 @@ select:focus {
     cursor: pointer;
     transition: background-color 0.2s;
     text-decoration: none;
-    /* Remove o sublinhado de links */
     display: inline-block;
-    /* Garante que o padding seja aplicado corretamente em links */
 }
 
 .btn-danger:hover {
@@ -177,9 +169,7 @@ select:focus {
     cursor: pointer;
     transition: background-color 0.2s;
     text-decoration: none;
-    /* Remove o sublinhado de links */
     display: inline-block;
-    /* Garante que o padding seja aplicado corretamente em links */
 }
 
 .btn-success:hover {
@@ -188,7 +178,6 @@ select:focus {
 }
 
 /* --- FIM DA CORREÇÃO --- */
-
 
 .btn-outline {
     background-color: transparent;
@@ -201,9 +190,7 @@ select:focus {
     cursor: pointer;
     transition: all 0.2s;
     text-decoration: none;
-    /* Remove o sublinhado de links */
     display: inline-block;
-    /* Garante que o padding seja aplicado corretamente em links */
 }
 
 .btn-outline:hover {
@@ -271,15 +258,9 @@ select:focus {
     justify-content: center;
     gap: 0.75rem;
     font-size: 0.9rem;
-
-    /* Faz a tarja "grudar" abaixo do header */
     position: sticky;
     top: 80px;
-    /* Altura exata do Header (definida em Header.css) */
     z-index: 999;
-    /* Fica abaixo do z-index 1000 do Header */
-
-    /* Animação de "REC" */
     animation: pulse-rec 1.5s infinite;
 }
 
@@ -287,11 +268,8 @@ select:focus {
     font-size: 1rem;
 }
 
-/* Ajusta o padding do dashboard quando a tarja está ativa */
 main.container.live-active .dashboard-main-content {
-    /* Ajusta o 'top' do sticky-card no Repertório (se existir) */
     --sticky-top-offset: 124px;
-    /* 80px (header) + 44px (banner) */
 }
 
 @keyframes pulse-rec {
@@ -303,7 +281,6 @@ main.container.live-active .dashboard-main-content {
         background-color: #a02020;
     }
 
-    /* Vermelho mais escuro */
     100% {
         background-color: var(--color-danger);
     }

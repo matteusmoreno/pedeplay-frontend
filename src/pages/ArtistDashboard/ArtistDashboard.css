@@ -4,7 +4,7 @@
  * ========================================
  */
 
-/* ... (Todo o CSS anterior .dashboard-layout, .dashboard-nav, ... .stat-card.timer, .requests-list, etc. permanece aqui) ... */
+/* ... (Todo o CSS anterior .dashboard-layout, ... .card-header, etc. permanece aqui) ... */
 .dashboard-layout {
     display: flex;
     flex-direction: row;
@@ -262,24 +262,88 @@
     font-family: 'Courier New', Courier, monospace;
 }
 
-.requests-list {
+/* --- INÍCIO: Estilos das Abas de Pedidos --- */
+.requests-list-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    /* Para o radius funcionar no container */
     margin-bottom: 3rem;
 }
 
-.requests-list h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+.requests-tabs {
+    display: flex;
+    background-color: #2a2a2a;
+    /* Fundo mais escuro para a barra */
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
 }
+
+.requests-tab-btn {
+    flex: 1;
+    background-color: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.requests-tab-btn:hover {
+    color: var(--text-color);
+}
+
+.requests-tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-counter {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.requests-tab-btn.active .tab-counter {
+    background-color: var(--primary-color);
+    color: #121212;
+}
+
+.requests-list {
+    /* Remove a margem antiga */
+    margin-bottom: 0;
+    /* Adiciona padding interno à lista */
+    padding: 1.5rem;
+}
+
+/* Remove o h3 de dentro da lista (agora está nas abas) */
+.requests-list h3 {
+    display: none;
+}
+
+/* --- FIM: Estilos das Abas de Pedidos --- */
+
 
 .empty-state {
     text-align: center;
     font-size: 1.1rem;
     color: var(--text-secondary);
     padding: 2rem;
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius);
+    /* Remove o card, pois a lista agora tem um */
+    background-color: transparent;
+    border-radius: 0;
 }
 
 .empty-state-small {
@@ -289,7 +353,7 @@
     padding: 1rem 0;
 }
 
-/* --- INÍCIO DA CORREÇÃO: Seção Histórico de Shows --- */
+/* --- Correção do Histórico de Shows --- */
 .past-shows-section {
     margin-top: 2rem;
     background-color: var(--card-bg);
@@ -363,7 +427,7 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-/* --- FIM DA CORREÇÃO --- */
+/* --- FIM: Correção Histórico --- */
 
 
 .past-show-item:last-child {
@@ -410,7 +474,6 @@
     border-radius: var(--border-radius);
     margin-bottom: 2.5rem;
     border: 1px solid var(--border-color);
-    /* Adicionado para consistência */
 }
 
 .profile-info-avatar {
@@ -531,7 +594,6 @@
     padding: 0 2rem;
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
-    /* Adicionado para consistência */
 }
 
 .accordion-section {
@@ -702,7 +764,6 @@
     margin-bottom: 2rem;
     padding: 1.5rem;
     border: 1px solid var(--border-color);
-    /* Adicionado para consistência */
 }
 
 .card-header-simple {
@@ -716,21 +777,15 @@
     padding-bottom: 1rem;
 }
 
-/* --- INÍCIO DA CORREÇÃO DE ALINHAMENTO DO ÍCONE --- */
 .card-header-simple h3 {
     margin: 0;
     font-size: 1.5rem;
     color: var(--text-color);
-
-    /* Novas regras para alinhar ícone e texto */
     display: flex;
     align-items: center;
     gap: 0.75rem;
     font-weight: 600;
-    /* Consistência com .accordion-title */
 }
-
-/* --- FIM DA CORREÇÃO --- */
 
 .repertoire-count {
     font-size: 0.9rem;
@@ -918,32 +973,46 @@
         border: 1px solid var(--secondary-color);
     }
 
-    /* --- INÍCIO DA CORREÇÃO (HISTÓRICO RESPONSIVO) --- */
     .past-shows-section,
     .past-shows-section.card {
         padding: 0 1rem;
-        /* Ajusta padding do histórico no mobile */
     }
 
     .past-shows-section .accordion-content {
         padding-left: 0;
-        /* Remove padding horizontal */
         padding-right: 0;
     }
 
     .past-shows-section.open .accordion-content {
         padding-bottom: 1rem;
-        /* Adiciona padding inferior ao abrir */
     }
 
-    /* --- FIM DA CORREÇÃO --- */
-
-    /* --- INÍCIO: Card "Modo Show" Responsivo --- */
     .modo-show-header {
         padding: 1.5rem;
     }
 
-    /* --- FIM: Card "Modo Show" Responsivo --- */
+    /* --- INÍCIO: Abas de Pedido (Mobile) --- */
+    .requests-tabs {
+        flex-direction: column;
+    }
+
+    .requests-tab-btn {
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .requests-tab-btn.active {
+        border-bottom: 1px solid var(--border-color);
+        background-color: rgba(187, 134, 252, 0.1);
+    }
+
+    .requests-list {
+        padding: 1rem;
+        /* Padding menor no mobile */
+    }
+
+    /* --- FIM: Abas de Pedido (Mobile) --- */
 }
 
 /* Mensagens de erro e formulário (genéricas) */
@@ -985,13 +1054,11 @@
 
 /* --- Aba "Finanças" (DashboardFinances) --- */
 .finances-tab .show-stats-grid {
-    /* Faz o grid de finanças ter 2 colunas */
     grid-template-columns: 2fr 1fr;
 }
 
 .stat-card.balance svg {
     color: var(--color-success);
-    /* Ícone verde para saldo */
 }
 
 .stat-card.balance .stat-value {
@@ -999,7 +1066,6 @@
 }
 
 .withdraw-card {
-    /* Card de Saque */
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
@@ -1016,7 +1082,6 @@
 
 
 .transactions-card {
-    /* O card de histórico */
     margin-top: 2rem;
     padding: 1.5rem;
     border: 1px solid var(--border-color);
@@ -1034,7 +1099,6 @@
     align-items: center;
     justify-content: center;
     min-height: 250px;
-    /* Altura do futuro gráfico */
     width: 100%;
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: var(--border-radius);

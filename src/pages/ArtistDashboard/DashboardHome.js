@@ -1,9 +1,9 @@
 /* * ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardHome.js
- * (Layout "Modo Show" unificado)
+ * (Correção dos Erros de Hooks e ESLint)
  * ========================================
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react'; // useMemo importado
 import { useAuth } from '../../hooks/useAuth';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { startShow, endShow, updateRequestStatus } from '../../services/artistService';
@@ -19,7 +19,9 @@ import {
     FaGift,
     FaCalendarCheck,
     FaRedoAlt,
-    FaChevronDown
+    FaChevronDown,
+    FaCheckCircle,
+    FaTimesCircle
 } from 'react-icons/fa';
 
 // --- Funções Helper (Inalteradas) ---
@@ -70,8 +72,35 @@ const DashboardHome = ({ artist }) => {
     const [pastShows, setPastShows] = useState([]);
     const [isLoadingPastShows, setIsLoadingPastShows] = useState(true);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [requestTab, setRequestTab] = useState('PENDING');
 
     const { messages, isConnected } = useWebSocket(activeShow ? user.id : null);
+
+    // --- INÍCIO DA CORREÇÃO 1: Mover Hooks para o topo ---
+    // Os Hooks useMemo devem ser chamados incondicionalmente no topo.
+    const pendingRequests = useMemo(() => {
+        return requests
+            .filter(req => req.status === 'PENDING')
+            .sort((a, b) => {
+                if (a.tipAmount > b.tipAmount) return -1;
+                if (a.tipAmount < b.tipAmount) return 1;
+                return new Date(a.receivedAt) - new Date(b.receivedAt); // Mais antigo primeiro
+            });
+    }, [requests]);
+
+    const playedRequests = useMemo(() => {
+        return requests
+            .filter(req => req.status === 'PLAYED')
+            .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt)); // Mais recente primeiro
+    }, [requests]);
+
+    const canceledRequests = useMemo(() => {
+        return requests
+            .filter(req => req.status === 'CANCELED')
+            .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt)); // Mais recente primeiro
+    }, [requests]);
+    // --- FIM DA CORREÇÃO 1 ---
+
 
     const fetchPastShows = useCallback(async () => {
         setIsLoadingPastShows(true);
@@ -110,7 +139,7 @@ const DashboardHome = ({ artist }) => {
         fetchActiveShow();
     }, [user.id, setActiveShow, fetchPastShows]);
 
-    // Efeito para o Timer
+    // Efeito para o Timer (Inalterado)
     useEffect(() => {
         let timerId = null;
         if (activeShow) {
@@ -123,7 +152,7 @@ const DashboardHome = ({ artist }) => {
         };
     }, [activeShow]);
 
-    // Efeito para o WebSocket
+    // Efeito para o WebSocket (Inalterado)
     useEffect(() => {
         messages.forEach((msg) => {
             if (msg.type === 'NEW_SONG_REQUEST') {
@@ -184,14 +213,25 @@ const DashboardHome = ({ artist }) => {
 
     const handleUpdateRequest = async (requestId, newStatus) => {
         try {
-            setRequests((prevRequests) =>
-                prevRequests.map((req) =>
-                    req.requestId === requestId
-                        ? { ...req, status: newStatus }
-                        : req
-                )
+            // --- INÍCIO DA CORREÇÃO 2: Remover 'originalRequests' ---
+            // const originalRequests = requests; // Variável não utilizada
+            // --- FIM DA CORREÇÃO 2 ---
+
+            const newRequests = requests.map((req) =>
+                req.requestId === requestId
+                    ? { ...req, status: newStatus }
+                    : req
             );
+            setRequests(newRequests);
+
             await updateRequestStatus(activeShow.id, requestId, newStatus);
+
+            if (newStatus === 'PLAYED') {
+                setActiveShow(prevShow => ({
+                    ...prevShow,
+                }));
+            }
+
         } catch (err) {
             console.error("Erro ao atualizar status:", err);
             setError('Falha ao atualizar o pedido. Tente novamente.');
@@ -209,16 +249,40 @@ const DashboardHome = ({ artist }) => {
         return <div className="loading-full-page">Carregando...</div>;
     }
 
-    const sortedRequests = [...requests].sort((a, b) => {
-        if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
-        if (a.status !== 'PENDING' && b.status === 'PENDING') return 1;
-        if (a.status === 'PENDING' && b.status === 'PENDING') {
-            if (a.tipAmount > b.tipAmount) return -1;
-            if (a.tipAmount < b.tipAmount) return 1;
-            return new Date(a.receivedAt) - new Date(a.receivedAt);
+    const renderRequestList = () => {
+        let listToRender = [];
+        let emptyMessage = "Nenhum pedido encontrado.";
+
+        switch (requestTab) {
+            case 'PENDING':
+                listToRender = pendingRequests;
+                emptyMessage = "Aguardando pedidos...";
+                break;
+            case 'PLAYED':
+                listToRender = playedRequests;
+                emptyMessage = "Nenhuma música foi marcada como 'tocada'.";
+                break;
+            case 'CANCELED':
+                listToRender = canceledRequests;
+                emptyMessage = "Nenhum pedido cancelado.";
+                break;
+            default:
+                listToRender = [];
         }
-        return new Date(b.receivedAt) - new Date(a.receivedAt);
-    });
+
+        if (listToRender.length === 0) {
+            return <p className="empty-state">{emptyMessage}</p>;
+        }
+
+        return listToRender.map((req) => (
+            <SongRequestCard
+                key={req.requestId}
+                request={req}
+                onUpdateRequestStatus={handleUpdateRequest}
+            />
+        ));
+    };
+
 
     return (
         <div className={`dashboard-tab-content ${activeShow ? 'show-is-active' : ''}`}>
@@ -233,9 +297,7 @@ const DashboardHome = ({ artist }) => {
                 <p>Esta ação não pode ser desfeita e o show será movido para o seu histórico.</p>
             </Modal>
 
-
-            {/* --- INÍCIO DA CORREÇÃO: Card "Modo Show" unificado --- */}
-            <div className="card-header modo-show-header"> {/* Adicionada classe .modo-show-header */}
+            <div className="card-header modo-show-header">
                 <div className="modo-show-title">
                     <h2>Modo Show</h2>
                     {!activeShow && (
@@ -265,8 +327,6 @@ const DashboardHome = ({ artist }) => {
                     </div>
                 )}
             </div>
-            {/* --- FIM DA CORREÇÃO --- */}
-
 
             {activeShow && (
                 <div className="show-stats-grid">
@@ -295,19 +355,37 @@ const DashboardHome = ({ artist }) => {
             )}
 
             {activeShow && (
-                <div className="requests-list">
-                    <h3>Fila de Pedidos</h3>
-                    {requests.length === 0 ? (
-                        <p className="empty-state">Aguardando pedidos...</p>
-                    ) : (
-                        sortedRequests.map((req) => (
-                            <SongRequestCard
-                                key={req.requestId}
-                                request={req}
-                                onUpdateRequestStatus={handleUpdateRequest}
-                            />
-                        ))
-                    )}
+                <div className="requests-list-container">
+                    <div className="requests-tabs">
+                        <button
+                            className={`requests-tab-btn ${requestTab === 'PENDING' ? 'active' : ''}`}
+                            onClick={() => setRequestTab('PENDING')}
+                        >
+                            <FaMusic />
+                            <span>Fila</span>
+                            <span className="tab-counter">{pendingRequests.length}</span>
+                        </button>
+                        <button
+                            className={`requests-tab-btn ${requestTab === 'PLAYED' ? 'active' : ''}`}
+                            onClick={() => setRequestTab('PLAYED')}
+                        >
+                            <FaCheckCircle />
+                            <span>Tocadas</span>
+                            <span className="tab-counter">{playedRequests.length}</span>
+                        </button>
+                        <button
+                            className={`requests-tab-btn ${requestTab === 'CANCELED' ? 'active' : ''}`}
+                            onClick={() => setRequestTab('CANCELED')}
+                        >
+                            <FaTimesCircle />
+                            <span>Canceladas</span>
+                            <span className="tab-counter">{canceledRequests.length}</span>
+                        </button>
+                    </div>
+
+                    <div className="requests-list">
+                        {renderRequestList()}
+                    </div>
                 </div>
             )}
 
