@@ -1,5 +1,6 @@
 /* * ========================================
  * ARQUIVO: src/pages/RegisterPage/RegisterPage.js
+ * (Adicionado login automático pós-cadastro)
  * ========================================
  */
 import React, { useState } from 'react';
@@ -10,13 +11,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { registerArtist } from '../../services/artistService';
 import './RegisterPage.css';
 
+// --- INÍCIO DA CORREÇÃO 1: Importar serviços de login ---
+import { login as apiLogin } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
+// --- FIM DA CORREÇÃO 1 ---
+
 // Importando os componentes de etapa
 import RegisterSteps from './RegisterSteps';
 import Step1Account from './Step1Account';
 import Step2Personal from './Step2Personal';
 import Step3Address from './Step3Address';
 import Step4Social from './Step4Social';
-// Importa o novo componente de ilustração
 import StepIllustration from './StepIllustration/StepIllustration';
 
 // Esquema de validação com Yup
@@ -31,18 +36,14 @@ const schema = yup.object().shape({
     name: yup.string().required('O nome é obrigatório'),
     biography: yup.string().required('A biografia é obrigatória'),
 
-    // --- INÍCIO DA CORREÇÃO (CEP) ---
-    // 1. O regex agora aceita 8 números OU 5 números + hífen + 3 números
-    // 2. A mensagem de erro foi melhorada para ser mais genérica.
     cep: yup.string()
         .required('O CEP é obrigatório')
         .matches(/^(\d{5}-\d{3}|\d{8})$/, 'Formato de CEP inválido.'),
-    // --- FIM DA CORREÇÃO ---
 
     street: yup.string().required('Rua é obrigatória'),
-    neighborhood: yup.string().required('Bairro é obrigatório'),
+    neighborhood: yup.string().required('Bairro é obrigatória'),
     city: yup.string().required('Cidade é obrigatória'),
-    state: yup.string().required('Estado é obrigatório'),
+    state: yup.string().required('Estado é obrigatória'),
     number: yup.string().required('O número é obrigatório'),
     complement: yup.string(),
 
@@ -75,6 +76,10 @@ const RegisterPage = () => {
     const [apiSuccess, setApiSuccess] = useState(null);
     const navigate = useNavigate();
 
+    // --- INÍCIO DA CORREÇÃO 2: Obter o 'login' do contexto ---
+    const { login: contextLogin } = useAuth();
+    // --- FIM DA CORREÇÃO 2 ---
+
     const methods = useForm({
         resolver: yupResolver(schema),
         mode: 'onTouched'
@@ -100,13 +105,28 @@ const RegisterPage = () => {
         setApiError(null);
         setApiSuccess(null);
         try {
+            // 1. Cria o artista
             await registerArtist(data);
-            setApiSuccess('Cadastro realizado com sucesso! Redirecionando para o login...');
+
+            // --- INÍCIO DA CORREÇÃO 3: Fazer login automático ---
+
+            // 2. Faz o login com os dados recém-cadastrados
+            const token = await apiLogin(data.email, data.password);
+
+            // 3. Define o estado de autenticação no contexto
+            contextLogin(token);
+
+            setApiSuccess('Cadastro realizado com sucesso! Redirecionando...');
+
+            // 4. Redireciona para a HomePage (/)
             setTimeout(() => {
-                navigate('/login');
-            }, 3000);
+                navigate('/');
+            }, 2000); // Um pequeno delay para o usuário ler a mensagem
+
+            // --- FIM DA CORREÇÃO 3 ---
+
         } catch (error) {
-            setApiError(error);
+            setApiError(error.message || 'Erro no cadastro.');
         }
     };
 
@@ -128,7 +148,7 @@ const RegisterPage = () => {
 
                             {apiError && (
                                 <div className="form-message error-message">
-                                    {apiError.message || 'Erro no cadastro.'}
+                                    {apiError}
                                 </div>
                             )}
                             {apiSuccess && <div className="form-message success-message">{apiSuccess}</div>}
@@ -164,7 +184,7 @@ const RegisterPage = () => {
                                     <button
                                         type="submit"
                                         className="btn-primary"
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting || apiSuccess} // Desabilita após o sucesso
                                     >
                                         {isSubmitting ? 'Finalizando...' : 'Finalizar Cadastro'}
                                     </button>

@@ -1,6 +1,6 @@
 /* * ========================================
  * ARQUIVO: src/pages/LoginPage/LoginPage.js
- * (Correção de Login e Layout)
+ * (Redirecionamento corrigido para /)
  * ========================================
  */
 import React, { useState } from 'react';
@@ -9,7 +9,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-// 1. Importar o serviço de API de login
 import { login as apiLogin } from '../../services/authService';
 import './LoginPage.css';
 
@@ -19,7 +18,6 @@ const schema = yup.object().shape({
 });
 
 const LoginPage = () => {
-    // 2. Renomear o 'login' do contexto para 'contextLogin'
     const { login: contextLogin } = useAuth();
     const navigate = useNavigate();
     const [apiError, setApiError] = useState(null);
@@ -30,20 +28,20 @@ const LoginPage = () => {
     const onSubmit = async (data) => {
         setApiError(null);
         try {
-            // 3. Chamar o serviço de API primeiro
             const token = await apiLogin(data.email, data.password);
-
-            // 4. Passar o TOKEN recebido para o contexto
             contextLogin(token);
 
-            navigate('/dashboard');
+            // --- INÍCIO DA CORREÇÃO ---
+            // Redireciona para a HomePage (/) em vez do Dashboard
+            navigate('/');
+            // --- FIM DA CORREÇÃO ---
+
         } catch (error) {
             setApiError(error.message || 'Email ou senha inválidos.');
         }
     };
 
     return (
-        // 5. Adicionar um container PRÓPRIO para a página de login
         <div className="login-page-container">
             <div className="login-card">
                 <h2>Login do Artista</h2>
