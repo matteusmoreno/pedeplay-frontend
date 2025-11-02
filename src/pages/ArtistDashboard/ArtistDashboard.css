@@ -294,19 +294,15 @@
     margin-top: 2rem;
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
-    /* 1. Aplicar o padding horizontal (igual ao .profile-form) */
     padding: 0 2rem;
-    /* 2. Adiciona borda (igual aos outros cards) */
     border: 1px solid var(--border-color);
 }
 
 .past-shows-section.card {
-    /* 3. Garantir que o padding seja aplicado e sobrescrever padding: 0 */
     padding: 0 2rem;
 }
 
 .past-shows-section .accordion-header {
-    /* 4. Aplicar apenas padding vertical (igual aos outros .accordion-header) */
     padding: 1.5rem 0;
     border-bottom: 1px solid transparent;
     transition: border-color 0.3s ease;
@@ -317,20 +313,19 @@
 }
 
 .past-shows-section .accordion-content {
-    /* 5. Remover padding horizontal, pois o pai (.past-shows-section) já tem */
     padding-left: 0;
     padding-right: 0;
-    /* 6. Garantir que as regras de acordeão se apliquem */
+    padding-bottom: 0;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
 }
 
 .past-shows-section.open .accordion-content {
-    /* 7. Adiciona o padding-bottom e max-height (igual aos outros) */
     max-height: 2000px;
     padding-bottom: 1.5rem;
 }
+
 
 .past-shows-actions {
     display: flex;
@@ -349,7 +344,6 @@
 .past-shows-list-container {
     max-height: 400px;
     overflow-y: auto;
-    /* 8. Ajustar o padding-right para a barra de rolagem */
     padding-right: 0.5rem;
 }
 
@@ -365,8 +359,7 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
-    /* 9. Padding vertical, mas usar padding-right do container-pai */
-    padding: 1rem 0;
+    padding: 1rem 0.5rem;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -723,11 +716,21 @@
     padding-bottom: 1rem;
 }
 
+/* --- INÍCIO DA CORREÇÃO DE ALINHAMENTO DO ÍCONE --- */
 .card-header-simple h3 {
     margin: 0;
     font-size: 1.5rem;
     color: var(--text-color);
+
+    /* Novas regras para alinhar ícone e texto */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    /* Consistência com .accordion-title */
 }
+
+/* --- FIM DA CORREÇÃO --- */
 
 .repertoire-count {
     font-size: 0.9rem;
@@ -977,4 +980,118 @@
     color: #c8e6c9;
     background-color: #1b5e20;
     border-color: #43a047;
+}
+
+
+/* --- Aba "Finanças" (DashboardFinances) --- */
+.finances-tab .show-stats-grid {
+    /* Faz o grid de finanças ter 2 colunas */
+    grid-template-columns: 2fr 1fr;
+}
+
+.stat-card.balance svg {
+    color: var(--color-success);
+    /* Ícone verde para saldo */
+}
+
+.stat-card.balance .stat-value {
+    color: var(--color-success);
+}
+
+.withdraw-card {
+    /* Card de Saque */
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.withdraw-card .stat-label {
+    font-size: 0.8rem;
+}
+
+.withdraw-card button {
+    width: 100%;
+}
+
+
+.transactions-card {
+    /* O card de histórico */
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+/* --- Estilos para o Card de Gráfico (Finanças) --- */
+.finances-chart-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.chart-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    /* Altura do futuro gráfico */
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--border-color);
+}
+
+.transactions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-desc {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.transaction-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.transaction-amount {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.transaction-item.success .transaction-amount {
+    color: var(--color-success);
+}
+
+.transaction-item.danger .transaction-amount {
+    color: var(--color-danger);
+}
+
+
+/* --- Ajustes Responsivos para Finanças --- */
+@media (max-width: 1024px) {
+    .finances-tab .show-stats-grid {
+        grid-template-columns: 1fr;
+        /* Coluna única no mobile */
+    }
 }

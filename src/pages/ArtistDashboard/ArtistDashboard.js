@@ -7,16 +7,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getArtistDetails } from '../../services/artistService';
 import './ArtistDashboard.css';
-import { FaBroadcastTower, FaUser, FaMusic } from 'react-icons/fa';
+// --- 1. Adicionar FaDollarSign ---
+import { FaBroadcastTower, FaUser, FaMusic, FaDollarSign } from 'react-icons/fa';
 
 // Importa os componentes de abas
 import DashboardHome from './DashboardHome';
 import DashboardProfile from './DashboardProfile';
 import DashboardRepertoire from './DashboardRepertoire';
+// --- 2. Importar o novo componente ---
+import DashboardFinances from './DashboardFinances';
 
 const ArtistDashboard = () => {
     const { user } = useAuth();
-    // A aba padrão continua sendo 'profile'
     const [activeTab, setActiveTab] = useState('profile');
     const [artistData, setArtistData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +64,9 @@ const ArtistDashboard = () => {
                 return <DashboardProfile artist={artistData} onUpdate={fetchArtistData} />;
             case 'repertoire':
                 return <DashboardRepertoire artist={artistData} />;
+            // --- 3. Adicionar o case para 'finances' ---
+            case 'finances':
+                return <DashboardFinances artist={artistData} />;
             default:
                 return <DashboardProfile artist={artistData} onUpdate={fetchArtistData} />;
         }
@@ -74,11 +79,17 @@ const ArtistDashboard = () => {
                     <h3>Painel do Artista</h3>
                 </div>
                 <ul>
-                    {/* --- INÍCIO DA CORREÇÃO: Ordem final do Menu --- */}
+                    {/* --- 4. Reordenar e adicionar a nova aba --- */}
                     <li className={activeTab === 'profile' ? 'active' : ''}>
                         <button onClick={() => setActiveTab('profile')}>
                             <FaUser />
                             <span>Meu Perfil</span>
+                        </button>
+                    </li>
+                    <li className={activeTab === 'finances' ? 'active' : ''}>
+                        <button onClick={() => setActiveTab('finances')}>
+                            <FaDollarSign />
+                            <span>Finanças</span>
                         </button>
                     </li>
                     <li className={activeTab === 'repertoire' ? 'active' : ''}>
