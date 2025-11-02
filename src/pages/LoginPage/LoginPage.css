@@ -1,3 +1,8 @@
+/* * ========================================
+ * ARQUIVO: src/pages/LoginPage/LoginPage.css
+ * ========================================
+ */
+
 .login-container {
     display: flex;
     justify-content: center;
@@ -22,9 +27,12 @@
 }
 
 .login-error {
-    color: #c62828;
-    background-color: #ffebee;
+    color: #ffcdd2;
+    /* Texto do erro (vermelho claro) */
+    background-color: #3e1010;
+    /* Fundo do erro (vermelho escuro) */
     border: 1px solid #c62828;
+    /* Borda vermelha */
     padding: 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 1rem;

@@ -1,13 +1,34 @@
+/* * ========================================
+ * ARQUIVO: src/assets/styles/global.css
+ * ========================================
+ */
+
 :root {
-    --primary-color: #6a1b9a;
-    /* Roxo */
+    /* Paleta Dark Mode */
+    --primary-color: #BB86FC;
+    /* Roxo mais vibrante para o modo escuro */
     --secondary-color: #fdd835;
-    /* Amarelo */
-    --background-color: #f5f5f5;
-    --text-color: #333;
-    --card-bg: #ffffff;
+    /* Amarelo (mantido) */
+    --background-color: #121212;
+    /* Fundo principal (preto suave) */
+    --text-color: #E0E0E0;
+    /* Texto principal (branco suave) */
+    --text-secondary: #B3B3B3;
+    /* Texto secundário (cinza claro) */
+    --card-bg: #1E1E1E;
+    /* Fundo de cards e inputs (cinza escuro) */
+    --border-color: #333333;
+    /* Cor da borda */
+
+    /* Cores de Ação */
+    --color-success: #43a047;
+    --color-danger: #e53935;
+    --color-warning: #fbc02d;
+
+    /* Estilos reaproveitáveis */
     --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    /* Sombra sutil para modo escuro */
 }
 
 * {
@@ -16,6 +37,10 @@
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
         Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    /* Suavização de fonte */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -30,6 +55,7 @@ body {
     padding: 0 1.5rem;
 }
 
+/* --- ESTILOS DE BOTÃO --- */
 button {
     cursor: pointer;
     padding: 0.75rem 1.5rem;
@@ -42,11 +68,13 @@ button {
 
 .btn-primary {
     background-color: var(--primary-color);
-    color: white;
+    color: #121212;
+    /* Texto escuro para botões roxos claros */
 }
 
 .btn-primary:hover {
-    background-color: #4a148c;
+    background-color: #a050f5;
+    /* Um pouco mais claro no hover */
 }
 
 .btn-secondary {
@@ -59,7 +87,7 @@ button {
 }
 
 .btn-danger {
-    background-color: #e53935;
+    background-color: var(--color-danger);
     color: white;
 }
 
@@ -68,7 +96,7 @@ button {
 }
 
 .btn-success {
-    background-color: #43a047;
+    background-color: var(--color-success);
     color: white;
 }
 
@@ -76,7 +104,7 @@ button {
     background-color: #2e7d32;
 }
 
-
+/* --- ESTILOS DE FORMULÁRIO E CARD --- */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -85,9 +113,29 @@ textarea {
     width: 100%;
     padding: 0.75rem;
     margin-bottom: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
+    /* Borda escura */
     border-radius: var(--border-radius);
     font-size: 1rem;
+    background-color: var(--card-bg);
+    /* Fundo do input */
+    color: var(--text-color);
+    /* Texto do input */
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-secondary);
+    /* Cor do placeholder */
+    opacity: 0.7;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+    /* Sombra de foco roxa */
 }
 
 textarea {
@@ -111,4 +159,6 @@ textarea {
     display: block;
     font-weight: bold;
     margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    /* Cor do label */
 }

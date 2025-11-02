@@ -1,6 +1,12 @@
+/* * ========================================
+ * ARQUIVO: src/components/Header/Header.css
+ * ========================================
+ */
+
 .header {
     background-color: var(--card-bg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* Sombra mais clara para destacar no fundo escuro */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 1rem 0;
     position: sticky;
     top: 0;
@@ -31,7 +37,8 @@
 
 .header-welcome {
     font-style: italic;
-    color: #555;
+    color: var(--text-secondary);
+    /* Corrigido de #555 */
 }
 
 .header-link {

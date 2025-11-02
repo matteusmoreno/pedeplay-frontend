@@ -1,3 +1,8 @@
+/* * ========================================
+ * ARQUIVO: src/components/SongRequestCard/SongRequestCard.css
+ * ========================================
+ */
+
 .song-request-card {
     border-left: 5px solid var(--primary-color);
     background-color: var(--card-bg);
@@ -10,18 +15,18 @@
 
 /* Estilos por status */
 .song-request-card.pending {
-    border-left-color: #fbc02d;
+    border-left-color: var(--color-warning);
     /* Amarelo */
 }
 
 .song-request-card.played {
-    border-left-color: #43a047;
+    border-left-color: var(--color-success);
     /* Verde */
     opacity: 0.7;
 }
 
 .song-request-card.canceled {
-    border-left-color: #e53935;
+    border-left-color: var(--color-danger);
     /* Vermelho */
     opacity: 0.6;
 }
@@ -38,22 +43,29 @@
 
 .song-artist {
     font-size: 1.1rem;
-    color: #555;
+    color: var(--text-secondary);
+    /* Corrigido de #555 */
     font-style: italic;
 }
 
 .client-message {
-    background-color: #f9f9f9;
-    border: 1px dashed #eee;
+    background-color: #2a2a2a;
+    /* Corrigido de #f9f9f9 */
+    border: 1px dashed var(--border-color);
+    /* Corrigido de #eee */
     padding: 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 1rem;
     font-style: italic;
+    color: var(--text-secondary);
+    /* Garante que o texto da mensagem seja legível */
 }
 
 .client-message strong {
     display: block;
     font-style: normal;
+    color: var(--text-color);
+    /* Texto em negrito com mais destaque */
 }
 
 .card-footer {
@@ -61,13 +73,14 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.9rem;
-    color: #777;
+    color: var(--text-secondary);
+    /* Corrigido de #777 */
 }
 
 .tip-amount {
     font-weight: bold;
-    color: #00796b;
-    /* Verde escuro para gorjeta */
+    color: #80CBC4;
+    /* Verde claro para gorjeta (legível) */
 }
 
 .request-status {
@@ -79,6 +92,7 @@
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-color);
+    /* Corrigido de #eee */
     padding-top: 1.5rem;
 }
