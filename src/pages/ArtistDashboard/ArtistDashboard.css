@@ -176,12 +176,11 @@
     font-size: 0.9rem;
     color: var(--text-secondary);
     text-align: center;
-    padding: 1rem;
+    padding: 1rem 0;
 }
 
 /* --- Aba "Perfil" (DashboardProfile) --- */
 
-/* NOVO: Card de Informações (Read-Only) */
 .profile-info-card {
     display: flex;
     flex-direction: row;
@@ -202,7 +201,6 @@
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    /* Imagem redonda */
     overflow: hidden;
     background-color: #333;
     border: 3px solid var(--primary-color);
@@ -232,18 +230,15 @@
     left: 0;
     width: 100%;
     height: 40%;
-    /* Cobre 40% da parte de baixo */
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     border: none;
     padding: 0.5rem;
     font-size: 0.8rem;
-    /* Fonte menor */
     font-weight: bold;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    /* Ícone em cima do texto */
     align-items: center;
     justify-content: center;
     gap: 0.25rem;
@@ -307,8 +302,9 @@
     color: var(--primary-color);
 }
 
-/* NOVO: Seções de Edição (Accordion) */
-.profile-form {
+/* Seções de Edição (Accordion) - Estilos Globais */
+.profile-form,
+.repertoire-actions-form {
     background-color: var(--card-bg);
     padding: 2rem;
     border-radius: var(--border-radius);
@@ -366,11 +362,10 @@
 
 .accordion-section.open .accordion-content {
     max-height: 2000px;
-    /* Valor alto para caber o conteúdo */
     padding-bottom: 1.5rem;
 }
 
-/* NOVO: Grid para o formulário de edição */
+/* Grid para o formulário de edição (PERFIL) */
 .profile-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -389,11 +384,9 @@
 }
 
 .form-section legend {
-    /* Esconde a legenda, já que o accordion-header é o título */
     display: none;
 }
 
-/* --- INÍCIO DA CORREÇÃO (Estilos de Endereço) --- */
 .address-fields-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -427,7 +420,6 @@
     border: 1px solid var(--secondary-color);
 }
 
-/* Lógica de Ocultar/Mostrar */
 .address-details {
     max-height: 0;
     opacity: 0;
@@ -440,17 +432,18 @@
     opacity: 1;
 }
 
-/* --- FIM DA CORREÇÃO (Estilos de Endereço) --- */
-
-
-/* --- INÍCIO DA CORREÇÃO (Ícones Sociais) --- */
-.social-input-group {
+/* Estilos Ícones Sociais (PERFIL e REPERTÓRIO) */
+.social-input-group,
+.search-input-group {
     display: flex;
     align-items: stretch;
-    /* Faz o ícone esticar para a altura do input */
+    /* Garante altura igual */
 }
 
-.social-input-group .social-icon {
+/* --- INÍCIO DA CORREÇÃO 4: Alinhamento Ícone Lupa --- */
+/* Regra unificada para AMBOS os ícones */
+.social-input-group .social-icon,
+.search-input-group .search-icon {
     flex-shrink: 0;
     display: grid;
     place-items: center;
@@ -459,71 +452,85 @@
     border-right: none;
     border-radius: var(--border-radius) 0 0 var(--border-radius);
     color: var(--text-secondary);
-
-    /* * Força o padding vertical a ser o MESMO do input (global.css)
-     * e o font-size a ser o MESMO do input.
-    */
-    padding: 0.75rem;
     font-size: 1rem;
-    width: 50px;
-    /* Largura fixa */
+    /* Tamanho do ícone padronizado */
+    width: 45px;
+    /* Largura fixa padronizada */
+    padding: 0.75rem;
     box-sizing: border-box;
 }
 
-.social-input-group input {
+.social-input-group input,
+.search-input-group input {
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
     margin-bottom: 0;
     box-sizing: border-box;
+    width: 100%;
+    /* Garante que o input ocupe o espaço */
 }
 
-/* --- FIM DA CORREÇÃO (Ícones Sociais) --- */
+/* --- FIM DA CORREÇÃO 4 --- */
+
 
 .btn-submit-profile {
     margin-top: 1.5rem;
     width: auto;
-    /* Botão não é mais 100% */
     min-width: 200px;
 }
 
 /* --- Aba "Repertório" (DashboardRepertoire) --- */
-.repertoire-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
-
-.repertoire-column .card {
-    padding: 1.5rem;
-    background-color: var(--card-bg);
+.repertoire-info-card {
     margin-bottom: 2rem;
+    padding: 1.5rem;
 }
 
-.repertoire-column h3 {
-    font-size: 1.25rem;
-    margin-bottom: 1.5rem;
-}
-
-.repertoire-form button {
-    width: 100%;
+.card-header-simple {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.card-header-simple h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.repertoire-count {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.song-list-container {
+    /* --- INÍCIO DA CORREÇÃO 2: Limite de Rolagem --- */
+    max-height: 300px;
+    /* Reduzido de 400px */
+    /* --- FIM DA CORREÇÃO 2 --- */
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.song-list-container.short-list {
+    max-height: 250px;
 }
 
 .song-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 400px;
-    overflow-y: auto;
 }
 
 .song-list-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0;
+    padding: 0.75rem 0.25rem;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -536,15 +543,22 @@
     flex-direction: column;
 }
 
+/* --- INÍCIO DA CORREÇÃO 3: Fontes Menores --- */
 .song-list-item .song-title {
-    font-weight: 600;
+    font-weight: 500;
+    /* Um pouco menos de peso */
     color: var(--text-color);
+    font-size: 0.95rem;
+    /* Reduzido de 1rem (padrão) */
 }
 
 .song-list-item .song-artist {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    /* Reduzido de 0.85rem */
     color: var(--text-secondary);
 }
+
+/* --- FIM DA CORREÇÃO 3 --- */
 
 .btn-icon {
     background: transparent;
@@ -575,6 +589,13 @@
     background-color: rgba(229, 57, 53, 0.1);
 }
 
+.repertoire-form button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
 
 /* --- Responsividade --- */
 @media (max-width: 1024px) {
@@ -629,7 +650,6 @@
     .profile-layout,
     .repertoire-layout,
     .profile-form-grid {
-        /* Coluna única no mobile */
         grid-template-columns: 1fr;
     }
 
@@ -685,7 +705,7 @@
     border: 1px solid transparent;
     padding: 1rem;
     border-radius: var(--border-radius);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     text-align: center;
     font-weight: 500;
 }
