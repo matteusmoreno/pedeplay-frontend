@@ -56,10 +56,13 @@ body {
     color: var(--text-secondary);
 }
 
+/* Estilos unificados para inputs, textareas e selects */
 input[type="text"],
 input[type="email"],
 input[type="password"],
-textarea {
+input[type="number"],
+textarea,
+select {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: var(--background-color);
@@ -68,7 +71,19 @@ textarea {
     color: var(--text-color);
     font-size: 1rem;
     line-height: 1.6;
+    font-family: 'Inter', sans-serif;
+    /* Garante a mesma fonte */
 }
+
+/* Ajuste específico para select */
+select {
+    cursor: pointer;
+    /* Remove a seta padrão do navegador */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
 
 textarea {
     min-height: 120px;
@@ -76,7 +91,8 @@ textarea {
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
@@ -93,12 +109,10 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
-    /* --- INÍCIO DA CORREÇÃO --- */
     text-decoration: none;
     /* Remove o sublinhado de links */
     display: inline-block;
     /* Garante que o padding seja aplicado corretamente em links */
-    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-primary:hover {
@@ -121,12 +135,10 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
-    /* --- INÍCIO DA CORREÇÃO --- */
     text-decoration: none;
     /* Remove o sublinhado de links */
     display: inline-block;
     /* Garante que o padding seja aplicado corretamente em links */
-    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-secondary:hover {
@@ -143,17 +155,40 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
-    /* --- INÍCIO DA CORREÇÃO --- */
     text-decoration: none;
     /* Remove o sublinhado de links */
     display: inline-block;
     /* Garante que o padding seja aplicado corretamente em links */
-    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-danger:hover {
     background-color: #d32f2f;
 }
+
+/* --- INÍCIO DA CORREÇÃO: Adicionar .btn-success --- */
+.btn-success {
+    background-color: var(--color-success);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    /* Remove o sublinhado de links */
+    display: inline-block;
+    /* Garante que o padding seja aplicado corretamente em links */
+}
+
+.btn-success:hover {
+    background-color: #388e3c;
+    /* Tom mais escuro de verde */
+}
+
+/* --- FIM DA CORREÇÃO --- */
+
 
 .btn-outline {
     background-color: transparent;
@@ -165,12 +200,10 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
-    /* --- INÍCIO DA CORREÇÃO --- */
     text-decoration: none;
     /* Remove o sublinhado de links */
     display: inline-block;
     /* Garante que o padding seja aplicado corretamente em links */
-    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-outline:hover {

@@ -1,7 +1,13 @@
+/* * ========================================
+ * ARQUIVO: src/components/SongRequestCard/SongRequestCard.js
+ * (Adicionada prop 'isPublicView')
+ * ========================================
+ */
 import React from 'react';
 import './SongRequestCard.css';
 
-const SongRequestCard = ({ request, onUpdateRequestStatus }) => {
+// --- 1. Adicionada prop 'isPublicView' ---
+const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false }) => {
 
     const { requestId, songTitle, songArtist, tipAmount, clientMessage, status } = request;
 
@@ -14,7 +20,8 @@ const SongRequestCard = ({ request, onUpdateRequestStatus }) => {
     const isPending = status === 'PENDING';
 
     return (
-        <div className={`song-request-card ${status.toLowerCase()}`}>
+        // --- 2. Adiciona classe 'public-view' se for o caso ---
+        <div className={`song-request-card ${status.toLowerCase()} ${isPublicView ? 'public-view' : ''}`}>
             <div className="card-header">
                 <h3 className="song-title">{songTitle}</h3>
                 <span className="song-artist">{songArtist}</span>
@@ -35,7 +42,9 @@ const SongRequestCard = ({ request, onUpdateRequestStatus }) => {
                 </span>
             </div>
 
-            {isPending && (
+            {/* --- 3. Condição para esconder botões --- */}
+            {/* Só mostra botões se for PENDENTE e NÃO for 'isPublicView' */}
+            {isPending && !isPublicView && (
                 <div className="card-actions">
                     <button
                         className="btn-success"

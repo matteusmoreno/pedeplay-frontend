@@ -1,5 +1,6 @@
 /* * ========================================
  * ARQUIVO: src/components/SongRequestCard/SongRequestCard.css
+ * (Estilos menores para a Página Pública)
  * ========================================
  */
 
@@ -8,8 +9,8 @@
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
     transition: all 0.3s;
 }
 
@@ -32,11 +33,11 @@
 }
 
 .card-header {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .song-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: var(--primary-color);
     margin: 0;
 }
@@ -44,28 +45,24 @@
 .song-artist {
     font-size: 1.1rem;
     color: var(--text-secondary);
-    /* Corrigido de #555 */
     font-style: italic;
 }
 
 .client-message {
     background-color: #2a2a2a;
-    /* Corrigido de #f9f9f9 */
     border: 1px dashed var(--border-color);
-    /* Corrigido de #eee */
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 1rem;
     font-style: italic;
     color: var(--text-secondary);
-    /* Garante que o texto da mensagem seja legível */
+    font-size: 0.9rem;
 }
 
 .client-message strong {
     display: block;
     font-style: normal;
     color: var(--text-color);
-    /* Texto em negrito com mais destaque */
 }
 
 .card-footer {
@@ -74,13 +71,11 @@
     align-items: center;
     font-size: 0.9rem;
     color: var(--text-secondary);
-    /* Corrigido de #777 */
 }
 
 .tip-amount {
     font-weight: bold;
     color: #80CBC4;
-    /* Verde claro para gorjeta (legível) */
 }
 
 .request-status {
@@ -91,8 +86,49 @@
 .card-actions {
     display: flex;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     border-top: 1px solid var(--border-color);
-    /* Corrigido de #eee */
-    padding-top: 1.5rem;
+    padding-top: 1rem;
 }
+
+.card-actions .btn-success,
+.card-actions .btn-danger {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+
+/* --- INÍCIO DA CORREÇÃO: Estilos Menores para a Página Pública --- */
+
+/* Aplica padding e fontes menores APENAS na visualização pública */
+.song-request-card.public-view {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.song-request-card.public-view .card-header {
+    margin-bottom: 0.5rem;
+}
+
+.song-request-card.public-view .song-title {
+    font-size: 1.1rem;
+    /* Menor que o 1.25rem do dashboard */
+}
+
+.song-request-card.public-view .song-artist {
+    font-size: 0.9rem;
+}
+
+.song-request-card.public-view .client-message {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+}
+
+.song-request-card.public-view .card-footer {
+    font-size: 0.85rem;
+}
+
+/* (Os botões de ação já estão ocultos via JS, não precisa de CSS) */
+
+/* --- FIM DA CORREÇÃO --- */

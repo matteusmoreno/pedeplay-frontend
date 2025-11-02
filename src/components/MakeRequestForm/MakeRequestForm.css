@@ -1,40 +1,228 @@
-.make-request-form h2 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
+/* * ========================================
+ * ARQUIVO: src/components/MakeRequestForm/MakeRequestForm.css
+ * (CSS com estilos de busca)
+ * ========================================
+ */
+
+/* 1. O formulário agora é o card */
+.make-request-form {
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
 }
 
-.tip-input-group {
+/* 2. Cabeçalho do formulário */
+.form-header {
     display: flex;
     align-items: center;
+    gap: 0.75rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.form-header svg {
+    font-size: 1.5rem;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    color: var(--primary-color);
+}
+
+
+/* --- INÍCIO DA CORREÇÃO: Estilos de Busca --- */
+
+/* 3. Container de busca relativo para o dropdown */
+.search-song-group {
+    position: relative;
+}
+
+/* 4. Estilos do grupo de input (copiado de ArtistDashboard.css) */
+.search-input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.search-input-group .search-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background-color: #333;
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    width: 45px;
+    padding: 0.75rem;
+    box-sizing: border-box;
+}
+
+.search-input-group input {
+    /* Herda de global.css, mas ajusta borda */
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* 5. Ícone de "Selecionado" (check) */
+.search-icon-selected {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background-color: #333;
+    border: 1px solid var(--border-color);
+    border-left: none;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    color: var(--color-success);
+    /* Verde */
+    font-size: 1rem;
+    width: 45px;
+    padding: 0.75rem;
+    box-sizing: border-box;
+}
+
+/* Se o check estiver presente, o input não tem borda arredondada */
+.search-input-group input:has(+ .search-icon-selected) {
+    border-radius: 0;
+}
+
+
+/* 6. Estilos do Dropdown de Resultados */
+.song-list-container.public-search-results {
+    position: absolute;
+    top: 100%;
+    /* Abaixo do form-group */
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.song-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.song-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.song-list-item:last-child {
+    border-bottom: none;
+}
+
+.song-list-item:hover {
+    background-color: rgba(187, 134, 252, 0.1);
+    /* Roxo hover */
+}
+
+.song-list-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.song-list-item .song-title {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.song-list-item .song-artist {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* --- FIM DA CORREÇÃO --- */
+
+
+/* 7. Grupo de Input de Gorjeta (moderno) */
+.tip-input-group {
+    display: flex;
+    align-items: stretch;
 }
 
 .tip-input-group span {
-    padding: 0.75rem 1rem;
-    background-color: #eee;
-    border: 1px solid #ddd;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background-color: #333;
+    border: 1px solid var(--border-color);
     border-right: none;
     border-radius: var(--border-radius) 0 0 var(--border-radius);
-    font-weight: bold;
+    color: var(--color-success);
+    /* Cor de dinheiro */
+    font-size: 1rem;
+    width: 45px;
+    padding: 0.75rem;
+    box-sizing: border-box;
 }
 
 .tip-input-group input {
+    /* Herda de global.css, mas ajusta borda */
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
     margin-bottom: 0;
-    /* Reset margin from global.css */
 }
 
-select {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    background-color: white;
-    cursor: pointer;
+/* --- INÍCIO DA CORREÇÃO (Esconder setas do input number) --- */
+.tip-input-group input[type="number"] {
+    -moz-appearance: textfield;
+    /* Firefox */
 }
 
+.tip-input-group input[type="number"]::-webkit-outer-spin-button,
+.tip-input-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    /* Chrome, Safari, Edge */
+    margin: 0;
+}
+
+/* --- FIM DA CORREÇÃO --- */
+
+
+.tip-info {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+
+/* 8. Labels e Textarea */
+.make-request-form label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+textarea {
+    min-height: 80px;
+    /* Reduz a altura padrão */
+}
+
+/* 9. Mensagens (usa o estilo global) */
 .message {
     padding: 1rem;
     border-radius: var(--border-radius);
@@ -54,6 +242,7 @@ select {
     border: 1px solid #2e7d32;
 }
 
+/* 10. Botão (usa o global) */
 .make-request-form button {
     width: 100%;
     font-size: 1.1rem;
@@ -63,3 +252,5 @@ select {
     background-color: #999;
     cursor: not-allowed;
 }
+
+/* 11. REMOVIDOS estilos de 'select' e '.select-wrapper' antigos */

@@ -1,70 +1,179 @@
 /* * ========================================
  * ARQUIVO: src/pages/PublicShowPage/PublicShowPage.js
+ * (Layout de 2 colunas)
  * ========================================
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-// Importações corrigidas
-import { getShowDetails, getArtistRepertoire } from '../../services/showService';
-// A importação 'useWebSocket' foi removida para corrigir o aviso,
-// já que ela não estava sendo utilizada no código.
+import { getArtistDetails } from '../../services/artistService';
+import { getActiveShowByArtist, getArtistRepertoire } from '../../services/showService';
 import SongRequestCard from '../../components/SongRequestCard/SongRequestCard';
 import MakeRequestForm from '../../components/MakeRequestForm/MakeRequestForm';
 import './PublicShowPage.css';
+// --- 1. Adicionar FaHistory ---
+import { FaUserCircle, FaInstagram, FaFacebook, FaYoutube, FaBroadcastTower, FaHistory } from 'react-icons/fa';
 
 const PublicShowPage = () => {
-    const { showId } = useParams();
-    const [artistName, setArtistName] = useState('');
-    const [repertoire, setRepertoire] = useState([]);
-    const [songRequests, setSongRequests] = useState([]);
-    const [error, setError] = useState('');
+    const { showId: artistId } = useParams();
 
-    // A lógica do useWebSocket() foi removida por enquanto.
+    const [artist, setArtist] = useState(null);
+    const [activeShow, setActiveShow] = useState(null);
+    const [repertoire, setRepertoire] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchPageData = useCallback(async () => {
+        if (!artistId) {
+            setError('ID do artista não fornecido.');
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            if (!artist) {
+                setIsLoading(true);
+                const artistDetails = await getArtistDetails(artistId);
+                setArtist(artistDetails);
+            }
+
+            const activeShowData = await getActiveShowByArtist(artistId);
+
+            if (activeShowData && activeShowData.status === 'ACTIVE') {
+                setActiveShow(activeShowData);
+
+                if (repertoire.length === 0) {
+                    const repertoireData = await getArtistRepertoire(artistId);
+                    setRepertoire(repertoireData || []);
+                }
+            } else {
+                setActiveShow(null);
+                setRepertoire([]);
+            }
+
+        } catch (err) {
+            console.error("Erro ao carregar dados da página:", err);
+            setError('Não foi possível carregar a página deste artista.');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [artistId, artist, repertoire.length]);
 
     useEffect(() => {
-        const fetchShowData = async () => {
-            try {
-                // Agora esta função existe no service
-                const showDetails = await getShowDetails(showId);
-                setArtistName(showDetails.artistName);
-                setSongRequests(showDetails.songRequests);
+        fetchPageData();
+    }, [fetchPageData]);
 
-                // E esta também
-                const repertoireData = await getArtistRepertoire(showDetails.artistId);
-                setRepertoire(repertoireData.repertoire);
-            } catch (err) {
-                setError('Erro ao carregar dados do show. Verifique o link ou tente mais tarde.');
-            }
-        };
+    const pendingRequests = useMemo(() => {
+        if (!activeShow || !activeShow.requests) return [];
+        return activeShow.requests
+            .filter(req => req.status === 'PENDING')
+            .sort((a, b) => {
+                if (a.tipAmount > b.tipAmount) return -1;
+                if (a.tipAmount < b.tipAmount) return 1;
+                return new Date(a.receivedAt) - new Date(b.receivedAt);
+            });
+    }, [activeShow]);
 
-        fetchShowData();
-    }, [showId]);
+    const hasSocialLinks = artist && artist.socialLinks && Object.values(artist.socialLinks).some(link => link);
+    const isLive = activeShow && activeShow.status === 'ACTIVE';
 
-    // ... (funções handleNewSongRequest e handleStatusUpdate, se existirem)
+    if (isLoading) {
+        return <div className="public-page-message">Carregando...</div>;
+    }
 
     if (error) {
-        return <div className="container error-container">{error}</div>;
+        return <div className="public-page-message error">{error}</div>;
+    }
+
+    if (!artist) {
+        return <div className="public-page-message error">Artista não encontrado.</div>;
     }
 
     return (
-        <div className="public-show-container">
-            <header className="show-header">
-                <h1>{artistName || 'Carregando...'}</h1>
-                <p>Faça seu pedido de música!</p>
+        <div className="public-show-page">
+
+            <header className="artist-header-card card">
+                <div className="artist-avatar">
+                    {artist.profileImageUrl ? (
+                        <img src={artist.profileImageUrl} alt={artist.name} className="profile-avatar-image" />
+                    ) : (
+                        <FaUserCircle className="profile-avatar-placeholder" />
+                    )}
+                </div>
+                <div className="artist-info">
+                    <h1 className="artist-name">{artist.name}</h1>
+
+                    <div className={`live-status-badge ${isLive ? 'live' : 'offline'}`}>
+                        <FaBroadcastTower />
+                        <span>{isLive ? 'AO VIVO' : 'OFFLINE'}</span>
+                    </div>
+
+                    {artist.biography && (
+                        <p className="artist-bio">{artist.biography}</p>
+                    )}
+
+                    {hasSocialLinks && (
+                        <div className="artist-social-links">
+                            {artist.socialLinks.instagramUrl && (
+                                <a href={artist.socialLinks.instagramUrl} target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
+                            )}
+                            {artist.socialLinks.facebookUrl && (
+                                <a href={artist.socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer"><FaFacebook /></a>
+                            )}
+                            {artist.socialLinks.youtubeUrl && (
+                                <a href={artist.socialLinks.youtubeUrl} target="_blank" rel="noopener noreferrer"><FaYoutube /></a>
+                            )}
+                        </div>
+                    )}
+                </div>
             </header>
 
-            <MakeRequestForm repertoire={repertoire} showId={showId} />
+            {isLive ? (
+                <div className="public-page-layout">
+                    {/* Coluna 1: Formulário */}
+                    <main className="layout-column form-column">
+                        <MakeRequestForm
+                            artistId={artistId}
+                            showId={activeShow.id}
+                            repertoire={repertoire}
+                            onSubmissionSuccess={fetchPageData}
+                        />
+                    </main>
 
-            <section className="song-requests-list">
-                <h2>Pedidos na fila</h2>
-                {songRequests.length === 0 ? (
-                    <p>Ainda não há pedidos. Seja o primeiro!</p>
-                ) : (
-                    songRequests.map(request => (
-                        <SongRequestCard key={request.id} request={request} />
-                    ))
-                )}
-            </section>
+                    {/* Coluna 2: Fila */}
+                    <aside className="layout-column queue-column">
+                        <section className="song-queue-section">
+                            {/* --- 2. INÍCIO DA CORREÇÃO: Padronizar cabeçalho --- */}
+                            <div className="form-header"> {/* Reutilizando a classe .form-header */}
+                                <FaHistory />
+                                <h2>Pedidos na Fila</h2>
+                            </div>
+                            {/* --- FIM DA CORREÇÃO --- */}
+
+                            {pendingRequests.length > 0 ? (
+                                <div className="queue-list-container">
+                                    {pendingRequests.map(req => (
+                                        <SongRequestCard
+                                            key={req.requestId}
+                                            request={req}
+                                            isPublicView={true}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="queue-empty-message">
+                                    Ainda não há pedidos. Seja o primeiro!
+                                </p>
+                            )}
+                        </section>
+                    </aside>
+                </div>
+            ) : (
+                // Mensagem de Artista Offline
+                <div className="offline-message-card card">
+                    <h3>Show Encerrado</h3>
+                    <p>O artista não está recebendo pedidos no momento. Volte mais tarde!</p>
+                </div>
+            )}
         </div>
     );
 };
