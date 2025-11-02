@@ -1,0 +1,221 @@
+/* * ========================================
+ * ARQUIVO: src/pages/RegisterPage/RegisterPage.css
+ * ========================================
+ */
+
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* Alinha no topo para formulários longos */
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    min-height: 80vh;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 700px;
+    /* Mais largo para o formulário de registro */
+}
+
+.register-card h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+/* --- NOVO: Indicador de Etapas --- */
+.register-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding: 0;
+    list-style: none;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    position: relative;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.step-item::after {
+    /* Linha conectora */
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    width: 100%;
+    height: 3px;
+    background-color: var(--border-color);
+    z-index: 1;
+}
+
+.step-item:last-child::after {
+    display: none;
+    /* Remove linha no último item */
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    z-index: 2;
+    /* Fica acima da linha */
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.step-label {
+    z-index: 2;
+    background-color: var(--card-bg);
+    /* Garante que o texto não seja cortado pela linha */
+    padding: 0 5px;
+}
+
+/* Estilo da etapa ativa */
+.step-item.active .step-number {
+    background-color: var(--primary-color);
+    color: #121212;
+}
+
+.step-item.active .step-label {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Estilo da etapa concluída */
+.step-item.completed .step-number {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.step-item.completed::after {
+    background-color: var(--color-success);
+}
+
+/* --- Fim do Indicador de Etapas --- */
+
+
+/* Estilização dos fieldsets para agrupar o formulário */
+.register-card fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: #222222;
+    /* Um leve destaque para o fieldset */
+}
+
+.register-card legend {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    padding: 0 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* --- NOVO: Botões de Navegação --- */
+.register-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+.register-navigation button {
+    font-size: 1rem;
+    min-width: 120px;
+}
+
+/* Botão de "Voltar" */
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background-color: rgba(187, 134, 252, 0.1);
+    /* Roxo com opacidade */
+}
+
+.btn-outline:disabled {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+    background-color: transparent;
+    cursor: not-allowed;
+}
+
+.btn-primary:disabled {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+
+/* Mensagem de erro de validação (react-hook-form) */
+.error-message {
+    color: var(--color-danger);
+    font-size: 0.875rem;
+    margin-top: -0.75rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Mensagem de sucesso ou erro da API */
+.form-message {
+    border: 1px solid transparent;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.form-message.error-message {
+    color: #ffcdd2;
+    background-color: #3e1010;
+    border-color: #c62828;
+}
+
+.form-message.success-message {
+    color: #c8e6c9;
+    background-color: #1b5e20;
+    border-color: #43a047;
+}
+
+.loading-message {
+    font-size: 0.875rem;
+    color: var(--color-warning);
+}
+
+/* Link para a página de login */
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.login-link a {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Inputs somente leitura (para dados do CEP) */
+input[readOnly] {
+    background-color: #2a2a2a;
+    /* Um pouco diferente para indicar não-edição */
+    cursor: not-allowed;
+    opacity: 0.8;
+}

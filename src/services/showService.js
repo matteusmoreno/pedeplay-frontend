@@ -1,21 +1,67 @@
+/* * ========================================
+ * ARQUIVO: src/services/showService.js
+ * ========================================
+ */
+// CORREÇÃO: Removidas as chaves {} da importação
 import api from './api';
 
-// Pega o show ativo de um artista (para a página pública)
+// Funções que você já tinha
 export const getActiveShowByArtist = async (artistId) => {
-    const response = await api.get(`/shows/active/${artistId}`);
-    return response.data;
+    try {
+        const response = await api.get(`/shows/active/${artistId}`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || new Error(error.message);
+    }
 };
 
-// Pega o repertório (lista de músicas) de um artista
-// Assumindo que você tenha um endpoint para isso.
-// Por enquanto, vamos buscar todas as músicas cadastradas.
-export const getSongList = async () => {
-    const response = await api.get('/songs/all');
-    return response.data;
-};
-
-// Faz um pedido de música
 export const makeSongRequest = async (requestData) => {
-    const response = await api.post('/shows/request', requestData);
-    return response.data;
+    try {
+        const response = await api.post('/shows/request-song', requestData);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || new Error(error.message);
+    }
 };
+
+export const getSongList = async (artistId) => {
+    try {
+        // Este endpoint parece ser o que busca o repertório
+        const response = await api.get(`/artists/${artistId}/repertoire-details`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || new Error(error.message);
+    }
+};
+
+
+// --- INÍCIO DAS NOVAS FUNÇÕES ---
+
+/**
+ * Busca os detalhes de um show específico pelo ID.
+ * Corresponde ao endpoint GET /shows/{showId}
+ *
+ */
+export const getShowDetails = async (showId) => {
+    try {
+        const response = await api.get(`/shows/${showId}`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || new Error(error.message);
+    }
+};
+
+/**
+ * Busca o repertório (lista de músicas) de um artista.
+ * Corresponde ao endpoint GET /artists/{artistId}/repertoire-details
+ *
+ */
+export const getArtistRepertoire = async (artistId) => {
+    try {
+        const response = await api.get(`/artists/${artistId}/repertoire-details`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || new Error(error.message);
+    }
+};
+// --- FIM DAS NOVAS FUNÇÕES ---

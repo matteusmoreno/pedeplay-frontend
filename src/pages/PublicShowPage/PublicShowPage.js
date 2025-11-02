@@ -1,59 +1,70 @@
-import React, { useState, useEffect } from 'react';
+/* * ========================================
+ * ARQUIVO: src/pages/PublicShowPage/PublicShowPage.js
+ * ========================================
+ */
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getActiveShowByArtist } from '../../services/showService';
+// Importações corrigidas
+import { getShowDetails, getArtistRepertoire } from '../../services/showService';
+// A importação 'useWebSocket' foi removida para corrigir o aviso,
+// já que ela não estava sendo utilizada no código.
+import SongRequestCard from '../../components/SongRequestCard/SongRequestCard';
 import MakeRequestForm from '../../components/MakeRequestForm/MakeRequestForm';
 import './PublicShowPage.css';
 
 const PublicShowPage = () => {
-    const { artistId } = useParams(); // Pega o artistId da URL
-    const [activeShow, setActiveShow] = useState(null);
-    const [artistName, setArtistName] = useState("Artista"); // Você pode buscar o nome do artista
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { showId } = useParams();
+    const [artistName, setArtistName] = useState('');
+    const [repertoire, setRepertoire] = useState([]);
+    const [songRequests, setSongRequests] = useState([]);
+    const [error, setError] = useState('');
+
+    // A lógica do useWebSocket() foi removida por enquanto.
 
     useEffect(() => {
-        const fetchShow = async () => {
-            if (!artistId) {
-                setError("ID do artista não fornecido.");
-                setIsLoading(false);
-                return;
-            }
-
-            setIsLoading(true);
-            setError(null);
+        const fetchShowData = async () => {
             try {
-                const showData = await getActiveShowByArtist(artistId);
-                setActiveShow(showData);
-                // Idealmente, o 'showData' ou um endpoint '/artists/{artistId}' 
-                // forneceria o nome do artista.
-                // setArtistName(showData.artistName); 
+                // Agora esta função existe no service
+                const showDetails = await getShowDetails(showId);
+                setArtistName(showDetails.artistName);
+                setSongRequests(showDetails.songRequests);
+
+                // E esta também
+                const repertoireData = await getArtistRepertoire(showDetails.artistId);
+                setRepertoire(repertoireData.repertoire);
             } catch (err) {
-                console.error(err);
-                setError("O artista não está com um show ativo no momento.");
-            } finally {
-                setIsLoading(false);
+                setError('Erro ao carregar dados do show. Verifique o link ou tente mais tarde.');
             }
         };
 
-        fetchShow();
-    }, [artistId]);
+        fetchShowData();
+    }, [showId]);
 
-    if (isLoading) {
-        return <div className="public-page-message">Carregando show do artista...</div>;
-    }
+    // ... (funções handleNewSongRequest e handleStatusUpdate, se existirem)
 
     if (error) {
-        return <div className="public-page-message error">{error}</div>;
+        return <div className="container error-container">{error}</div>;
     }
 
     return (
-        <div className="public-show-page">
-            <div className="artist-info-header card">
-                <h1>{artistName}</h1>
-                <p>Peça sua música e mande sua mensagem!</p>
-            </div>
+        <div className="public-show-container">
+            <header className="show-header">
+                <h1>{artistName || 'Carregando...'}</h1>
+                <p>Faça seu pedido de música!</p>
+            </header>
 
-            <MakeRequestForm artistId={artistId} showId={activeShow.id} />
+            <MakeRequestForm repertoire={repertoire} showId={showId} />
+
+            <section className="song-requests-list">
+                <h2>Pedidos na fila</h2>
+                {songRequests.length === 0 ? (
+                    <p>Ainda não há pedidos. Seja o primeiro!</p>
+                ) : (
+                    songRequests.map(request => (
+                        <SongRequestCard key={request.id} request={request} />
+                    ))
+                )}
+            </section>
         </div>
     );
 };
