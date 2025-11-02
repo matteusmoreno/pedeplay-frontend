@@ -1,34 +1,34 @@
 /* * ========================================
  * ARQUIVO: src/components/Header/Header.js
- * (Refatorado para usar UserMenu)
+ * (Texto do botão de Login atualizado)
  * ========================================
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import './Header.css';
-import UserMenu from './UserMenu/UserMenu'; // <-- 1. Importar o novo componente
+import UserMenu from './UserMenu/UserMenu';
 
 const Header = () => {
-    // 2. 'artistData' agora está disponível no contexto
     const { isAuthenticated } = useAuth();
 
     return (
         <header className="header">
             <div className="header-container">
-                <Link to={isAuthenticated ? "/dashboard" : "/"} className="header-logo">
+                <Link to="/" className="header-logo">
                     PedePlay
                 </Link>
+
                 <nav>
-                    {/* --- INÍCIO DA CORREÇÃO --- */}
                     {isAuthenticated ? (
-                        <UserMenu /> // 3. Substituir links soltos pelo UserMenu
+                        <UserMenu />
                     ) : (
-                        <Link to="/login" className="btn-primary"> {/* Mudei para btn-primary */}
-                            Login do Artista
+                        /* --- INÍCIO DA CORREÇÃO --- */
+                        <Link to="/login" className="btn-primary">
+                            Login
                         </Link>
+                        /* --- FIM DA CORREÇÃO --- */
                     )}
-                    {/* --- FIM DA CORREÇÃO --- */}
                 </nav>
             </div>
         </header>

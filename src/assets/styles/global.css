@@ -93,6 +93,12 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
+    /* --- INÍCIO DA CORREÇÃO --- */
+    text-decoration: none;
+    /* Remove o sublinhado de links */
+    display: inline-block;
+    /* Garante que o padding seja aplicado corretamente em links */
+    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-primary:hover {
@@ -115,6 +121,12 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
+    /* --- INÍCIO DA CORREÇÃO --- */
+    text-decoration: none;
+    /* Remove o sublinhado de links */
+    display: inline-block;
+    /* Garante que o padding seja aplicado corretamente em links */
+    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-secondary:hover {
@@ -131,6 +143,12 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
+    /* --- INÍCIO DA CORREÇÃO --- */
+    text-decoration: none;
+    /* Remove o sublinhado de links */
+    display: inline-block;
+    /* Garante que o padding seja aplicado corretamente em links */
+    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-danger:hover {
@@ -147,6 +165,12 @@ textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
+    /* --- INÍCIO DA CORREÇÃO --- */
+    text-decoration: none;
+    /* Remove o sublinhado de links */
+    display: inline-block;
+    /* Garante que o padding seja aplicado corretamente em links */
+    /* --- FIM DA CORREÇÃO --- */
 }
 
 .btn-outline:hover {
