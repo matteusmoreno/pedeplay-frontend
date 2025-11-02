@@ -1,15 +1,15 @@
 /* * ========================================
  * ARQUIVO: src/pages/ArtistDashboard/ArtistDashboard.js
- * (Controlador das Abas) - CORRIGIDO
+ * (Controlador das Abas)
  * ========================================
  */
-import React, { useState, useEffect, useCallback } from 'react'; // 1. Importar useCallback
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getArtistDetails } from '../../services/artistService';
 import './ArtistDashboard.css';
 import { FaBroadcastTower, FaUser, FaMusic } from 'react-icons/fa';
 
-// Importa os novos componentes de abas
+// Importa os componentes de abas
 import DashboardHome from './DashboardHome';
 import DashboardProfile from './DashboardProfile';
 import DashboardRepertoire from './DashboardRepertoire';
@@ -21,8 +21,6 @@ const ArtistDashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- INÍCIO DA CORREÇÃO (exhaustive-deps) ---
-    // 2. Envolvemos a função fetchArtistData em useCallback
     const fetchArtistData = useCallback(async () => {
         if (!user?.id) {
             setError("Usuário não encontrado.");
@@ -30,7 +28,6 @@ const ArtistDashboard = () => {
             return;
         }
 
-        // Reseta o estado de carregamento para novas buscas
         setIsLoading(true);
         try {
             const data = await getArtistDetails(user.id);
@@ -40,16 +37,12 @@ const ArtistDashboard = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [user.id]); // 3. A dependência do useCallback é user.id
-    // --- FIM DA CORREÇÃO ---
+    }, [user.id]);
 
-    // Busca os dados do artista ao carregar o dashboard
     useEffect(() => {
-        // 4. Chamamos a função
         fetchArtistData();
-    }, [fetchArtistData]); // 5. Adicionamos a função ao array de dependências
+    }, [fetchArtistData]);
 
-    // Renderiza o conteúdo da aba selecionada
     const renderTabContent = () => {
         if (isLoading) {
             return <div className="loading-full-page">Carregando...</div>;
@@ -63,9 +56,9 @@ const ArtistDashboard = () => {
 
         switch (activeTab) {
             case 'home':
+                // Passa o 'artistData' para o DashboardHome
                 return <DashboardHome artist={artistData} />;
             case 'profile':
-                // Passa a função de recarregar os dados
                 return <DashboardProfile artist={artistData} onUpdate={fetchArtistData} />;
             case 'repertoire':
                 return <DashboardRepertoire artist={artistData} />;
@@ -76,18 +69,19 @@ const ArtistDashboard = () => {
 
     return (
         <div className="dashboard-layout">
-            {/* Menu Lateral de Navegação */}
             <nav className="dashboard-nav">
                 <div className="dashboard-nav-header">
                     <h3>Painel do Artista</h3>
                 </div>
                 <ul>
+                    {/* --- INÍCIO DA CORREÇÃO 1: Renomear Aba --- */}
                     <li className={activeTab === 'home' ? 'active' : ''}>
                         <button onClick={() => setActiveTab('home')}>
                             <FaBroadcastTower />
-                            <span>Ao Vivo</span>
+                            <span>Modo Show</span>
                         </button>
                     </li>
+                    {/* --- FIM DA CORREÇÃO 1 --- */}
                     <li className={activeTab === 'profile' ? 'active' : ''}>
                         <button onClick={() => setActiveTab('profile')}>
                             <FaUser />
@@ -103,7 +97,6 @@ const ArtistDashboard = () => {
                 </ul>
             </nav>
 
-            {/* Conteúdo Principal da Aba */}
             <main className="dashboard-main-content">
                 {renderTabContent()}
             </main>

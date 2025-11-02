@@ -4,18 +4,16 @@
  * ========================================
  */
 
-/* Layout Principal do Dashboard */
+/* ... (Todo o CSS anterior .dashboard-layout, .dashboard-nav, ... .stat-card.timer, .requests-list, etc. permanece aqui) ... */
 .dashboard-layout {
     display: flex;
     flex-direction: row;
     min-height: calc(100vh - 80px);
-    /* Altura total menos o header */
     margin-top: -2rem;
     margin-left: -1.5rem;
     margin-right: -1.5rem;
 }
 
-/* Navegação Lateral */
 .dashboard-nav {
     flex-basis: 240px;
     flex-shrink: 0;
@@ -73,7 +71,6 @@
     font-size: 1.1rem;
 }
 
-/* Conteúdo Principal */
 .dashboard-main-content {
     flex-grow: 1;
     padding: 2rem 2.5rem;
@@ -91,8 +88,6 @@
     color: var(--color-danger);
 }
 
-/* --- Estilos das Abas --- */
-
 .dashboard-tab-content {
     animation: fadeIn 0.3s ease-out;
 }
@@ -109,7 +104,6 @@
     }
 }
 
-/* Header comum para as abas */
 .card-header {
     display: flex;
     justify-content: space-between;
@@ -121,6 +115,7 @@
     border-radius: var(--border-radius);
     margin-bottom: 2rem;
     border-left: 4px solid var(--primary-color);
+    transition: border-color 0.3s ease;
 }
 
 .card-header h2 {
@@ -128,7 +123,11 @@
     font-size: 1.75rem;
 }
 
-/* --- Aba "Ao Vivo" (DashboardHome) --- */
+/* --- Aba "Modo Show" (DashboardHome) --- */
+.dashboard-tab-content.show-is-active .card-header {
+    border-left-color: var(--color-danger);
+}
+
 .show-controls {
     display: flex;
     align-items: center;
@@ -150,10 +149,94 @@
     color: var(--text-secondary);
 }
 
+.dashboard-tab-content.show-is-active .show-status.active::before {
+    content: 'REC';
+    font-size: 0.8rem;
+    color: white;
+    background-color: var(--color-danger);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.25rem;
+    animation: pulse-rec 1.5s infinite;
+}
+
+/* Keyframes movidos para o final (em global.css, mas aqui por segurança) */
+@keyframes pulse-rec {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 .show-controls button {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.show-stats-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.stat-card svg {
+    font-size: 2rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.stat-card.timer {
+    background-color: #2a2a2a;
+    border-color: var(--color-danger);
+}
+
+.stat-card.timer svg {
+    color: var(--color-danger);
+}
+
+.stat-card.timer .stat-value {
+    color: var(--color-danger);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.requests-list {
+    margin-bottom: 3rem;
 }
 
 .requests-list h3 {
@@ -179,8 +262,118 @@
     padding: 1rem 0;
 }
 
-/* --- Aba "Perfil" (DashboardProfile) --- */
+/* --- INÍCIO DA CORREÇÃO: Seção Histórico de Shows --- */
+.past-shows-section {
+    margin-top: 3rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    /* Remove padding, o accordion-header cuida disso */
+    padding: 0;
+}
 
+.past-shows-section.card {
+    /* Garante que o padding 0 seja aplicado */
+    padding: 0;
+}
+
+/* O cabeçalho do histórico agora é o cabeçalho do accordion */
+.past-shows-section .accordion-header {
+    padding: 1.5rem 2rem;
+    /* Adiciona padding que estava no card */
+    border-bottom: 1px solid transparent;
+    /* Borda só aparece quando aberto */
+    transition: border-color 0.3s ease;
+}
+
+.past-shows-section.open .accordion-header {
+    border-bottom-color: var(--border-color);
+}
+
+/* O conteúdo do histórico é o conteúdo do accordion */
+.past-shows-section .accordion-content {
+    /* Adiciona padding interno */
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.past-shows-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Corrigindo a cor do botão de refresh */
+.past-shows-actions .btn-icon {
+    color: var(--text-color);
+    /* Botão branco */
+}
+
+.past-shows-actions .btn-icon:hover {
+    color: var(--primary-color);
+}
+
+/* NOVO: Container de rolagem para o histórico */
+.past-shows-list-container {
+    max-height: 400px;
+    /* Define altura máxima */
+    overflow-y: auto;
+    /* Adiciona rolagem */
+    padding-right: 0.5rem;
+}
+
+.past-shows-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.past-show-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.past-show-item:last-child {
+    border-bottom: none;
+}
+
+.past-show-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.past-show-date {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.past-show-stats {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.past-show-metrics {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.past-show-metrics span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- FIM DA CORREÇÃO --- */
+
+
+/* --- Aba "Perfil" (DashboardProfile) --- */
 .profile-info-card {
     display: flex;
     flex-direction: row;
@@ -306,18 +499,19 @@
 .profile-form,
 .repertoire-actions-form {
     background-color: var(--card-bg);
-    padding: 2rem;
+    padding: 0 2rem;
+    /* Remove padding vertical, o accordion cuida disso */
     border-radius: var(--border-radius);
 }
 
 .accordion-section {
     border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    /* Remove margem, a borda faz a separação */
 }
 
 .accordion-section:last-of-type {
     border-bottom: none;
-    margin-bottom: 0;
 }
 
 .accordion-header {
@@ -327,7 +521,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0;
+    padding: 1.5rem 0;
+    /* Aumenta o padding do header */
     cursor: pointer;
 }
 
@@ -364,6 +559,12 @@
     max-height: 2000px;
     padding-bottom: 1.5rem;
 }
+
+.profile-form .btn-submit-profile {
+    /* Botão de salvar fica fora do accordion, mas dentro do form */
+    margin: 2rem 0;
+}
+
 
 /* Grid para o formulário de edição (PERFIL) */
 .profile-form-grid {
@@ -437,11 +638,8 @@
 .search-input-group {
     display: flex;
     align-items: stretch;
-    /* Garante altura igual */
 }
 
-/* --- INÍCIO DA CORREÇÃO 4: Alinhamento Ícone Lupa --- */
-/* Regra unificada para AMBOS os ícones */
 .social-input-group .social-icon,
 .search-input-group .search-icon {
     flex-shrink: 0;
@@ -453,9 +651,7 @@
     border-radius: var(--border-radius) 0 0 var(--border-radius);
     color: var(--text-secondary);
     font-size: 1rem;
-    /* Tamanho do ícone padronizado */
     width: 45px;
-    /* Largura fixa padronizada */
     padding: 0.75rem;
     box-sizing: border-box;
 }
@@ -466,11 +662,7 @@
     margin-bottom: 0;
     box-sizing: border-box;
     width: 100%;
-    /* Garante que o input ocupe o espaço */
 }
-
-/* --- FIM DA CORREÇÃO 4 --- */
-
 
 .btn-submit-profile {
     margin-top: 1.5rem;
@@ -508,10 +700,7 @@
 }
 
 .song-list-container {
-    /* --- INÍCIO DA CORREÇÃO 2: Limite de Rolagem --- */
     max-height: 300px;
-    /* Reduzido de 400px */
-    /* --- FIM DA CORREÇÃO 2 --- */
     overflow-y: auto;
     padding-right: 0.5rem;
 }
@@ -543,22 +732,16 @@
     flex-direction: column;
 }
 
-/* --- INÍCIO DA CORREÇÃO 3: Fontes Menores --- */
 .song-list-item .song-title {
     font-weight: 500;
-    /* Um pouco menos de peso */
     color: var(--text-color);
     font-size: 0.95rem;
-    /* Reduzido de 1rem (padrão) */
 }
 
 .song-list-item .song-artist {
     font-size: 0.8rem;
-    /* Reduzido de 0.85rem */
     color: var(--text-secondary);
 }
-
-/* --- FIM DA CORREÇÃO 3 --- */
 
 .btn-icon {
     background: transparent;
@@ -646,14 +829,20 @@
         padding: 1.5rem;
     }
 
-    /* Coluna única para todos os layouts em mobile */
     .profile-layout,
     .repertoire-layout,
     .profile-form-grid {
         grid-template-columns: 1fr;
     }
 
-    /* Layout do Card de Info no mobile */
+    .show-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card.timer {
+        grid-row: 1;
+    }
+
     .profile-info-card {
         flex-direction: column;
         align-items: center;

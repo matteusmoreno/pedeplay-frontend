@@ -1,133 +1,78 @@
-/* * ========================================
- * ARQUIVO: src/assets/styles/global.css
- * ========================================
- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* Reset e Variáveis */
 :root {
-    /* Paleta Dark Mode */
     --primary-color: #BB86FC;
-    /* Roxo mais vibrante para o modo escuro */
-    --secondary-color: #fdd835;
-    /* Amarelo (mantido) */
+    --secondary-color: #3700B3;
     --background-color: #121212;
-    /* Fundo principal (preto suave) */
-    --text-color: #E0E0E0;
-    /* Texto principal (branco suave) */
-    --text-secondary: #B3B3B3;
-    /* Texto secundário (cinza claro) */
     --card-bg: #1E1E1E;
-    /* Fundo de cards e inputs (cinza escuro) */
+    --text-color: #FFFFFF;
+    --text-secondary: #B0B0B0;
     --border-color: #333333;
-    /* Cor da borda */
-
-    /* Cores de Ação */
+    --color-danger: #CF6679;
     --color-success: #43a047;
-    --color-danger: #e53935;
-    --color-warning: #fbc02d;
-
-    /* Estilos reaproveitáveis */
+    --color-warning: #FB8C00;
+    --box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
     --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    /* Sombra sutil para modo escuro */
 }
 
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-
-    /* Suavização de fonte */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
 }
 
 body {
     background-color: var(--background-color);
     color: var(--text-color);
+    font-family: 'Inter', sans-serif;
     line-height: 1.6;
 }
 
+/* Container Principal */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 .container {
-    max-width: 1100px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
+    width: 100%;
+    max-width: 1400px;
+    /* Layout mais largo */
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
 }
 
-/* --- ESTILOS DE BOTÃO --- */
-button {
-    cursor: pointer;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: var(--border-radius);
-    font-weight: bold;
-    font-size: 1rem;
-    transition: all 0.2s ease-in-out;
+/* Formulários */
+.form-group {
+    margin-bottom: 1.5rem;
 }
 
-.btn-primary {
-    background-color: var(--primary-color);
-    color: #121212;
-    /* Texto escuro para botões roxos claros */
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
 }
 
-.btn-primary:hover {
-    background-color: #a050f5;
-    /* Um pouco mais claro no hover */
-}
-
-.btn-secondary {
-    background-color: var(--secondary-color);
-    color: #333;
-}
-
-.btn-secondary:hover {
-    background-color: #fbc02d;
-}
-
-.btn-danger {
-    background-color: var(--color-danger);
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #c62828;
-}
-
-.btn-success {
-    background-color: var(--color-success);
-    color: white;
-}
-
-.btn-success:hover {
-    background-color: #2e7d32;
-}
-
-/* --- ESTILOS DE FORMULÁRIO E CARD --- */
 input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="number"],
 textarea {
     width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--background-color);
     border: 1px solid var(--border-color);
-    /* Borda escura */
     border-radius: var(--border-radius);
-    font-size: 1rem;
-    background-color: var(--card-bg);
-    /* Fundo do input */
     color: var(--text-color);
-    /* Texto do input */
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: var(--text-secondary);
-    /* Cor do placeholder */
-    opacity: 0.7;
+textarea {
+    min-height: 120px;
+    resize: vertical;
 }
 
 input:focus,
@@ -135,30 +80,176 @@ textarea:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
-    /* Sombra de foco roxa */
 }
 
-textarea {
-    min-height: 100px;
-    resize: vertical;
+/* Botões */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #121212;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #a96ef6;
+}
+
+.btn-primary:disabled {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #4a1bb4;
+}
+
+.btn-danger {
+    background-color: var(--color-danger);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    background-color: rgba(187, 134, 252, 0.1);
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+/* Mensagens */
+.error-message {
+    color: var(--color-danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.form-message {
+    border: 1px solid transparent;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.form-message.error-message {
+    color: #ffcdd2;
+    background-color: #3e1010;
+    border-color: #c62828;
+}
+
+.form-message.success-message {
+    color: #c8e6c9;
+    background-color: #1b5e20;
+    border-color: #43a047;
 }
 
 .card {
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
+/* --- INÍCIO: Estilos da Tarja "Modo Show" --- */
+.live-status-banner {
+    background-color: var(--color-danger);
+    color: white;
     font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: var(--text-secondary);
-    /* Cor do label */
+    text-align: center;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+
+    /* Faz a tarja "grudar" abaixo do header */
+    position: sticky;
+    top: 80px;
+    /* Altura exata do Header (definida em Header.css) */
+    z-index: 999;
+    /* Fica abaixo do z-index 1000 do Header */
+
+    /* Animação de "REC" */
+    animation: pulse-rec 1.5s infinite;
 }
+
+.live-status-banner svg {
+    font-size: 1rem;
+}
+
+/* Ajusta o padding do dashboard quando a tarja está ativa */
+main.container.live-active .dashboard-main-content {
+    /* Ajusta o 'top' do sticky-card no Repertório (se existir) */
+    --sticky-top-offset: 124px;
+    /* 80px (header) + 44px (banner) */
+}
+
+@keyframes pulse-rec {
+    0% {
+        background-color: var(--color-danger);
+    }
+
+    50% {
+        background-color: #a02020;
+    }
+
+    /* Vermelho mais escuro */
+    100% {
+        background-color: var(--color-danger);
+    }
+}
+
+/* --- FIM: Estilos da Tarja "Modo Show" --- */

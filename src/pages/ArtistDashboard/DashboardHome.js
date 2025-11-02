@@ -1,51 +1,141 @@
 /* * ========================================
- * ARQUIVO NOVO: src/pages/ArtistDashboard/DashboardHome.js
- * (Aba "Ao Vivo")
+ * ARQUIVO: src/pages/ArtistDashboard/DashboardHome.js
+ * (Correção do Warning)
  * ========================================
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { startShow, endShow, updateRequestStatus } from '../../services/artistService';
-import { getActiveShowByArtist } from '../../services/showService';
+import { getActiveShowByArtist, getPastShowsByArtist } from '../../services/showService';
 import SongRequestCard from '../../components/SongRequestCard/SongRequestCard';
-import { FaPlay, FaStop, FaSatelliteDish } from 'react-icons/fa';
+import Modal from '../../components/Modal/Modal';
+import {
+    FaPlay,
+    FaStop,
+    FaSatelliteDish,
+    FaClock,
+    FaMusic,
+    FaGift,
+    FaCalendarCheck,
+    FaRedoAlt,
+    FaChevronDown
+} from 'react-icons/fa';
 
-// Recebe os dados do artista como prop do painel principal
+// --- Funções Helper (Inalteradas) ---
+const formatDuration = (startTime) => {
+    const start = new Date(startTime).getTime();
+    const now = Date.now();
+    const diff = Math.max(0, now - start);
+
+    const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+};
+const formatDurationFromSeconds = (totalSeconds) => {
+    if (!totalSeconds) return "N/A";
+    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+};
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+    }).format(value || 0);
+};
+const formatDateTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
+// --- Fim Funções Helper ---
+
+
 const DashboardHome = ({ artist }) => {
-    const { user } = useAuth();
-    const [activeShow, setActiveShow] = useState(null);
+    const { user, activeShow, setActiveShow } = useAuth();
     const [requests, setRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showDuration, setShowDuration] = useState("00:00:00");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [pastShows, setPastShows] = useState([]);
+    const [isLoadingPastShows, setIsLoadingPastShows] = useState(true);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
-    // Conecta ao WebSocket
     const { messages, isConnected } = useWebSocket(activeShow ? user.id : null);
 
-    // Efeito para buscar o show ativo ao carregar a página
+    const fetchPastShows = useCallback(async () => {
+        setIsLoadingPastShows(true);
+        try {
+            const pastShowsData = await getPastShowsByArtist(user.id, 0, 5);
+            setPastShows(pastShowsData);
+        } catch (err) {
+            console.error("Erro ao buscar histórico:", err);
+        } finally {
+            setIsLoadingPastShows(false);
+        }
+    }, [user.id]);
+
     useEffect(() => {
         const fetchActiveShow = async () => {
             if (!user.id) return;
+            setIsLoading(true);
             try {
                 const showData = await getActiveShowByArtist(user.id);
                 if (showData) {
                     setActiveShow(showData);
                     setRequests(showData.requests || []);
+                } else {
+                    setActiveShow(null);
+                    fetchPastShows();
                 }
             } catch (err) {
                 console.info("Nenhum show ativo encontrado.");
+                setActiveShow(null);
+                fetchPastShows();
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchActiveShow();
-    }, [user.id]);
 
-    // Efeito para lidar com novas mensagens do WebSocket
+        fetchActiveShow();
+        // --- INÍCIO DA CORREÇÃO (Warning) ---
+        // Adiciona 'fetchPastShows' ao array de dependências
+    }, [user.id, setActiveShow, fetchPastShows]);
+    // --- FIM DA CORREÇÃO ---
+
+    // Efeito para o Timer
+    useEffect(() => {
+        let timerId = null;
+        if (activeShow) {
+            timerId = setInterval(() => {
+                setShowDuration(formatDuration(activeShow.startTime));
+            }, 1000);
+        }
+        return () => {
+            if (timerId) clearInterval(timerId);
+        };
+    }, [activeShow]);
+
+    // Efeito para o WebSocket
     useEffect(() => {
         messages.forEach((msg) => {
             if (msg.type === 'NEW_SONG_REQUEST') {
                 setRequests((prevRequests) => [msg.data, ...prevRequests]);
+                setActiveShow(prevShow => ({
+                    ...prevShow,
+                    totalRequests: (prevShow.totalRequests || 0) + 1,
+                    totalTipsValue: (prevShow.totalTipsValue || 0) + (msg.data.tipAmount || 0)
+                }));
             }
             if (msg.type === 'REQUEST_STATUS_UPDATED') {
                 setRequests((prevRequests) =>
@@ -57,7 +147,7 @@ const DashboardHome = ({ artist }) => {
                 );
             }
         });
-    }, [messages]);
+    }, [messages, setActiveShow]);
 
     const handleStartShow = async () => {
         setIsLoading(true);
@@ -66,6 +156,7 @@ const DashboardHome = ({ artist }) => {
             const showData = await startShow(user.id);
             setActiveShow(showData);
             setRequests(showData.requests || []);
+            setShowDuration("00:00:00");
         } catch (err) {
             setError(err.response?.data?.message || 'Erro ao iniciar o show.');
         } finally {
@@ -73,15 +164,20 @@ const DashboardHome = ({ artist }) => {
         }
     };
 
-    const handleEndShow = async () => {
-        if (!window.confirm("Tem certeza que deseja encerrar o show?")) return;
+    const handleEndShow = () => {
+        setIsModalOpen(true);
+    };
 
+    const confirmEndShow = async () => {
+        setIsModalOpen(false);
         setIsLoading(true);
         setError(null);
         try {
             await endShow(activeShow.id);
             setActiveShow(null);
             setRequests([]);
+            setShowDuration("00:00:00");
+            fetchPastShows();
         } catch (err) {
             setError(err.response?.data?.message || 'Erro ao encerrar o show.');
         } finally {
@@ -91,7 +187,6 @@ const DashboardHome = ({ artist }) => {
 
     const handleUpdateRequest = async (requestId, newStatus) => {
         try {
-            // Chamada otimista - atualiza a UI primeiro
             setRequests((prevRequests) =>
                 prevRequests.map((req) =>
                     req.requestId === requestId
@@ -99,27 +194,24 @@ const DashboardHome = ({ artist }) => {
                         : req
                 )
             );
-            // Em seguida, chama a API
             await updateRequestStatus(activeShow.id, requestId, newStatus);
         } catch (err) {
             console.error("Erro ao atualizar status:", err);
             setError('Falha ao atualizar o pedido. Tente novamente.');
-            // Reverte a UI em caso de erro
             setRequests((prevRequests) =>
                 prevRequests.map((req) =>
                     req.requestId === requestId
-                        ? { ...req, status: 'PENDING' } // Reverte para o estado anterior
+                        ? { ...req, status: 'PENDING' }
                         : req
                 )
             );
         }
     };
 
-    if (isLoading && !activeShow) {
-        return <div>Carregando...</div>;
+    if (isLoading) {
+        return <div className="loading-full-page">Carregando...</div>;
     }
 
-    // Ordena os pedidos: PENDENTES primeiro, depois por data
     const sortedRequests = [...requests].sort((a, b) => {
         if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
         if (a.status !== 'PENDING' && b.status === 'PENDING') return 1;
@@ -132,16 +224,27 @@ const DashboardHome = ({ artist }) => {
     });
 
     return (
-        <div className="dashboard-tab-content">
+        <div className={`dashboard-tab-content ${activeShow ? 'show-is-active' : ''}`}>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={confirmEndShow}
+                title="Encerrar Show"
+            >
+                <p>Tem certeza que deseja encerrar o show atual?</p>
+                <p>Esta ação não pode ser desfeita e o show será movido para o seu histórico.</p>
+            </Modal>
+
             <div className="card-header">
-                <h2>Gerenciamento ao Vivo</h2>
+                <h2>Modo Show</h2>
                 {error && <p className="dashboard-error">{error}</p>}
 
                 {activeShow ? (
                     <div className="show-controls">
                         <div className={`show-status ${isConnected ? 'active' : 'inactive'}`}>
                             <FaSatelliteDish />
-                            {isConnected ? 'CONECTADO' : 'DESCONECTADO'}
+                            {isConnected ? 'CONECTADO' : 'OFFLINE'}
                         </div>
                         <button className="btn-danger" onClick={handleEndShow} disabled={isLoading}>
                             <FaStop /> Encerrar Show
@@ -160,10 +263,36 @@ const DashboardHome = ({ artist }) => {
             </div>
 
             {activeShow && (
+                <div className="show-stats-grid">
+                    <div className="stat-card timer">
+                        <FaClock />
+                        <div className="stat-info">
+                            <span className="stat-value">{showDuration}</span>
+                            <span className="stat-label">Tempo de Show</span>
+                        </div>
+                    </div>
+                    <div className="stat-card">
+                        <FaMusic />
+                        <div className="stat-info">
+                            <span className="stat-value">{activeShow.totalRequests}</span>
+                            <span className="stat-label">Pedidos Recebidos</span>
+                        </div>
+                    </div>
+                    <div className="stat-card">
+                        <FaGift />
+                        <div className="stat-info">
+                            <span className="stat-value">{formatCurrency(activeShow.totalTipsValue)}</span>
+                            <span className="stat-label">Total em Gorjetas</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {activeShow && (
                 <div className="requests-list">
                     <h3>Fila de Pedidos</h3>
                     {requests.length === 0 ? (
-                        <p className="empty-state">Aguardando o primeiro pedido...</p>
+                        <p className="empty-state">Aguardando pedidos...</p>
                     ) : (
                         sortedRequests.map((req) => (
                             <SongRequestCard
@@ -173,6 +302,57 @@ const DashboardHome = ({ artist }) => {
                             />
                         ))
                     )}
+                </div>
+            )}
+
+            {!activeShow && (
+                <div className={`past-shows-section card ${isHistoryOpen ? 'open' : ''}`}>
+                    <button type="button" className="accordion-header" onClick={() => setIsHistoryOpen(!isHistoryOpen)}>
+                        <div className="accordion-title">
+                            <FaCalendarCheck />
+                            <span>Histórico de Shows</span>
+                        </div>
+                        <div className="past-shows-actions">
+                            <button
+                                className="btn-icon"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    fetchPastShows();
+                                }}
+                                disabled={isLoadingPastShows}
+                            >
+                                <FaRedoAlt />
+                            </button>
+                            <FaChevronDown className="accordion-icon" />
+                        </div>
+                    </button>
+
+                    <div className="accordion-content">
+                        {isLoadingPastShows ? (
+                            <p>Carregando histórico...</p>
+                        ) : pastShows.length === 0 ? (
+                            <p className="empty-state-small">Nenhum show anterior encontrado.</p>
+                        ) : (
+                            <div className="past-shows-list-container">
+                                <ul className="past-shows-list">
+                                    {pastShows.map(show => (
+                                        <li key={show.id} className="past-show-item">
+                                            <div className="past-show-info">
+                                                <span className="past-show-date">{formatDateTime(show.startTime)}</span>
+                                                <span className="past-show-stats">
+                                                    Duração: {formatDurationFromSeconds(show.durationInSeconds)}
+                                                </span>
+                                            </div>
+                                            <div className="past-show-metrics">
+                                                <span>{show.totalRequests} Pedidos</span>
+                                                <span>{formatCurrency(show.totalTipsValue)}</span>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

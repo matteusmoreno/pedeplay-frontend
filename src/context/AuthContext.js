@@ -1,58 +1,72 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { login as loginService } from '../services/authService';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import api from '../services/api';
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(() => localStorage.getItem('token')); // Lê o token na inicialização
 
-    useEffect(() => {
-        // Tenta carregar o token do localStorage ao iniciar
-        const storedToken = localStorage.getItem('token');
-        if (storedToken) {
-            try {
-                const decodedToken = jwtDecode(storedToken);
-                // Verifica se o token expirou (a propriedade 'exp' está em segundos)
-                if (decodedToken.exp * 1000 > Date.now()) {
-                    setToken(storedToken);
-                    // O 'sub' (subject) no seu backend é o artistId
-                    setUser({ id: decodedToken.sub, email: decodedToken.upn });
-                } else {
-                    // Token expirado
-                    localStorage.removeItem('token');
-                }
-            } catch (error) {
-                console.error("Erro ao decodificar token:", error);
-                localStorage.removeItem('token');
-            }
+    const [activeShow, setActiveShow] = useState(null);
+
+    const login = useCallback((newToken) => {
+        try {
+            localStorage.setItem('token', newToken);
+            api.defaults.headers.Authorization = `Bearer ${newToken}`;
+            const decodedUser = jwtDecode(newToken);
+            setUser(decodedUser);
+            setToken(newToken);
+        } catch (error) {
+            console.error("Falha ao decodificar novo token", error);
+            logout(); // Se o novo token for inválido, desloga
         }
-        setLoading(false);
     }, []);
 
-    const login = async (email, password) => {
-        const data = await loginService(email, password);
-        const decodedToken = jwtDecode(data.token);
-
-        setToken(data.token);
-        // O 'sub' (subject) no seu backend é o artistId
-        setUser({ id: decodedToken.sub, email: decodedToken.upn });
-        localStorage.setItem('token', data.token);
-    };
-
     const logout = () => {
+        localStorage.removeItem('token');
+        api.defaults.headers.Authorization = null;
         setUser(null);
         setToken(null);
-        localStorage.removeItem('token');
+        setActiveShow(null);
     };
 
-    const isAuthenticated = !!token;
+    // Este useEffect agora é robusto
+    useEffect(() => {
+        if (token) {
+            // --- INÍCIO DA CORREÇÃO ---
+            // Adiciona try...catch para lidar com tokens inválidos
+            try {
+                const decodedUser = jwtDecode(token);
+                if (decodedUser.exp * 1000 > Date.now()) {
+                    // Token válido e não expirado
+                    api.defaults.headers.Authorization = `Bearer ${token}`;
+                    setUser(decodedUser);
+                } else {
+                    // Token expirado
+                    logout();
+                }
+            } catch (error) {
+                // Token inválido ou corrompido
+                console.error("Token inválido no localStorage", error);
+                logout();
+            }
+            // --- FIM DA CORREÇÃO ---
+        }
+    }, [token]); // Só executa quando o token mudar
 
     return (
-        <AuthContext.Provider value={{ user, token, isAuthenticated, login, logout, loading }}>
+        <AuthContext.Provider value={{
+            user,
+            token,
+            login,
+            logout,
+            activeShow,
+            setActiveShow
+        }}>
             {children}
         </AuthContext.Provider>
     );
 };
+
+export default AuthContext;

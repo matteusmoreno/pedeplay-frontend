@@ -2,10 +2,8 @@
  * ARQUIVO: src/services/showService.js
  * ========================================
  */
-// CORREÇÃO: Removidas as chaves {} da importação
 import api from './api';
 
-// Funções que você já tinha
 export const getActiveShowByArtist = async (artistId) => {
     try {
         const response = await api.get(`/shows/active/${artistId}`);
@@ -17,7 +15,10 @@ export const getActiveShowByArtist = async (artistId) => {
 
 export const makeSongRequest = async (requestData) => {
     try {
-        const response = await api.post('/shows/request-song', requestData);
+        // --- CORREÇÃO DE ENDPOINT ---
+        // Seu backend (ShowResource.java) usa /shows/request
+        const response = await api.post('/shows/request', requestData);
+        // --- FIM DA CORREÇÃO ---
         return response.data;
     } catch (error) {
         throw error.response?.data || new Error(error.message);
@@ -26,7 +27,6 @@ export const makeSongRequest = async (requestData) => {
 
 export const getSongList = async (artistId) => {
     try {
-        // Este endpoint parece ser o que busca o repertório
         const response = await api.get(`/artists/${artistId}/repertoire-details`);
         return response.data;
     } catch (error) {
@@ -35,13 +35,6 @@ export const getSongList = async (artistId) => {
 };
 
 
-// --- INÍCIO DAS NOVAS FUNÇÕES ---
-
-/**
- * Busca os detalhes de um show específico pelo ID.
- * Corresponde ao endpoint GET /shows/{showId}
- *
- */
 export const getShowDetails = async (showId) => {
     try {
         const response = await api.get(`/shows/${showId}`);
@@ -51,17 +44,30 @@ export const getShowDetails = async (showId) => {
     }
 };
 
-/**
- * Busca o repertório (lista de músicas) de um artista.
- * Corresponde ao endpoint GET /artists/{artistId}/repertoire-details
- *
- */
 export const getArtistRepertoire = async (artistId) => {
     try {
         const response = await api.get(`/artists/${artistId}/repertoire-details`);
-        return response.data;
+        // Corrigido para retornar o array de 'repertoire'
+        return response.data.repertoire || [];
     } catch (error) {
         throw error.response?.data || new Error(error.message);
     }
 };
-// --- FIM DAS NOVAS FUNÇÕES ---
+
+// --- INÍCIO DA NOVA FUNÇÃO ---
+/**
+ * Busca o histórico de shows (paginado) de um artista.
+ * Corresponde ao endpoint GET /shows/all/{artistId}
+ */
+export const getPastShowsByArtist = async (artistId, page = 0, size = 5) => {
+    try {
+        const response = await api.get(`/shows/all/${artistId}`, {
+            params: { page, size, sort: 'startTime,desc' } // Ordena pelos mais recentes
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao buscar histórico de shows:", error);
+        throw error.response?.data || new Error(error.message);
+    }
+};
+// --- FIM DA NOVA FUNÇÃO ---
