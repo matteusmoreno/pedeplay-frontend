@@ -5,7 +5,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-// Nome do componente corrigido para PascalCase
 const Step2Personal = () => {
     const { register, formState: { errors } } = useFormContext();
 
@@ -14,20 +13,19 @@ const Step2Personal = () => {
     };
 
     return (
-        <fieldset>
-            <legend>Dados Pessoais</legend>
+        <>
             <div className="form-group">
                 <label htmlFor="name">Nome Artístico</label>
-                <input id="name" type="text" {...register('name')} />
+                <input id="name" type="text" {...register('name')} placeholder="Ex: DJ Batidão" />
                 {getError('name')}
             </div>
             <div className="form-group">
                 <label htmlFor="biography">Biografia</label>
-                <textarea id="biography" {...register('biography')} />
+                <textarea id="biography" {...register('biography')} placeholder="Fale um pouco sobre você, seu estilo musical, e sua carreira..." />
                 {getError('biography')}
             </div>
-        </fieldset>
+        </>
     );
 };
 
-export default Step2Personal; // Export corrigido
+export default Step2Personal;

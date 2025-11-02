@@ -17,6 +17,7 @@ const RegisterSteps = ({ currentStep }) => {
             {steps.map((step) => (
                 <li
                     key={step.id}
+                    // Classes mais limpas para o novo CSS
                     className={`step-item ${step.id === currentStep ? 'active' : ''} ${step.id < currentStep ? 'completed' : ''}`}
                 >
                     <div className="step-number">

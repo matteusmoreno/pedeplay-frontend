@@ -10,14 +10,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { registerArtist } from '../../services/artistService';
 import './RegisterPage.css';
 
-// Importando os componentes de etapa com nomes corrigidos
+// Importando os componentes de etapa
 import RegisterSteps from './RegisterSteps';
 import Step1Account from './Step1Account';
 import Step2Personal from './Step2Personal';
 import Step3Address from './Step3Address';
 import Step4Social from './Step4Social';
+// Importa o novo componente de ilustração
+import StepIllustration from './StepIllustration/StepIllustration';
 
-// Esquema de validação com Yup (agora completo)
+// Esquema de validação com Yup
 const schema = yup.object().shape({
     // Etapa 1
     email: yup.string().email('Email inválido').required('O email é obrigatório'),
@@ -28,8 +30,15 @@ const schema = yup.object().shape({
     // Etapa 2
     name: yup.string().required('O nome é obrigatório'),
     biography: yup.string().required('A biografia é obrigatória'),
-    // Etapa 3
-    cep: yup.string().required('O CEP é obrigatório').matches(/^[0-9]{8}$/, 'CEP inválido (apenas 8 números)'),
+
+    // --- INÍCIO DA CORREÇÃO (CEP) ---
+    // 1. O regex agora aceita 8 números OU 5 números + hífen + 3 números
+    // 2. A mensagem de erro foi melhorada para ser mais genérica.
+    cep: yup.string()
+        .required('O CEP é obrigatório')
+        .matches(/^(\d{5}-\d{3}|\d{8})$/, 'Formato de CEP inválido.'),
+    // --- FIM DA CORREÇÃO ---
+
     street: yup.string().required('Rua é obrigatória'),
     neighborhood: yup.string().required('Bairro é obrigatório'),
     city: yup.string().required('Cidade é obrigatória'),
@@ -37,8 +46,7 @@ const schema = yup.object().shape({
     number: yup.string().required('O número é obrigatório'),
     complement: yup.string(),
 
-    // Etapa 4: Usando os nomes exatos do DTO
-    //
+    // Etapa 4
     instagramUrl: yup.string().transform(value => (value === '' ? undefined : value)).url('URL inválida').nullable(),
     facebookUrl: yup.string().transform(value => (value === '' ? undefined : value)).url('URL inválida').nullable(),
     youtubeUrl: yup.string().transform(value => (value === '' ? undefined : value)).url('URL inválida').nullable(),
@@ -53,6 +61,14 @@ const fieldsByStep = {
     4: ['instagramUrl', 'facebookUrl', 'youtubeUrl', 'linkedInUrl']
 };
 
+// Títulos para cada etapa
+const stepTitles = {
+    1: 'Crie sua Conta',
+    2: 'Informações Pessoais',
+    3: 'Seu Endereço',
+    4: 'Redes Sociais'
+};
+
 const RegisterPage = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [apiError, setApiError] = useState(null);
@@ -61,28 +77,20 @@ const RegisterPage = () => {
 
     const methods = useForm({
         resolver: yupResolver(schema),
-        mode: 'onTouched' // Valida ao sair do campo
+        mode: 'onTouched'
     });
 
     const { handleSubmit, trigger, formState: { isSubmitting } } = methods;
 
-    // --- INÍCIO DA CORREÇÃO (Failsafe) ---
-    // 1. A função agora aceita o evento 'e'
     const handleNext = async (e) => {
-        // 2. Previne qualquer comportamento padrão de 'submit' que possa estar ocorrendo
-        if (e) {
-            e.preventDefault();
-        }
-
-        // Valida apenas os campos da etapa atual
+        if (e) e.preventDefault();
         const fieldsToValidate = fieldsByStep[currentStep];
-        const isValid = await trigger(fieldsToValidate);
+        const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
 
         if (isValid) {
             setCurrentStep((prev) => prev + 1);
         }
     };
-    // --- FIM DA CORREÇÃO ---
 
     const handleBack = () => {
         setCurrentStep((prev) => prev - 1);
@@ -92,7 +100,6 @@ const RegisterPage = () => {
         setApiError(null);
         setApiSuccess(null);
         try {
-            // A função registerArtist fará a chamada para POST /artists
             await registerArtist(data);
             setApiSuccess('Cadastro realizado com sucesso! Redirecionando para o login...');
             setTimeout(() => {
@@ -105,64 +112,70 @@ const RegisterPage = () => {
 
     return (
         <div className="register-container">
-            <div className="card register-card">
-                <h2>Cadastro de Artista</h2>
+            <div className="register-layout-card">
 
-                <RegisterSteps currentStep={currentStep} />
+                {/* Coluna da Esquerda: Ilustração e Etapas */}
+                <div className="register-sidebar">
+                    <RegisterSteps currentStep={currentStep} />
+                    <StepIllustration currentStep={currentStep} />
+                </div>
 
-                {apiError && (
-                    <div className="form-message error-message">
-                        {apiError.message || 'Erro no cadastro.'}
-                    </div>
-                )}
-                {apiSuccess && <div className="form-message success-message">{apiSuccess}</div>}
+                {/* Coluna da Direita: Formulário */}
+                <div className="register-content">
+                    <FormProvider {...methods}>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <h2 className="register-title">{stepTitles[currentStep]}</h2>
 
-                {/* O FormProvider passa o 'methods' para todos os componentes filhos */}
-                <FormProvider {...methods}>
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                            {apiError && (
+                                <div className="form-message error-message">
+                                    {apiError.message || 'Erro no cadastro.'}
+                                </div>
+                            )}
+                            {apiSuccess && <div className="form-message success-message">{apiSuccess}</div>}
 
-                        {/* Renderização condicional da Etapa (Nomes JSX corrigidos) */}
-                        {currentStep === 1 && <Step1Account />}
-                        {currentStep === 2 && <Step2Personal />}
-                        {currentStep === 3 && <Step3Address />}
-                        {currentStep === 4 && <Step4Social />}
+                            <div className="step-fieldset">
+                                {currentStep === 1 && <Step1Account />}
+                                {currentStep === 2 && <Step2Personal />}
+                                {currentStep === 3 && <Step3Address />}
+                                {currentStep === 4 && <Step4Social />}
+                            </div>
 
-                        {/* Navegação */}
-                        <div className="register-navigation">
-                            <button
-                                type="button"
-                                className="btn-outline"
-                                onClick={handleBack}
-                                disabled={currentStep === 1 || isSubmitting}
-                            >
-                                Voltar
-                            </button>
-
-                            {currentStep < 4 ? (
+                            {/* Navegação */}
+                            <div className="register-navigation">
                                 <button
                                     type="button"
-                                    className="btn-primary"
-                                    // 3. Passamos o evento 'e' para a função handleNext
-                                    onClick={(e) => handleNext(e)}
-                                    disabled={isSubmitting}
+                                    className="btn-outline"
+                                    onClick={handleBack}
+                                    disabled={currentStep === 1 || isSubmitting}
                                 >
-                                    Próximo
+                                    Voltar
                                 </button>
-                            ) : (
-                                <button
-                                    type="submit"
-                                    className="btn-primary"
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Finalizando...' : 'Finalizar Cadastro'}
-                                </button>
-                            )}
-                        </div>
-                    </form>
-                </FormProvider>
 
-                <div className="login-link">
-                    <p>Já tem uma conta? <Link to="/login">Faça Login</Link></p>
+                                {currentStep < 4 ? (
+                                    <button
+                                        type="button"
+                                        className="btn-primary"
+                                        onClick={handleNext}
+                                        disabled={isSubmitting}
+                                    >
+                                        Próximo
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="submit"
+                                        className="btn-primary"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Finalizando...' : 'Finalizar Cadastro'}
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    </FormProvider>
+
+                    <div className="login-link">
+                        <p>Já tem uma conta? <Link to="/login">Faça Login</Link></p>
+                    </div>
                 </div>
             </div>
         </div>

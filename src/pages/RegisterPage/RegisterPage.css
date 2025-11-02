@@ -6,87 +6,115 @@
 .register-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    /* Alinha no topo para formulários longos */
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    align-items: center;
+    padding: 3rem 1rem;
     min-height: 80vh;
 }
 
-.register-card {
+.register-layout-card {
     width: 100%;
-    max-width: 700px;
-    /* Mais largo para o formulário de registro */
-}
-
-.register-card h2 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-}
-
-/* --- NOVO: Indicador de Etapas --- */
-.register-steps {
+    max-width: 950px;
     display: flex;
-    justify-content: space-between;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+}
+
+/* Coluna da Esquerda (Sidebar) */
+.register-sidebar {
+    flex-basis: 40%;
+    background-color: #2a2a2a;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid var(--border-color);
+}
+
+/* Coluna da Direita (Conteúdo do Formulário) */
+.register-content {
+    flex-basis: 60%;
+    padding: 2.5rem 3rem;
+    overflow-y: auto;
+}
+
+.register-title {
+    text-align: left;
+    color: var(--text-color);
     margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.step-fieldset {
+    border: none;
     padding: 0;
+    margin: 0;
+    animation: stepFadeIn 0.4s ease-out;
+}
+
+@keyframes stepFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* --- Indicador de Etapas (Vertical) --- */
+.register-steps {
     list-style: none;
+    padding: 0;
+    margin-bottom: 3rem;
+    position: relative;
+    border-left: 3px solid var(--border-color);
+    margin-left: 14px;
 }
 
 .step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-grow: 1;
     position: relative;
-    font-size: 0.85rem;
+    padding-left: 40px;
+    padding-bottom: 2.5rem;
     color: var(--text-secondary);
 }
 
-.step-item::after {
-    /* Linha conectora */
-    content: '';
-    position: absolute;
-    top: 15px;
-    left: 50%;
-    width: 100%;
-    height: 3px;
-    background-color: var(--border-color);
-    z-index: 1;
-}
-
-.step-item:last-child::after {
-    display: none;
-    /* Remove linha no último item */
+.step-item:last-child {
+    padding-bottom: 0;
 }
 
 .step-number {
+    position: absolute;
+    left: -15px;
+    top: -2px;
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: var(--border-color);
+    background-color: var(--card-bg);
     color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     z-index: 2;
-    /* Fica acima da linha */
+    border: 3px solid var(--card-bg);
     transition: all 0.3s ease;
-    margin-bottom: 0.5rem;
 }
 
 .step-label {
-    z-index: 2;
-    background-color: var(--card-bg);
-    /* Garante que o texto não seja cortado pela linha */
-    padding: 0 5px;
+    font-weight: 500;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
 }
 
-/* Estilo da etapa ativa */
 .step-item.active .step-number {
     background-color: var(--primary-color);
+    border-color: var(--primary-color);
     color: #121212;
 }
 
@@ -95,42 +123,46 @@
     font-weight: bold;
 }
 
-/* Estilo da etapa concluída */
 .step-item.completed .step-number {
     background-color: var(--color-success);
+    border-color: var(--color-success);
     color: white;
 }
 
-.step-item.completed::after {
+.step-item.completed .step-label {
+    color: var(--text-color);
+}
+
+.step-item::after {
+    content: '';
+    position: absolute;
+    left: -1.5px;
+    top: 15px;
+    width: 3px;
+    height: 100%;
     background-color: var(--color-success);
+    z-index: 1;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.4s ease;
 }
 
-/* --- Fim do Indicador de Etapas --- */
-
-
-/* Estilização dos fieldsets para agrupar o formulário */
-.register-card fieldset {
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 1rem 1.5rem;
-    margin-bottom: 1.5rem;
-    background-color: #222222;
-    /* Um leve destaque para o fieldset */
+.step-item.completed::after {
+    transform: scaleY(1);
 }
 
-.register-card legend {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: var(--primary-color);
-    padding: 0 0.5rem;
-    margin-bottom: 1rem;
+.step-item.completed:last-child::after {
+    height: 0;
 }
 
-/* --- NOVO: Botões de Navegação --- */
+
+/* --- Botões de Navegação --- */
 .register-navigation {
     display: flex;
     justify-content: space-between;
     margin-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
 }
 
 .register-navigation button {
@@ -138,7 +170,6 @@
     min-width: 120px;
 }
 
-/* Botão de "Voltar" */
 .btn-outline {
     background-color: transparent;
     border: 2px solid var(--primary-color);
@@ -147,7 +178,6 @@
 
 .btn-outline:hover {
     background-color: rgba(187, 134, 252, 0.1);
-    /* Roxo com opacidade */
 }
 
 .btn-outline:disabled {
@@ -163,17 +193,17 @@
     cursor: not-allowed;
 }
 
-
-/* Mensagem de erro de validação (react-hook-form) */
+/* Mensagens de erro e sucesso */
 .error-message {
     color: var(--color-danger);
     font-size: 0.875rem;
-    margin-top: -0.75rem;
+    /* --- CORREÇÃO (Sobreposição) --- */
+    margin-top: 0.25rem;
+    /* --- FIM DA CORREÇÃO --- */
     margin-bottom: 0.5rem;
     display: block;
 }
 
-/* Mensagem de sucesso ou erro da API */
 .form-message {
     border: 1px solid transparent;
     padding: 1rem;
@@ -198,12 +228,15 @@
 .loading-message {
     font-size: 0.875rem;
     color: var(--color-warning);
+    margin-top: 0.5rem;
+    display: block;
 }
 
-/* Link para a página de login */
+/* Link de Login */
 .login-link {
     text-align: center;
     margin-top: 1.5rem;
+    font-size: 0.9rem;
 }
 
 .login-link a {
@@ -212,10 +245,212 @@
     text-decoration: none;
 }
 
-/* Inputs somente leitura (para dados do CEP) */
+/* --- Estilos Específicos das Etapas --- */
+
+/* Etapa 3: Endereço */
+.cep-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.cep-input-group .form-group {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+.cep-input-group .form-group input {
+    margin-bottom: 0;
+}
+
+/* --- INÍCIO DA CORREÇÃO (Alinhamento Botão CEP) --- */
+.cep-input-group .btn-secondary {
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+    /* * Adiciona a borda para que o 'box-model' do botão 
+      * tenha a mesma altura total do input (que também tem borda).
+    */
+    border: 1px solid var(--secondary-color);
+}
+
+/* --- FIM DA CORREÇÃO --- */
+
+
+/* Animação para campos de endereço aparecerem */
+.address-details {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, opacity 0.3s ease-out, margin-top 0.5s ease-out;
+}
+
+.address-details.visible {
+    max-height: 1000px;
+    opacity: 1;
+    margin-top: 1.5rem;
+}
+
+.address-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.address-fields-grid-auto {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 1rem;
+}
+
 input[readOnly] {
     background-color: #2a2a2a;
-    /* Um pouco diferente para indicar não-edição */
     cursor: not-allowed;
     opacity: 0.8;
+}
+
+/* Etapa 4: Redes Sociais */
+.social-input-group {
+    display: flex;
+    /* --- INÍCIO DA CORREÇÃO (Alinhamento Ícones Sociais) --- */
+    /* * 'align-items: stretch' (que é o padrão) fará com que o 
+     * 'social-icon' estique para a altura do 'input' ao lado.
+     * Mas o 'input' está sozinho. O truque é usar 'flex-start'
+     * e forçar as alturas a serem iguais.
+    */
+    align-items: flex-start;
+    /* Alinha pelo topo */
+    /* --- FIM DA CORREÇÃO --- */
+    margin-bottom: 0;
+}
+
+.social-input-group .social-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #333;
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    color: var(--text-secondary);
+
+    /* --- INÍCIO DA CORREÇÃO (Alinhamento Ícones Sociais) --- */
+    /* * O 'global.css' define 'padding: 0.75rem' e 'border: 1px' no input.
+     * Vamos replicar EXATAMENTE isso aqui.
+     * Também removemos o 'line-height' para que ele herde o 1.6 padrão.
+    */
+    padding: 0.75rem;
+    font-size: 1.1rem;
+    width: 50px;
+    /* Largura fixa */
+
+    /* * Força a altura do ícone a ser exatamente a mesma do input.
+     * (0.75rem * 2) de padding + (1rem * 1.6) de line-height + (1px * 2) de borda
+     * Esta é a parte mais importante.
+    */
+    height: calc(1.5rem + 1.6em + 2px);
+    box-sizing: border-box;
+    /* Garante que padding/border fiquem dentro da altura */
+    /* --- FIM DA CORREÇÃO --- */
+}
+
+.social-input-group input {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    margin-bottom: 0;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 800px) {
+    .register-layout-card {
+        flex-direction: column;
+        max-width: 500px;
+    }
+
+    .register-sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 2rem 1.5rem;
+    }
+
+    .register-content {
+        padding: 2rem 1.5rem;
+    }
+
+    .step-illustration {
+        display: none;
+    }
+
+    .register-steps {
+        display: flex;
+        flex-direction: row;
+        border-left: none;
+        margin-left: 0;
+        margin-bottom: 0;
+    }
+
+    .step-item {
+        padding-left: 0;
+        padding-bottom: 0;
+        align-items: center;
+        flex: 1;
+    }
+
+    .step-number {
+        position: static;
+        margin-bottom: 0.5rem;
+    }
+
+    .step-item::after {
+        content: '';
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        width: 100%;
+        height: 3px;
+        background-color: var(--border-color);
+        z-index: 0;
+        transform: scaleX(1);
+    }
+
+    .step-item:last-child::after {
+        display: none;
+    }
+
+    .step-item.completed::after {
+        background-color: var(--color-success);
+    }
+
+    .step-label {
+        font-size: 0.8rem;
+    }
+
+    .address-fields-grid,
+    .address-fields-grid-auto {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .address-fields-grid .form-group,
+    .address-fields-grid-auto .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .register-title {
+        text-align: center;
+        font-size: 1.75rem;
+    }
+
+    .cep-input-group button {
+        margin-top: 0;
+        padding: 0.75rem 0.75rem;
+        border: 1px solid var(--secondary-color);
+    }
+
+    /* --- INÍCIO DA CORREÇÃO (Ícones Sociais Mobile) --- */
+    .social-input-group .social-icon {
+        /* Garante que a altura seja mantida no mobile */
+        height: calc(1.5rem + 1.6em + 2px);
+    }
+
+    /* --- FIM DA CORREÇÃO --- */
 }
