@@ -9,9 +9,6 @@
     display: flex;
     flex-direction: row;
     min-height: calc(100vh - 80px);
-    margin-top: -2rem;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
 }
 
 .dashboard-nav {
@@ -123,6 +120,35 @@
     font-size: 1.75rem;
 }
 
+/* --- INÍCIO: Card "Modo Show" Unificado --- */
+.modo-show-header {
+    /* Alinha o botão ao topo quando a explicação aparecer */
+    align-items: flex-start;
+}
+
+.modo-show-title {
+    flex-grow: 1;
+}
+
+.show-explanation-text {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-top: 0.75rem;
+    /* Espaçamento do título */
+    margin-bottom: 0;
+    max-width: 600px;
+    /* Limita a largura do texto */
+}
+
+/* Remove o card de explicação antigo */
+.show-explanation-card {
+    display: none;
+}
+
+/* --- FIM: Card "Modo Show" Unificado --- */
+
+
 /* --- Aba "Modo Show" (DashboardHome) --- */
 .dashboard-tab-content.show-is-active .card-header {
     border-left-color: var(--color-danger);
@@ -132,6 +158,8 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    /* Faz o botão "Iniciar Show" ficar alinhado com o título "Modo Show" */
+    margin-top: 4px;
 }
 
 .show-status {
@@ -160,7 +188,6 @@
     animation: pulse-rec 1.5s infinite;
 }
 
-/* Keyframes movidos para o final (em global.css, mas aqui por segurança) */
 @keyframes pulse-rec {
     0% {
         opacity: 1;
@@ -264,24 +291,24 @@
 
 /* --- INÍCIO DA CORREÇÃO: Seção Histórico de Shows --- */
 .past-shows-section {
-    margin-top: 3rem;
+    margin-top: 2rem;
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
-    /* Remove padding, o accordion-header cuida disso */
-    padding: 0;
+    /* 1. Aplicar o padding horizontal (igual ao .profile-form) */
+    padding: 0 2rem;
+    /* 2. Adiciona borda (igual aos outros cards) */
+    border: 1px solid var(--border-color);
 }
 
 .past-shows-section.card {
-    /* Garante que o padding 0 seja aplicado */
-    padding: 0;
+    /* 3. Garantir que o padding seja aplicado e sobrescrever padding: 0 */
+    padding: 0 2rem;
 }
 
-/* O cabeçalho do histórico agora é o cabeçalho do accordion */
 .past-shows-section .accordion-header {
-    padding: 1.5rem 2rem;
-    /* Adiciona padding que estava no card */
+    /* 4. Aplicar apenas padding vertical (igual aos outros .accordion-header) */
+    padding: 1.5rem 0;
     border-bottom: 1px solid transparent;
-    /* Borda só aparece quando aberto */
     transition: border-color 0.3s ease;
 }
 
@@ -289,10 +316,20 @@
     border-bottom-color: var(--border-color);
 }
 
-/* O conteúdo do histórico é o conteúdo do accordion */
 .past-shows-section .accordion-content {
-    /* Adiciona padding interno */
-    padding: 0 1.5rem 1.5rem 1.5rem;
+    /* 5. Remover padding horizontal, pois o pai (.past-shows-section) já tem */
+    padding-left: 0;
+    padding-right: 0;
+    /* 6. Garantir que as regras de acordeão se apliquem */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.past-shows-section.open .accordion-content {
+    /* 7. Adiciona o padding-bottom e max-height (igual aos outros) */
+    max-height: 2000px;
+    padding-bottom: 1.5rem;
 }
 
 .past-shows-actions {
@@ -301,22 +338,18 @@
     gap: 0.5rem;
 }
 
-/* Corrigindo a cor do botão de refresh */
 .past-shows-actions .btn-icon {
     color: var(--text-color);
-    /* Botão branco */
 }
 
 .past-shows-actions .btn-icon:hover {
     color: var(--primary-color);
 }
 
-/* NOVO: Container de rolagem para o histórico */
 .past-shows-list-container {
     max-height: 400px;
-    /* Define altura máxima */
     overflow-y: auto;
-    /* Adiciona rolagem */
+    /* 8. Ajustar o padding-right para a barra de rolagem */
     padding-right: 0.5rem;
 }
 
@@ -332,9 +365,13 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
-    padding: 1rem 0.5rem;
+    /* 9. Padding vertical, mas usar padding-right do container-pai */
+    padding: 1rem 0;
     border-bottom: 1px solid var(--border-color);
 }
+
+/* --- FIM DA CORREÇÃO --- */
+
 
 .past-show-item:last-child {
     border-bottom: none;
@@ -370,9 +407,6 @@
     gap: 0.5rem;
 }
 
-/* --- FIM DA CORREÇÃO --- */
-
-
 /* --- Aba "Perfil" (DashboardProfile) --- */
 .profile-info-card {
     display: flex;
@@ -382,6 +416,8 @@
     padding: 2rem;
     border-radius: var(--border-radius);
     margin-bottom: 2.5rem;
+    border: 1px solid var(--border-color);
+    /* Adicionado para consistência */
 }
 
 .profile-info-avatar {
@@ -500,14 +536,14 @@
 .repertoire-actions-form {
     background-color: var(--card-bg);
     padding: 0 2rem;
-    /* Remove padding vertical, o accordion cuida disso */
     border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    /* Adicionado para consistência */
 }
 
 .accordion-section {
     border-bottom: 1px solid var(--border-color);
     margin-bottom: 0;
-    /* Remove margem, a borda faz a separação */
 }
 
 .accordion-section:last-of-type {
@@ -522,7 +558,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 0;
-    /* Aumenta o padding do header */
     cursor: pointer;
 }
 
@@ -561,7 +596,6 @@
 }
 
 .profile-form .btn-submit-profile {
-    /* Botão de salvar fica fora do accordion, mas dentro do form */
     margin: 2rem 0;
 }
 
@@ -674,6 +708,8 @@
 .repertoire-info-card {
     margin-bottom: 2rem;
     padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    /* Adicionado para consistência */
 }
 
 .card-header-simple {
@@ -829,6 +865,11 @@
         padding: 1.5rem;
     }
 
+    .modo-show-header {
+        align-items: center;
+        /* Centraliza no mobile */
+    }
+
     .profile-layout,
     .repertoire-layout,
     .profile-form-grid {
@@ -873,6 +914,33 @@
         padding: 0.75rem 0.75rem;
         border: 1px solid var(--secondary-color);
     }
+
+    /* --- INÍCIO DA CORREÇÃO (HISTÓRICO RESPONSIVO) --- */
+    .past-shows-section,
+    .past-shows-section.card {
+        padding: 0 1rem;
+        /* Ajusta padding do histórico no mobile */
+    }
+
+    .past-shows-section .accordion-content {
+        padding-left: 0;
+        /* Remove padding horizontal */
+        padding-right: 0;
+    }
+
+    .past-shows-section.open .accordion-content {
+        padding-bottom: 1rem;
+        /* Adiciona padding inferior ao abrir */
+    }
+
+    /* --- FIM DA CORREÇÃO --- */
+
+    /* --- INÍCIO: Card "Modo Show" Responsivo --- */
+    .modo-show-header {
+        padding: 1.5rem;
+    }
+
+    /* --- FIM: Card "Modo Show" Responsivo --- */
 }
 
 /* Mensagens de erro e formulário (genéricas) */

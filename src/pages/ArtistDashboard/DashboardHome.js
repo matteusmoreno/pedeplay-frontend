@@ -1,6 +1,6 @@
 /* * ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardHome.js
- * (Correção do Warning)
+ * (Layout "Modo Show" unificado)
  * ========================================
  */
 import React, { useState, useEffect, useCallback } from 'react';
@@ -108,10 +108,7 @@ const DashboardHome = ({ artist }) => {
         };
 
         fetchActiveShow();
-        // --- INÍCIO DA CORREÇÃO (Warning) ---
-        // Adiciona 'fetchPastShows' ao array de dependências
     }, [user.id, setActiveShow, fetchPastShows]);
-    // --- FIM DA CORREÇÃO ---
 
     // Efeito para o Timer
     useEffect(() => {
@@ -236,8 +233,18 @@ const DashboardHome = ({ artist }) => {
                 <p>Esta ação não pode ser desfeita e o show será movido para o seu histórico.</p>
             </Modal>
 
-            <div className="card-header">
-                <h2>Modo Show</h2>
+
+            {/* --- INÍCIO DA CORREÇÃO: Card "Modo Show" unificado --- */}
+            <div className="card-header modo-show-header"> {/* Adicionada classe .modo-show-header */}
+                <div className="modo-show-title">
+                    <h2>Modo Show</h2>
+                    {!activeShow && (
+                        <p className="show-explanation-text">
+                            Ao "Iniciar Novo Show", você ativa sua página pública e habilita o recebimento de pedidos de música e gorjetas em tempo real. Use esta função apenas quando estiver ao vivo.
+                        </p>
+                    )}
+                </div>
+
                 {error && <p className="dashboard-error">{error}</p>}
 
                 {activeShow ? (
@@ -252,15 +259,14 @@ const DashboardHome = ({ artist }) => {
                     </div>
                 ) : (
                     <div className="show-controls">
-                        <div className="show-status inactive">
-                            Show Inativo
-                        </div>
                         <button className="btn-primary" onClick={handleStartShow} disabled={isLoading}>
                             <FaPlay /> Iniciar Novo Show
                         </button>
                     </div>
                 )}
             </div>
+            {/* --- FIM DA CORREÇÃO --- */}
+
 
             {activeShow && (
                 <div className="show-stats-grid">

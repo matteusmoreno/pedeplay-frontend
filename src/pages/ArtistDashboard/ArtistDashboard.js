@@ -16,7 +16,8 @@ import DashboardRepertoire from './DashboardRepertoire';
 
 const ArtistDashboard = () => {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState('home');
+    // A aba padrão continua sendo 'profile'
+    const [activeTab, setActiveTab] = useState('profile');
     const [artistData, setArtistData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -56,14 +57,13 @@ const ArtistDashboard = () => {
 
         switch (activeTab) {
             case 'home':
-                // Passa o 'artistData' para o DashboardHome
                 return <DashboardHome artist={artistData} />;
             case 'profile':
                 return <DashboardProfile artist={artistData} onUpdate={fetchArtistData} />;
             case 'repertoire':
                 return <DashboardRepertoire artist={artistData} />;
             default:
-                return <DashboardHome artist={artistData} />;
+                return <DashboardProfile artist={artistData} onUpdate={fetchArtistData} />;
         }
     };
 
@@ -74,14 +74,7 @@ const ArtistDashboard = () => {
                     <h3>Painel do Artista</h3>
                 </div>
                 <ul>
-                    {/* --- INÍCIO DA CORREÇÃO 1: Renomear Aba --- */}
-                    <li className={activeTab === 'home' ? 'active' : ''}>
-                        <button onClick={() => setActiveTab('home')}>
-                            <FaBroadcastTower />
-                            <span>Modo Show</span>
-                        </button>
-                    </li>
-                    {/* --- FIM DA CORREÇÃO 1 --- */}
+                    {/* --- INÍCIO DA CORREÇÃO: Ordem final do Menu --- */}
                     <li className={activeTab === 'profile' ? 'active' : ''}>
                         <button onClick={() => setActiveTab('profile')}>
                             <FaUser />
@@ -94,6 +87,13 @@ const ArtistDashboard = () => {
                             <span>Repertório</span>
                         </button>
                     </li>
+                    <li className={activeTab === 'home' ? 'active' : ''}>
+                        <button onClick={() => setActiveTab('home')}>
+                            <FaBroadcastTower />
+                            <span>Modo Show</span>
+                        </button>
+                    </li>
+                    {/* --- FIM DA CORREÇÃO --- */}
                 </ul>
             </nav>
 
