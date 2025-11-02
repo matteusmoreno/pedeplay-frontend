@@ -1,6 +1,12 @@
+/* * ========================================
+ * ARQUIVO: src/context/AuthContext.js
+ * (Refatorado para buscar dados do Artista)
+ * ========================================
+ */
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import api from '../services/api';
+import { getArtistDetails } from '../services/artistService'; // Importar o serviço
 
 const AuthContext = createContext();
 
@@ -9,12 +15,11 @@ const createUserFromToken = (token) => {
     try {
         const decodedToken = jwtDecode(token);
         if (decodedToken.exp * 1000 > Date.now()) {
-            // Constrói o objeto 'user' que a aplicação espera
             return {
-                id: decodedToken.sub, // Traduz 'sub' (subject) para 'id'
-                email: decodedToken.upn, // Traduz 'upn' (user principal name) para 'email'
+                id: decodedToken.sub,
+                email: decodedToken.upn,
                 roles: decodedToken.groups,
-                ...decodedToken // Mantém o resto (exp, iat, etc.) se necessário
+                ...decodedToken
             };
         }
         return null; // Token expirado
@@ -26,12 +31,24 @@ const createUserFromToken = (token) => {
 
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(null); // Dados do Token (id, email)
     const [token, setToken] = useState(null);
+    const [artistData, setArtistData] = useState(null); // Dados completos do Artista (nome, foto)
     const [loading, setLoading] = useState(true);
     const [activeShow, setActiveShow] = useState(null);
 
-    const login = useCallback((newToken) => {
+    // Nova função para buscar e armazenar os dados completos do artista
+    const fetchArtistData = useCallback(async (artistId) => {
+        try {
+            const data = await getArtistDetails(artistId);
+            setArtistData(data);
+        } catch (error) {
+            console.error("Falha ao buscar dados do artista para o contexto", error);
+            // Não desloga, mas o header pode ficar sem nome/avatar
+        }
+    }, []);
+
+    const login = useCallback(async (newToken) => {
         setLoading(true);
         const appUser = createUserFromToken(newToken);
 
@@ -40,15 +57,17 @@ export const AuthProvider = ({ children }) => {
             api.defaults.headers.Authorization = `Bearer ${newToken}`;
             setUser(appUser);
             setToken(newToken);
+            // Busca os dados completos do artista após o login
+            await fetchArtistData(appUser.id);
         } else {
-            // Se o token for inválido (raro no login, mas seguro)
             localStorage.removeItem('token');
             api.defaults.headers.Authorization = null;
             setUser(null);
             setToken(null);
+            setArtistData(null);
         }
         setLoading(false);
-    }, []);
+    }, [fetchArtistData]);
 
     const logout = () => {
         setLoading(true);
@@ -57,27 +76,35 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setToken(null);
         setActiveShow(null);
+        setArtistData(null); // Limpa os dados do artista
         setLoading(false);
     };
 
     // Efeito de inicialização (só roda uma vez)
     useEffect(() => {
-        const initialToken = localStorage.getItem('token');
-        const appUser = createUserFromToken(initialToken);
+        const initializeAuth = async () => {
+            const initialToken = localStorage.getItem('token');
+            const appUser = createUserFromToken(initialToken);
 
-        if (appUser) {
-            api.defaults.headers.Authorization = `Bearer ${initialToken}`;
-            setUser(appUser);
-            setToken(initialToken);
-        }
+            if (appUser) {
+                api.defaults.headers.Authorization = `Bearer ${initialToken}`;
+                setUser(appUser);
+                setToken(initialToken);
+                // Busca os dados completos do artista na inicialização
+                await fetchArtistData(appUser.id);
+            }
 
-        setLoading(false);
-    }, []);
+            setLoading(false);
+        };
+
+        initializeAuth();
+    }, [fetchArtistData]); // Adicionado fetchArtistData aqui
 
     return (
         <AuthContext.Provider value={{
             user,
             token,
+            artistData, // <-- Exporta os dados completos
             login,
             logout,
             activeShow,

@@ -1,16 +1,17 @@
+/* * ========================================
+ * ARQUIVO: src/components/Header/Header.js
+ * (Refatorado para usar UserMenu)
+ * ========================================
+ */
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import './Header.css';
+import UserMenu from './UserMenu/UserMenu'; // <-- 1. Importar o novo componente
 
 const Header = () => {
-    const { isAuthenticated, logout, user } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+    // 2. 'artistData' agora está disponível no contexto
+    const { isAuthenticated } = useAuth();
 
     return (
         <header className="header">
@@ -19,22 +20,15 @@ const Header = () => {
                     PedePlay
                 </Link>
                 <nav>
+                    {/* --- INÍCIO DA CORREÇÃO --- */}
                     {isAuthenticated ? (
-                        <>
-                            <span className="header-welcome">Olá, {user?.email}</span>
-                            {/* Link para a página pública do artista */}
-                            <Link to={`/show/${user?.id}`} className="header-link">
-                                Minha Página Pública
-                            </Link>
-                            <button onClick={handleLogout} className="btn-secondary">
-                                Sair
-                            </button>
-                        </>
+                        <UserMenu /> // 3. Substituir links soltos pelo UserMenu
                     ) : (
-                        <Link to="/login" className="header-link">
+                        <Link to="/login" className="btn-primary"> {/* Mudei para btn-primary */}
                             Login do Artista
                         </Link>
                     )}
+                    {/* --- FIM DA CORREÇÃO --- */}
                 </nav>
             </div>
         </header>
