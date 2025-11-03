@@ -1,0 +1,132 @@
+/* * ========================================
+ * ARQUIVO NOVO: src/components/ToastNotification/Toast.css
+ * ========================================
+ */
+
+/* O container que fica fixo no canto da tela */
+.toast-container {
+    position: fixed;
+    top: 100px;
+    /* Abaixo do header e da tarja 'live' */
+    right: 2rem;
+    z-index: 5000;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 360px;
+}
+
+/* Cada notificação individual */
+.toast-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    border-left-width: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+/* Animações de entrada e saída */
+.toast-item.fade-in {
+    animation: toastFadeIn 0.3s ease-out;
+}
+
+.toast-item.fade-out {
+    animation: toastFadeOut 0.3s ease-in forwards;
+}
+
+@keyframes toastFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastFadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Estilos por tipo */
+.toast-item.success {
+    border-left-color: var(--color-success);
+}
+
+.toast-item.success .toast-icon {
+    color: var(--color-success);
+}
+
+.toast-item.error {
+    border-left-color: var(--color-danger);
+}
+
+.toast-item.error .toast-icon {
+    color: var(--color-danger);
+}
+
+.toast-item.info {
+    border-left-color: var(--primary-color);
+}
+
+.toast-item.info .toast-icon {
+    color: var(--primary-color);
+}
+
+
+.toast-icon {
+    font-size: 1.25rem;
+    margin-top: 2px;
+    /* Alinhamento visual */
+}
+
+.toast-content {
+    flex-grow: 1;
+}
+
+.toast-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 0.25rem 0;
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    /* Permite quebra de linha */
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.toast-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: auto;
+}
+
+.toast-close-btn:hover {
+    color: var(--text-color);
+}

@@ -1,15 +1,25 @@
+/* * ========================================
+ * ARQUIVO: src/hooks/useWebSocket.js
+ * (Corrigido para retornar apenas a última mensagem)
+ * ========================================
+ */
 import { useState, useEffect, useRef } from 'react';
 
 // ATENÇÃO: Seu backend está na porta 8182
 const WS_URL = 'ws://localhost:8182/shows/live/';
 
 export const useWebSocket = (artistId) => {
-    const [messages, setMessages] = useState([]);
+    // 1. Mudar de "messages" (array) para "lastMessage" (objeto)
+    const [lastMessage, setLastMessage] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const ws = useRef(null);
 
     useEffect(() => {
-        if (!artistId) return;
+        if (!artistId) {
+            // Limpa a última mensagem se não houver artista (show encerrado)
+            setLastMessage(null);
+            return;
+        }
 
         // Conecta ao WebSocket
         ws.current = new WebSocket(`${WS_URL}${artistId}`);
@@ -22,7 +32,9 @@ export const useWebSocket = (artistId) => {
         ws.current.onmessage = (event) => {
             console.log('Nova mensagem WebSocket:', event.data);
             const message = JSON.parse(event.data);
-            setMessages((prevMessages) => [...prevMessages, message]);
+
+            // 2. Apenas armazena a mensagem mais recente
+            setLastMessage(message);
         };
 
         ws.current.onclose = () => {
@@ -43,5 +55,6 @@ export const useWebSocket = (artistId) => {
         };
     }, [artistId]);
 
-    return { messages, isConnected };
+    // 3. Retorna o objeto da última mensagem
+    return { lastMessage, isConnected };
 };

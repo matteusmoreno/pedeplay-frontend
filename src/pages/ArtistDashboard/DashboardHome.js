@@ -1,9 +1,9 @@
 /* * ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardHome.js
- * (Correção dos Erros de Hooks e ESLint)
+ * (Substituindo Notificação Nativa por Toast Customizado)
  * ========================================
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; // useMemo importado
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { startShow, endShow, updateRequestStatus } from '../../services/artistService';
@@ -23,6 +23,8 @@ import {
     FaCheckCircle,
     FaTimesCircle
 } from 'react-icons/fa';
+// --- 1. Importar o novo hook ---
+import { useNotification } from '../../context/NotificationContext';
 
 // --- Funções Helper (Inalteradas) ---
 const formatDuration = (startTime) => {
@@ -74,32 +76,73 @@ const DashboardHome = ({ artist }) => {
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [requestTab, setRequestTab] = useState('PENDING');
 
-    const { messages, isConnected } = useWebSocket(activeShow ? user.id : null);
+    // --- Lógica de Áudio (Inalterada) ---
+    const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
+    const notificationSound = useRef(null);
+    useEffect(() => {
+        notificationSound.current = new Audio('/notification.mp3');
+    }, []);
+    const unlockAudio = useCallback(() => {
+        if (isAudioUnlocked || !notificationSound.current) return;
+        console.log("Tentando desbloquear o áudio...");
+        notificationSound.current.play()
+            .then(() => {
+                notificationSound.current.pause();
+                notificationSound.current.currentTime = 0;
+                setIsAudioUnlocked(true);
+                console.log("Áudio desbloqueado com sucesso.");
+            })
+            .catch(e => {
+                console.warn("Interação de áudio falhou.", e);
+            });
+    }, [isAudioUnlocked]);
+    useEffect(() => {
+        const unlock = () => {
+            unlockAudio();
+            if (isAudioUnlocked) {
+                document.removeEventListener('click', unlock);
+                document.removeEventListener('touchstart', unlock);
+            }
+        };
+        document.addEventListener('click', unlock);
+        document.addEventListener('touchstart', unlock);
+        return () => {
+            document.removeEventListener('click', unlock);
+            document.removeEventListener('touchstart', unlock);
+        };
+    }, [unlockAudio, isAudioUnlocked]);
+    // --- Fim Lógica de Áudio ---
 
-    // --- INÍCIO DA CORREÇÃO 1: Mover Hooks para o topo ---
-    // Os Hooks useMemo devem ser chamados incondicionalmente no topo.
+    // --- 2. Inicializar o hook de Notificação ---
+    const { addToast } = useNotification();
+
+
+    const { lastMessage, isConnected } = useWebSocket(activeShow ? user.id : null);
+    const processedMessageId = useRef(null);
+
+
+    // Hooks useMemo (Inalterados)
     const pendingRequests = useMemo(() => {
         return requests
             .filter(req => req.status === 'PENDING')
             .sort((a, b) => {
                 if (a.tipAmount > b.tipAmount) return -1;
                 if (a.tipAmount < b.tipAmount) return 1;
-                return new Date(a.receivedAt) - new Date(b.receivedAt); // Mais antigo primeiro
+                return new Date(a.receivedAt) - new Date(a.receivedAt);
             });
     }, [requests]);
 
     const playedRequests = useMemo(() => {
         return requests
             .filter(req => req.status === 'PLAYED')
-            .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt)); // Mais recente primeiro
+            .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
     }, [requests]);
 
     const canceledRequests = useMemo(() => {
         return requests
             .filter(req => req.status === 'CANCELED')
-            .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt)); // Mais recente primeiro
+            .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
     }, [requests]);
-    // --- FIM DA CORREÇÃO 1 ---
 
 
     const fetchPastShows = useCallback(async () => {
@@ -114,6 +157,7 @@ const DashboardHome = ({ artist }) => {
         }
     }, [user.id]);
 
+    // useEffect de carregamento inicial (Inalterado)
     useEffect(() => {
         const fetchActiveShow = async () => {
             if (!user.id) return;
@@ -152,30 +196,75 @@ const DashboardHome = ({ artist }) => {
         };
     }, [activeShow]);
 
-    // Efeito para o WebSocket (Inalterado)
+
+    // Efeito do WebSocket (Atualizado para usar addToast)
     useEffect(() => {
-        messages.forEach((msg) => {
-            if (msg.type === 'NEW_SONG_REQUEST') {
-                setRequests((prevRequests) => [msg.data, ...prevRequests]);
-                setActiveShow(prevShow => ({
-                    ...prevShow,
-                    totalRequests: (prevShow.totalRequests || 0) + 1,
-                    totalTipsValue: (prevShow.totalTipsValue || 0) + (msg.data.tipAmount || 0)
-                }));
+        if (!lastMessage) return;
+
+        let messageId;
+        let messageType = lastMessage.type;
+
+        if (messageType === 'NEW_SONG_REQUEST') {
+            messageId = lastMessage.data.requestId;
+        } else if (messageType === 'REQUEST_STATUS_UPDATED') {
+            messageId = lastMessage.requestId + lastMessage.newStatus;
+        } else {
+            return;
+        }
+
+        if (processedMessageId.current === messageId) {
+            return;
+        }
+
+        if (messageType === 'NEW_SONG_REQUEST') {
+            // Toca o som
+            if (notificationSound.current) {
+                notificationSound.current.play().catch(e => console.warn("Notificação de áudio bloqueada.", e));
             }
-            if (msg.type === 'REQUEST_STATUS_UPDATED') {
-                setRequests((prevRequests) =>
-                    prevRequests.map((req) =>
-                        req.requestId === msg.requestId
-                            ? { ...req, status: msg.newStatus }
-                            : req
-                    )
-                );
-            }
-        });
-    }, [messages, setActiveShow]);
+
+            // --- 3. Dispara a Notificação Visual (Toast) ---
+            const songTitle = lastMessage.data.songTitle;
+            const tip = lastMessage.data.tipAmount;
+            const bodyMessage = tip > 0
+                ? `Com gorjeta de ${formatCurrency(tip)}!`
+                : 'Pedido gratuito.';
+
+            // Adiciona o toast customizado
+            addToast(`Novo Pedido: ${songTitle}`, bodyMessage, 'success');
+            // --- Fim da Notificação ---
+
+            setRequests(prevRequests => {
+                const exists = prevRequests.some(req => req.requestId === lastMessage.data.requestId);
+                if (exists) {
+                    return prevRequests;
+                }
+                return [lastMessage.data, ...prevRequests];
+            });
+
+            setActiveShow(prevShow => ({
+                ...prevShow,
+                totalRequests: (prevShow.totalRequests || 0) + 1,
+                totalTipsValue: (prevShow.totalTipsValue || 0) + (lastMessage.data.tipAmount || 0)
+            }));
+
+        } else if (messageType === 'REQUEST_STATUS_UPDATED') {
+            setRequests(prevRequests =>
+                prevRequests.map(req =>
+                    req.requestId === lastMessage.requestId
+                        ? { ...req, status: lastMessage.newStatus }
+                        : req
+                )
+            );
+        }
+
+        processedMessageId.current = messageId;
+
+        // 4. Adiciona 'addToast' às dependências
+    }, [lastMessage, setActiveShow, addToast]);
+
 
     const handleStartShow = async () => {
+        // A lógica de desbloqueio de áudio agora é global
         setIsLoading(true);
         setError(null);
         try {
@@ -189,6 +278,8 @@ const DashboardHome = ({ artist }) => {
             setIsLoading(false);
         }
     };
+
+    // ... (O restante do arquivo permanece igual) ...
 
     const handleEndShow = () => {
         setIsModalOpen(true);
@@ -213,10 +304,6 @@ const DashboardHome = ({ artist }) => {
 
     const handleUpdateRequest = async (requestId, newStatus) => {
         try {
-            // --- INÍCIO DA CORREÇÃO 2: Remover 'originalRequests' ---
-            // const originalRequests = requests; // Variável não utilizada
-            // --- FIM DA CORREÇÃO 2 ---
-
             const newRequests = requests.map((req) =>
                 req.requestId === requestId
                     ? { ...req, status: newStatus }
@@ -244,6 +331,11 @@ const DashboardHome = ({ artist }) => {
             );
         }
     };
+
+    const handleRequestTabClick = (tab) => {
+        setRequestTab(tab);
+    };
+
 
     if (isLoading) {
         return <div className="loading-full-page">Carregando...</div>;
@@ -359,7 +451,7 @@ const DashboardHome = ({ artist }) => {
                     <div className="requests-tabs">
                         <button
                             className={`requests-tab-btn ${requestTab === 'PENDING' ? 'active' : ''}`}
-                            onClick={() => setRequestTab('PENDING')}
+                            onClick={() => handleRequestTabClick('PENDING')}
                         >
                             <FaMusic />
                             <span>Fila</span>
@@ -367,7 +459,7 @@ const DashboardHome = ({ artist }) => {
                         </button>
                         <button
                             className={`requests-tab-btn ${requestTab === 'PLAYED' ? 'active' : ''}`}
-                            onClick={() => setRequestTab('PLAYED')}
+                            onClick={() => handleRequestTabClick('PLAYED')}
                         >
                             <FaCheckCircle />
                             <span>Tocadas</span>
@@ -375,7 +467,7 @@ const DashboardHome = ({ artist }) => {
                         </button>
                         <button
                             className={`requests-tab-btn ${requestTab === 'CANCELED' ? 'active' : ''}`}
-                            onClick={() => setRequestTab('CANCELED')}
+                            onClick={() => handleRequestTabClick('CANCELED')}
                         >
                             <FaTimesCircle />
                             <span>Canceladas</span>

@@ -1,6 +1,6 @@
 /* * ========================================
  * ARQUIVO: src/components/SongRequestCard/SongRequestCard.css
- * (Estilos menores para a Página Pública)
+ * (Estilos menores para a Página Pública + Animação de entrada)
  * ========================================
  */
 
@@ -12,7 +12,27 @@
     padding: 1rem 1.25rem;
     margin-bottom: 1rem;
     transition: all 0.3s;
+
+    /* --- INÍCIO DA MELHORIA: Animação de entrada --- */
+    animation: fadeInRequest 0.5s ease-out;
+    /* --- FIM DA MELHORIA --- */
 }
+
+/* --- INÍCIO DA MELHORIA: Keyframe da animação --- */
+@keyframes fadeInRequest {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- FIM DA MELHORIA --- */
+
 
 /* Estilos por status */
 .song-request-card.pending {
@@ -98,7 +118,7 @@
 }
 
 
-/* --- INÍCIO DA CORREÇÃO: Estilos Menores para a Página Pública --- */
+/* --- Estilos Menores para a Página Pública --- */
 
 /* Aplica padding e fontes menores APENAS na visualização pública */
 .song-request-card.public-view {
@@ -130,5 +150,3 @@
 }
 
 /* (Os botões de ação já estão ocultos via JS, não precisa de CSS) */
-
-/* --- FIM DA CORREÇÃO --- */

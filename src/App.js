@@ -1,6 +1,6 @@
 /* * ========================================
  * ARQUIVO: src/App.js
- * (Correção do Layout e da Tarja)
+ * (Adicionado NotificationProvider)
  * ========================================
  */
 import React from 'react';
@@ -10,6 +10,9 @@ import Header from './components/Header/Header';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import { FaBroadcastTower } from 'react-icons/fa';
+
+// --- 1. Importar o Provider e o Container ---
+import { NotificationProvider } from './context/NotificationContext';
 
 import './assets/styles/global.css';
 
@@ -29,14 +32,7 @@ const AppContent = () => {
         </div>
       )}
 
-      {/* --- INÍCIO DA CORREÇÃO DE LAYOUT --- */}
-      {/* * Removemos o <main className="container"> daqui.
-              * Agora, o AppRoutes renderiza as páginas (Login, Register, Dashboard)
-              * diretamente, permitindo que cada página controle seu próprio layout
-              * (tela cheia ou 'container').
-            */}
       <AppRoutes />
-      {/* --- FIM DA CORREÇÃO DE LAYOUT --- */}
     </div>
   );
 };
@@ -44,9 +40,12 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      {/* 2. Envolver o Router com o NotificationProvider */}
+      <NotificationProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
