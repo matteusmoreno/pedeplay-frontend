@@ -1,11 +1,12 @@
 /* * ========================================
  * ARQUIVO: src/pages/PublicShowPage/PublicShowPage.css
- * (Padronização do Card de Fila)
+ * (Reformulado com novo layout de 2 colunas)
  * ========================================
  */
 
 .public-show-page {
-    max-width: 1000px;
+    max-width: 1100px;
+    /* Layout um pouco mais largo */
     margin: 2rem auto;
     padding: 0 1.5rem;
     animation: fadeIn 0.3s ease-out;
@@ -23,21 +24,38 @@
     }
 }
 
-/* --- Card de Header do Artista --- */
-.artist-header-card {
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    display: flex;
-    flex-direction: row;
-    gap: 1.5rem;
-    align-items: center;
-    margin-bottom: 2rem;
-    border: 1px solid var(--border-color);
+/* --- INÍCIO DA REFORMULAÇÃO --- */
+
+/* 1. O Layout em Grid principal */
+.public-page-layout {
+    display: grid;
+    /* Coluna de info fixa em 320px, conteúdo ocupa o resto */
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    align-items: flex-start;
 }
 
-.artist-avatar {
-    flex-shrink: 0;
+/* 2. Coluna da Esquerda (Informações do Artista) */
+.layout-column.artist-info-column {
+    position: sticky;
+    top: 100px;
+    /* 80px (header) + 20px (margem) */
+    padding: 1.5rem;
+    /* Removemos o 'display:flex' para um layout de info vertical */
+}
+
+/* 3. Coluna da Direita (Conteúdo) */
+.layout-column.content-column {
+    /* Esta coluna vai rolar */
+    min-width: 0;
+    /* Corrige overflow de flexbox/grid */
+}
+
+/* 4. REMOVIDO: .artist-header-card (substituído por .artist-info-column) */
+
+
+/* --- Estilos dos Itens na Coluna de Info --- */
+.artist-info-column .artist-avatar {
     width: 120px;
     height: 120px;
     border-radius: 50%;
@@ -45,6 +63,8 @@
     background-color: #333;
     border: 3px solid var(--primary-color);
     position: relative;
+    margin: 0 auto 1.5rem auto;
+    /* Centraliza o avatar */
 }
 
 .profile-avatar-image {
@@ -65,21 +85,42 @@
     color: #444;
 }
 
-.artist-info {
+.artist-info-column .artist-info {
     display: flex;
     flex-direction: column;
+    text-align: center;
+    /* Centraliza todo o texto na coluna */
 }
 
-.artist-name {
-    font-size: 2rem;
+.artist-info-column .artist-name {
+    font-size: 1.75rem;
+    /* Um pouco menor para a coluna */
     font-weight: 700;
     color: var(--text-color);
     margin: 0;
     line-height: 1.2;
 }
 
-/* --- Badge AO VIVO / OFFLINE --- */
-.live-status-badge {
+/* --- 5. NOVO: Estilo da Localização --- */
+.artist-location {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Centraliza */
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0.75rem 0 0 0;
+}
+
+.artist-location svg {
+    font-size: 0.85rem;
+}
+
+/* --- FIM: Estilo da Localização --- */
+
+
+.artist-info-column .live-status-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -87,7 +128,8 @@
     font-weight: bold;
     padding: 0.25rem 0.75rem;
     border-radius: 50px;
-    margin-top: 0.75rem;
+    margin: 1rem auto 0 auto;
+    /* Centraliza o badge */
     width: fit-content;
 }
 
@@ -116,18 +158,21 @@
     }
 }
 
-.artist-bio {
-    font-size: 0.95rem;
+.artist-info-column .artist-bio {
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     line-height: 1.6;
+    text-align: left;
+    /* Biografia fica melhor alinhada à esquerda */
 }
 
-/* --- Links Sociais --- */
-.artist-social-links {
+.artist-info-column .artist-social-links {
     display: flex;
     gap: 1.25rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+    /* Centraliza os ícones */
 }
 
 .artist-social-links a {
@@ -140,52 +185,27 @@
     color: var(--primary-color);
 }
 
-/* --- Seção de Conteúdo --- */
-.public-content-section {
-    padding-bottom: 3rem;
-}
-
-
-/* --- INÍCIO DA CORREÇÃO: Layout em Grid --- */
-.public-page-layout {
-    display: grid;
-    grid-template-columns: 55% auto;
-    gap: 2rem;
-    align-items: flex-start;
-    /* Alinha os topos */
-}
-
-.layout-column.queue-column {
-    position: sticky;
-    top: 100px;
-    /* 80px (header) + 20px (margem) */
-}
-
-/* 1. Fila de Pedidos agora é um card padronizado */
+/* --- 6. Seção da Fila (Agora na Coluna 2) --- */
 .song-queue-section {
-    margin-top: 0;
+    margin-top: 2rem;
+    /* Espaçamento do formulário */
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: 2rem;
-    /* <-- PADRONIZADO (era 1.5rem) */
-
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
 }
 
-/* 2. REMOVIDO: .section-title (usamos .form-header do MakeRequestForm.css) */
-/* Agora ele usa o .form-header globalmente */
+.song-queue-section .form-header {
+    margin-bottom: 1.5rem;
+}
 
-/* 3. Container da lista de músicas com rolagem */
 .queue-list-container {
-    max-height: 50vh;
+    /* Não precisa mais de altura máxima, pois a coluna rola */
+    max-height: none;
     overflow-y: auto;
-    /* 4. Ajustado padding-top para alinhar com o form */
     padding-top: 0;
-    /* O header já tem margin */
-    margin-top: 2rem;
-    /* Espaço do header */
 }
 
 .queue-empty-message {
@@ -195,10 +215,10 @@
     padding: 2rem 0;
 }
 
-/* --- FIM DA CORREÇÃO --- */
+/* --- FIM DA REFORMULAÇÃO --- */
 
 
-/* Card de Artista Offline */
+/* Card de Artista Offline (na Coluna 2) */
 .offline-message-card {
     padding: 2rem;
     text-align: center;
@@ -237,20 +257,20 @@
         gap: 2rem;
     }
 
-    .layout-column.queue-column {
+    .layout-column.artist-info-column {
         position: static;
         /* Remove o sticky */
         top: auto;
+        padding: 1.5rem;
+    }
+
+    .artist-info-column .artist-bio {
+        text-align: center;
+        /* Centraliza a bio no mobile */
     }
 
     .song-queue-section {
         padding: 1.5rem;
-        /* Retorna ao padding menor no mobile */
-    }
-
-    /* Recria o .section-title apenas para mobile */
-    .song-queue-section .form-header {
-        margin-bottom: 1.5rem;
     }
 }
 
@@ -258,30 +278,6 @@
     .public-show-page {
         padding: 0 0.5rem;
         margin-top: 1rem;
-    }
-
-    .artist-header-card {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem;
-    }
-
-    .artist-avatar {
-        width: 100px;
-        height: 100px;
-    }
-
-    .artist-name {
-        font-size: 1.75rem;
-    }
-
-    .live-status-badge {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .artist-social-links {
-        justify-content: center;
     }
 
     .make-request-form {
