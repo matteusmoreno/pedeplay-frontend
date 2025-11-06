@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 // ATENÇÃO: Seu backend está na porta 8182
-const WS_URL = 'ws://localhost:8182/shows/live/';
+const WS_URL = 'ws://localhost:8383/shows/live/';
 
 export const useWebSocket = (artistId) => {
     // 1. Mudar de "messages" (array) para "lastMessage" (objeto)
