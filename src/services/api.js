@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // ATENÇÃO: Seu backend está rodando na porta 8182
-const API_URL = 'http://localhost:8182';
+const API_URL = 'http://localhost:8383';
 
 const api = axios.create({
     baseURL: API_URL,
