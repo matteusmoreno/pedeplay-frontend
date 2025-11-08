@@ -70,16 +70,16 @@ const ArtistDashboard = () => {
                             <span>Meu Perfil</span>
                         </button>
                     </li>
-                    <li className={activeTab === 'repertoire' ? 'active' : ''}>
-                        <button onClick={() => setActiveTab('repertoire')}>
-                            <FaMusic />
-                            <span>Repertório</span>
-                        </button>
-                    </li>
                     <li className={activeTab === 'finances' ? 'active' : ''}>
                         <button onClick={() => setActiveTab('finances')}>
                             <FaDollarSign />
                             <span>Finanças</span>
+                        </button>
+                    </li>
+                    <li className={activeTab === 'repertoire' ? 'active' : ''}>
+                        <button onClick={() => setActiveTab('repertoire')}>
+                            <FaMusic />
+                            <span>Repertório</span>
                         </button>
                     </li>
                     <li className={activeTab === 'home' ? 'active' : ''}>
