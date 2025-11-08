@@ -1,13 +1,12 @@
 /* * ========================================
  * ARQUIVO: src/components/Header/UserMenu/UserMenu.js
- * (Adicionado link para o Dashboard)
+ * (Modificado para abrir link público em nova aba e fechar menu no dashboard)
  * ========================================
  */
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import './UserMenu.css';
-// --- 1. Adicionar o ícone do Dashboard ---
 import { FaUserCircle, FaExternalLinkAlt, FaSignOutAlt, FaChevronDown, FaTachometerAlt } from 'react-icons/fa';
 
 const UserMenu = () => {
@@ -59,17 +58,29 @@ const UserMenu = () => {
                         <p className="dropdown-email">{user?.email}</p>
                     </div>
 
-                    {/* --- 2. INÍCIO DA CORREÇÃO: Adicionar link para o Dashboard --- */}
-                    <Link to="/dashboard" className="dropdown-item">
+                    {/* --- INÍCIO DA CORREÇÃO (Dashboard) --- */}
+                    <Link
+                        to="/dashboard"
+                        className="dropdown-item"
+                        onClick={() => setIsOpen(false)} // Fecha o menu ao clicar
+                    >
                         <FaTachometerAlt />
                         <span>Painel do Artista</span>
                     </Link>
                     {/* --- FIM DA CORREÇÃO --- */}
 
-                    <Link to={`/show/${user?.id}`} className="dropdown-item">
+                    {/* --- INÍCIO DA CORREÇÃO (Página Pública) --- */}
+                    <Link
+                        to={`/show/${user?.id}`}
+                        className="dropdown-item"
+                        target="_blank" // Abre em nova aba
+                        rel="noopener noreferrer"
+                        onClick={() => setIsOpen(false)} // Opcional: fechar ao clicar também
+                    >
                         <FaExternalLinkAlt />
                         <span>Minha Página Pública</span>
                     </Link>
+                    {/* --- FIM DA CORREÇÃO --- */}
 
                     <button onClick={handleLogout} className="dropdown-item dropdown-logout">
                         <FaSignOutAlt />
