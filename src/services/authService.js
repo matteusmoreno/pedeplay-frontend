@@ -7,17 +7,25 @@ import api from './api';
 
 export const login = async (email, password) => {
     try {
-        const response = await api.post('/auth/login', { email, password });
+        // Limpa qualquer token anterior antes de tentar login
+        delete api.defaults.headers.Authorization;
+        
+        const response = await api.post('/auth/login', { 
+            email, 
+            password 
+        }, {
+            // Garante que não vai enviar headers de autenticação nesta requisição
+            headers: {
+                'Authorization': undefined
+            }
+        });
 
-        // --- INÍCIO DA CORREÇÃO ---
-        // O backend retorna { "token": "..." }.
-        // Precisamos retornar APENAS a string do token.
+        // O backend retorna { "token": "..." }
+        // Retorna apenas a string do token
         return response.data.token;
-        // --- FIM DA CORREÇÃO ---
 
     } catch (error) {
-        // Se a API der erro (ex: 401), ela não retorna 'data.token'
-        // Lançamos a mensagem de erro da API ou uma mensagem padrão
+        // Se a API der erro (ex: 401), lança mensagem de erro
         throw new Error(error.response?.data?.message || 'Email ou senha inválidos');
     }
 };

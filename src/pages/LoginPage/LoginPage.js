@@ -27,14 +27,18 @@ const LoginPage = () => {
 
     const onSubmit = async (data) => {
         setApiError(null);
+        
+        // Limpa dados anteriores antes de fazer login
+        localStorage.removeItem('token');
+        
         try {
             const token = await apiLogin(data.email, data.password);
-            contextLogin(token);
-
-            // --- INÍCIO DA CORREÇÃO ---
-            // Redireciona para a HomePage (/) em vez do Dashboard
-            navigate('/');
-            // --- FIM DA CORREÇÃO ---
+            await contextLogin(token);
+            
+            // Pequeno delay antes de redirecionar
+            setTimeout(() => {
+                navigate('/');
+            }, 100);
 
         } catch (error) {
             setApiError(error.message || 'Email ou senha inválidos.');

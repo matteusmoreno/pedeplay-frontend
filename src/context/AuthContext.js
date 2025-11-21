@@ -50,6 +50,11 @@ export const AuthProvider = ({ children }) => {
 
     const login = useCallback(async (newToken) => {
         setLoading(true);
+        
+        // Limpa dados anteriores antes de fazer login
+        localStorage.removeItem('token');
+        delete api.defaults.headers.Authorization;
+        
         const appUser = createUserFromToken(newToken);
 
         if (appUser) {
@@ -57,11 +62,16 @@ export const AuthProvider = ({ children }) => {
             api.defaults.headers.Authorization = `Bearer ${newToken}`;
             setUser(appUser);
             setToken(newToken);
+            
             // Busca os dados completos do artista após o login
-            await fetchArtistData(appUser.id);
+            try {
+                await fetchArtistData(appUser.id);
+            } catch (error) {
+                console.error('Erro ao carregar dados do artista:', error);
+            }
         } else {
             localStorage.removeItem('token');
-            api.defaults.headers.Authorization = null;
+            delete api.defaults.headers.Authorization;
             setUser(null);
             setToken(null);
             setArtistData(null);
@@ -72,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         setLoading(true);
         localStorage.removeItem('token');
-        api.defaults.headers.Authorization = null;
+        delete api.defaults.headers.Authorization;
         setUser(null);
         setToken(null);
         setActiveShow(null);
@@ -84,21 +94,42 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const initializeAuth = async () => {
             const initialToken = localStorage.getItem('token');
+            
+            if (!initialToken) {
+                setLoading(false);
+                return;
+            }
+
             const appUser = createUserFromToken(initialToken);
 
             if (appUser) {
-                api.defaults.headers.Authorization = `Bearer ${initialToken}`;
-                setUser(appUser);
-                setToken(initialToken);
-                // Busca os dados completos do artista na inicialização
-                await fetchArtistData(appUser.id);
+                try {
+                    api.defaults.headers.Authorization = `Bearer ${initialToken}`;
+                    setUser(appUser);
+                    setToken(initialToken);
+                    // Busca os dados completos do artista na inicialização
+                    await fetchArtistData(appUser.id);
+                } catch (error) {
+                    console.error("Erro ao inicializar autenticação:", error);
+                    // Limpa dados corrompidos
+                    localStorage.removeItem('token');
+                    delete api.defaults.headers.Authorization;
+                    setUser(null);
+                    setToken(null);
+                    setArtistData(null);
+                }
+            } else {
+                // Token inválido ou expirado, limpa o localStorage
+                localStorage.removeItem('token');
+                delete api.defaults.headers.Authorization;
             }
 
             setLoading(false);
         };
 
         initializeAuth();
-    }, [fetchArtistData]); // Adicionado fetchArtistData aqui
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Roda apenas uma vez na montagem
 
     return (
         <AuthContext.Provider value={{
