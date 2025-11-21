@@ -24,6 +24,28 @@
     }
 }
 
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 /* --- INÍCIO DA REFORMULAÇÃO --- */
 
 /* 1. O Layout em Grid principal */
@@ -41,6 +63,7 @@
     top: 100px;
     /* 80px (header) + 20px (margem) */
     padding: 1.5rem;
+    animation: slideIn 0.4s ease-out;
     /* Removemos o 'display:flex' para um layout de info vertical */
 }
 
@@ -48,6 +71,7 @@
 .layout-column.content-column {
     /* Esta coluna vai rolar */
     min-width: 0;
+    animation: fadeIn 0.5s ease-out;
     /* Corrige overflow de flexbox/grid */
 }
 
@@ -283,4 +307,139 @@
     .make-request-form {
         padding: 1.5rem;
     }
+}
+
+/* Live Stream Section */
+.livestream-section {
+    margin-bottom: 2rem;
+}
+
+.livestream-section h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+    color: var(--color-text);
+}
+
+/* WebSocket Status Indicator */
+.ws-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.ws-status-indicator.connected {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.ws-status-indicator.disconnected {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.ws-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.ws-status-indicator.connected .ws-dot {
+    animation: pulse-dot 2s infinite;
+}
+
+.ws-status-indicator.disconnected .ws-dot {
+    animation: blink-dot 1s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes blink-dot {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+    25%, 75% {
+        opacity: 0.3;
+    }
+}
+
+/* === ANIMAÇÕES E TRANSIÇÕES PROFISSIONAIS === */
+.card {
+    animation: scaleIn 0.3s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.song-request-card {
+    animation: slideIn 0.4s ease-out;
+}
+
+.livestream-section {
+    animation: scaleIn 0.5s ease-out;
+}
+
+/* Transições suaves nos botões */
+button, .control-button {
+    transition: all 0.2s ease;
+}
+
+button:hover, .control-button:hover {
+    transform: scale(1.05);
+}
+
+button:active, .control-button:active {
+    transform: scale(0.95);
+}
+
+/* Loading state suave */
+.public-page-message {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Melhoria no badge ao vivo */
+.live-status-badge.live {
+    animation: pulse-live 2s infinite, scaleIn 0.3s ease-out;
+}
+
+/* Transições de entrada/saída suaves */
+.fade-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s, transform 0.2s;
 }

@@ -5,50 +5,81 @@
  */
 import { useState, useEffect, useRef } from 'react';
 
-// ATENÇÃO: Seu backend está na porta 8182
 const WS_URL = 'ws://localhost:8383/shows/live/';
+const RECONNECT_DELAY = 3000; // 3 segundos
 
 export const useWebSocket = (artistId) => {
-    // 1. Mudar de "messages" (array) para "lastMessage" (objeto)
     const [lastMessage, setLastMessage] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const ws = useRef(null);
+    const reconnectTimeout = useRef(null);
+    const shouldReconnect = useRef(true);
 
     useEffect(() => {
         if (!artistId) {
-            // Limpa a última mensagem se não houver artista (show encerrado)
             setLastMessage(null);
+            shouldReconnect.current = false;
             return;
         }
 
-        // Conecta ao WebSocket
-        ws.current = new WebSocket(`${WS_URL}${artistId}`);
+        shouldReconnect.current = true;
 
-        ws.current.onopen = () => {
-            console.log('WebSocket conectado para o artista:', artistId);
-            setIsConnected(true);
+        const connect = () => {
+            if (!shouldReconnect.current) return;
+
+            const wsUrl = `${WS_URL}${artistId}`;
+            console.log('🔌 Conectando WebSocket:', wsUrl);
+            
+            try {
+                ws.current = new WebSocket(wsUrl);
+
+                ws.current.onopen = () => {
+                    console.log('✅ WebSocket CONECTADO:', wsUrl);
+                    setIsConnected(true);
+                };
+
+                ws.current.onmessage = (event) => {
+                    console.log('📩 WebSocket RAW:', event.data);
+                    try {
+                        const message = JSON.parse(event.data);
+                        console.log('📦 WebSocket PARSED:', message);
+                        setLastMessage(message);
+                    } catch (err) {
+                        console.error('❌ Erro ao parsear mensagem WebSocket:', err, event.data);
+                    }
+                };
+
+                ws.current.onclose = (event) => {
+                    console.log('🔌 WebSocket DESCONECTADO:', event.code, event.reason);
+                    setIsConnected(false);
+                    
+                    // Reconecta automaticamente após delay
+                    if (shouldReconnect.current) {
+                        console.log(`🔄 Reconectando em ${RECONNECT_DELAY}ms...`);
+                        reconnectTimeout.current = setTimeout(connect, RECONNECT_DELAY);
+                    }
+                };
+
+                ws.current.onerror = (error) => {
+                    console.error('❌ Erro no WebSocket:', error);
+                    setIsConnected(false);
+                };
+            } catch (err) {
+                console.error('❌ Erro ao criar WebSocket:', err);
+                if (shouldReconnect.current) {
+                    reconnectTimeout.current = setTimeout(connect, RECONNECT_DELAY);
+                }
+            }
         };
 
-        ws.current.onmessage = (event) => {
-            console.log('Nova mensagem WebSocket:', event.data);
-            const message = JSON.parse(event.data);
+        connect();
 
-            // 2. Apenas armazena a mensagem mais recente
-            setLastMessage(message);
-        };
-
-        ws.current.onclose = () => {
-            console.log('WebSocket desconectado.');
-            setIsConnected(false);
-        };
-
-        ws.current.onerror = (error) => {
-            console.error('Erro no WebSocket:', error);
-            setIsConnected(false);
-        };
-
-        // Função de limpeza para fechar a conexão
+        // Função de limpeza
         return () => {
+            shouldReconnect.current = false;
+            if (reconnectTimeout.current) {
+                clearTimeout(reconnectTimeout.current);
+            }
             if (ws.current) {
                 ws.current.close();
             }

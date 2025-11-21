@@ -10,6 +10,7 @@ import { startShow, endShow, updateRequestStatus } from '../../services/artistSe
 import { getActiveShowByArtist, getPastShowsByArtist } from '../../services/showService';
 import SongRequestCard from '../../components/SongRequestCard/SongRequestCard';
 import Modal from '../../components/Modal/Modal';
+import LiveStreamFloating from '../../components/LiveStreamBroadcaster/LiveStreamFloating';
 import {
     FaPlay,
     FaStop,
@@ -21,7 +22,8 @@ import {
     FaRedoAlt,
     FaChevronDown,
     FaCheckCircle,
-    FaTimesCircle
+    FaTimesCircle,
+    FaVideo
 } from 'react-icons/fa';
 // --- 1. Importar o novo hook ---
 import { useNotification } from '../../context/NotificationContext';
@@ -75,6 +77,7 @@ const DashboardHome = ({ artist }) => {
     const [isLoadingPastShows, setIsLoadingPastShows] = useState(true);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [requestTab, setRequestTab] = useState('PENDING');
+    const [isLiveStreamOpen, setIsLiveStreamOpen] = useState(false);
 
     // --- Lógica de Áudio (Inalterada) ---
     const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
@@ -97,20 +100,20 @@ const DashboardHome = ({ artist }) => {
             });
     }, [isAudioUnlocked]);
     useEffect(() => {
+        if (isAudioUnlocked) return;
+        
         const unlock = () => {
             unlockAudio();
-            if (isAudioUnlocked) {
-                document.removeEventListener('click', unlock);
-                document.removeEventListener('touchstart', unlock);
-            }
         };
-        document.addEventListener('click', unlock);
-        document.addEventListener('touchstart', unlock);
+        
+        document.addEventListener('click', unlock, { once: true });
+        document.addEventListener('touchstart', unlock, { once: true });
+        
         return () => {
             document.removeEventListener('click', unlock);
             document.removeEventListener('touchstart', unlock);
         };
-    }, [unlockAudio, isAudioUnlocked]);
+    }, [isAudioUnlocked]);
     // --- Fim Lógica de Áudio ---
 
     // --- 2. Inicializar o hook de Notificação ---
@@ -197,71 +200,78 @@ const DashboardHome = ({ artist }) => {
     }, [activeShow]);
 
 
-    // Efeito do WebSocket (Atualizado para usar addToast)
+    // 🔥 PROCESSA MENSAGENS WEBSOCKET EM TEMPO REAL
     useEffect(() => {
         if (!lastMessage) return;
+
+        console.log('📨 Dashboard WebSocket:', lastMessage);
 
         let messageId;
         let messageType = lastMessage.type;
 
-        if (messageType === 'NEW_SONG_REQUEST') {
-            messageId = lastMessage.data.requestId;
-        } else if (messageType === 'REQUEST_STATUS_UPDATED') {
-            messageId = lastMessage.requestId + lastMessage.newStatus;
+        // Compatibilidade com ambos formatos de mensagem
+        if (messageType === 'NEW_SONG_REQUEST' || messageType === 'new-song-request') {
+            messageId = lastMessage.data?.requestId || lastMessage.requestId;
+        } else if (messageType === 'REQUEST_STATUS_UPDATED' || messageType === 'request-status-updated') {
+            messageId = (lastMessage.requestId || '') + (lastMessage.newStatus || lastMessage.status || '');
         } else {
+            console.log('📩 Mensagem não tratada:', messageType);
             return;
         }
 
         if (processedMessageId.current === messageId) {
+            console.log('⏭️ Mensagem já processada:', messageId);
             return;
         }
 
-        if (messageType === 'NEW_SONG_REQUEST') {
+        if (messageType === 'NEW_SONG_REQUEST' || messageType === 'new-song-request') {
+            console.log('🎵 Processando novo pedido:', lastMessage);
+            
             // Toca o som
             if (notificationSound.current) {
                 notificationSound.current.play().catch(e => console.warn("Notificação de áudio bloqueada.", e));
             }
 
-            // --- 3. Dispara a Notificação Visual (Toast) ---
-            const songTitle = lastMessage.data.songTitle;
-            const tip = lastMessage.data.tipAmount;
+            // Extrai dados da mensagem (compatível com ambos formatos)
+            const requestData = lastMessage.data || lastMessage;
+            const songTitle = requestData.songTitle;
+            const tip = requestData.tipAmount || 0;
+            const requestId = requestData.requestId;
+
             const bodyMessage = tip > 0
                 ? `Com gorjeta de ${formatCurrency(tip)}!`
                 : 'Pedido gratuito.';
 
-            // Adiciona o toast customizado
             addToast(`Novo Pedido: ${songTitle}`, bodyMessage, 'success');
-            // --- Fim da Notificação ---
 
-            setRequests(prevRequests => {
-                const exists = prevRequests.some(req => req.requestId === lastMessage.data.requestId);
-                if (exists) {
-                    return prevRequests;
+            // Recarrega show completo para garantir sincronização
+            getActiveShowByArtist(user.id).then(showData => {
+                if (showData) {
+                    console.log('✅ Show atualizado com novo pedido');
+                    setActiveShow(showData);
+                    setRequests(showData.requests || []);
                 }
-                return [lastMessage.data, ...prevRequests];
+            }).catch(err => {
+                console.error('❌ Erro ao recarregar show:', err);
             });
 
-            setActiveShow(prevShow => ({
-                ...prevShow,
-                totalRequests: (prevShow.totalRequests || 0) + 1,
-                totalTipsValue: (prevShow.totalTipsValue || 0) + (lastMessage.data.tipAmount || 0)
-            }));
+        } else if (messageType === 'REQUEST_STATUS_UPDATED' || messageType === 'request-status-updated') {
+            console.log('✏️ Processando atualização de status:', lastMessage);
+            
+            const requestId = lastMessage.requestId;
+            const newStatus = lastMessage.newStatus || lastMessage.status;
 
-        } else if (messageType === 'REQUEST_STATUS_UPDATED') {
             setRequests(prevRequests =>
                 prevRequests.map(req =>
-                    req.requestId === lastMessage.requestId
-                        ? { ...req, status: lastMessage.newStatus }
+                    req.requestId === requestId
+                        ? { ...req, status: newStatus }
                         : req
                 )
             );
         }
 
         processedMessageId.current = messageId;
-
-        // 4. Adiciona 'addToast' às dependências
-    }, [lastMessage, setActiveShow, addToast]);
-
+    }, [lastMessage, setActiveShow, addToast, user.id]);
 
     const handleStartShow = async () => {
         // A lógica de desbloqueio de áudio agora é global
@@ -407,6 +417,12 @@ const DashboardHome = ({ artist }) => {
                             <FaSatelliteDish />
                             {isConnected ? 'CONECTADO' : 'OFFLINE'}
                         </div>
+                        <button 
+                            className="btn-livestream" 
+                            onClick={() => setIsLiveStreamOpen(true)}
+                        >
+                            <FaVideo /> Transmitir ao Vivo
+                        </button>
                         <button className="btn-danger" onClick={handleEndShow} disabled={isLoading}>
                             <FaStop /> Encerrar Show
                         </button>
@@ -483,11 +499,18 @@ const DashboardHome = ({ artist }) => {
 
             {!activeShow && (
                 <div className={`past-shows-section card ${isHistoryOpen ? 'open' : ''}`}>
-                    <button type="button" className="accordion-header" onClick={() => setIsHistoryOpen(!isHistoryOpen)}>
-                        <div className="accordion-title">
-                            <FaCalendarCheck />
-                            <span>Histórico de Shows</span>
-                        </div>
+                    <div className="accordion-header">
+                        <button 
+                            type="button" 
+                            className="accordion-title-btn"
+                            onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                        >
+                            <div className="accordion-title">
+                                <FaCalendarCheck />
+                                <span>Histórico de Shows</span>
+                            </div>
+                            <FaChevronDown className="accordion-icon" />
+                        </button>
                         <div className="past-shows-actions">
                             <button
                                 className="btn-icon"
@@ -496,12 +519,12 @@ const DashboardHome = ({ artist }) => {
                                     fetchPastShows();
                                 }}
                                 disabled={isLoadingPastShows}
+                                type="button"
                             >
                                 <FaRedoAlt />
                             </button>
-                            <FaChevronDown className="accordion-icon" />
                         </div>
-                    </button>
+                    </div>
 
                     <div className="accordion-content">
                         {isLoadingPastShows ? (
@@ -531,6 +554,14 @@ const DashboardHome = ({ artist }) => {
                     </div>
                 </div>
             )}
+
+            {/* Componente Flutuante de Live Stream */}
+            <LiveStreamFloating
+                isOpen={isLiveStreamOpen && activeShow}
+                onClose={() => setIsLiveStreamOpen(false)}
+                showId={activeShow?.id}
+                artistId={user?.id}
+            />
         </div>
     );
 };

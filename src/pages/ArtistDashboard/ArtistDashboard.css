@@ -367,6 +367,9 @@
 }
 
 .past-shows-section .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 1.5rem 0;
     border-bottom: 1px solid transparent;
     transition: border-color 0.3s ease;
@@ -374,6 +377,20 @@
 
 .past-shows-section.open .accordion-header {
     border-bottom-color: var(--border-color);
+}
+
+.past-shows-section .accordion-title-btn {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
 }
 
 .past-shows-section .accordion-content {

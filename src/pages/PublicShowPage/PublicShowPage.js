@@ -7,8 +7,11 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { getArtistDetails } from '../../services/artistService';
 import { getActiveShowByArtist, getArtistRepertoire } from '../../services/showService';
+import { getLiveStreamInfo } from '../../services/liveStreamService';
+import { useWebSocket } from '../../hooks/useWebSocket';
 import SongRequestCard from '../../components/SongRequestCard/SongRequestCard';
 import MakeRequestForm from '../../components/MakeRequestForm/MakeRequestForm';
+import LiveStreamViewer from '../../components/LiveStreamViewer/LiveStreamViewer';
 import './PublicShowPage.css';
 // --- 1. Adicionar FaHistory e FaMapMarkerAlt ---
 import {
@@ -29,8 +32,36 @@ const PublicShowPage = () => {
     const [repertoire, setRepertoire] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [liveStreamInfo, setLiveStreamInfo] = useState(null);
+    
+    // Gera ou recupera viewerId persistente do sessionStorage
+    const [viewerId] = useState(() => {
+        const storageKey = `pedeplay-viewer-${artistId}`;
+        let existingId = sessionStorage.getItem(storageKey);
+        
+        if (!existingId) {
+            existingId = `viewer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            sessionStorage.setItem(storageKey, existingId);
+        }
+        
+        return existingId;
+    });
 
-    const fetchPageData = useCallback(async () => {
+    // Refs para evitar loops no useEffect
+    const activeShowRef = React.useRef(activeShow);
+    const artistIdRef = React.useRef(artistId);
+
+    // Atualiza refs quando valores mudam
+    React.useEffect(() => {
+        activeShowRef.current = activeShow;
+        artistIdRef.current = artistId;
+    }, [activeShow, artistId]);
+
+    // WebSocket para atualizações em tempo real
+    const { lastMessage, isConnected: wsConnected } = useWebSocket(artistId);
+
+    // Busca inicial: apenas artista e show ativo
+    const fetchInitialData = useCallback(async () => {
         if (!artistId) {
             setError('ID do artista não fornecido.');
             setIsLoading(false);
@@ -38,39 +69,224 @@ const PublicShowPage = () => {
         }
 
         try {
-            // Só busca o artista se ainda não o tiver
-            if (!artist) {
-                setIsLoading(true);
-                const artistDetails = await getArtistDetails(artistId);
-                setArtist(artistDetails);
-            }
+            setIsLoading(true);
 
+            // Busca dados do artista
+            const artistDetails = await getArtistDetails(artistId);
+            setArtist(artistDetails);
+
+            // Busca show ativo (apenas uma vez no início)
             const activeShowData = await getActiveShowByArtist(artistId);
 
             if (activeShowData && activeShowData.status === 'ACTIVE') {
+                console.log('✅ Show ativo encontrado:', activeShowData.id);
                 setActiveShow(activeShowData);
 
-                // Só busca o repertório se ainda não o tiver
-                if (repertoire.length === 0) {
-                    const repertoireData = await getArtistRepertoire(artistId);
-                    setRepertoire(repertoireData || []);
+                // Busca repertório
+                const repertoireData = await getArtistRepertoire(artistId);
+                setRepertoire(repertoireData || []);
+
+                // Busca live stream (apenas se houver show ativo)
+                const liveStream = await getLiveStreamInfo(activeShowData.id);
+                if (liveStream?.isActive) {
+                    console.log('� Live stream ativa encontrada');
+                    setLiveStreamInfo(liveStream);
                 }
             } else {
+                console.log('⏸️  Nenhum show ativo - modo aguardando');
                 setActiveShow(null);
-                setRepertoire([]);
             }
 
         } catch (err) {
-            console.error("Erro ao carregar dados da página:", err);
+            console.error("❌ Erro ao carregar dados iniciais:", err);
             setError('Não foi possível carregar a página deste artista.');
         } finally {
             setIsLoading(false);
         }
-    }, [artistId, artist, repertoire.length]); // Dependências atualizadas
+    }, [artistId]);
 
+    // Atualiza apenas a fila de pedidos (chamado quando há mudanças)
+    const refreshShowData = useCallback(async () => {
+        if (!activeShow) return;
+
+        try {
+            console.log('🔄 Atualizando dados do show...');
+            const activeShowData = await getActiveShowByArtist(artistId);
+            
+            if (activeShowData && activeShowData.status === 'ACTIVE') {
+                setActiveShow(activeShowData);
+            } else {
+                // Show foi encerrado
+                setActiveShow(null);
+                setRepertoire([]);
+                setLiveStreamInfo(null);
+            }
+        } catch (err) {
+            console.error("❌ Erro ao atualizar show:", err);
+        }
+    }, [activeShow, artistId]);
+
+    // Carrega dados apenas uma vez no início
     useEffect(() => {
-        fetchPageData();
-    }, [fetchPageData]);
+        fetchInitialData();
+    }, [fetchInitialData]);
+
+    // 🔥 PROCESSA MENSAGENS WEBSOCKET EM TEMPO REAL
+    useEffect(() => {
+        if (!lastMessage) return;
+
+        console.log('📨 [PublicShowPage] WebSocket recebeu:', lastMessage.type, lastMessage);
+
+        const messageType = lastMessage.type;
+        
+        const handleShowStarted = async () => {
+            console.log('🎬 Show iniciou via WebSocket!');
+            try {
+                const activeShowData = await getActiveShowByArtist(artistIdRef.current);
+                if (activeShowData && activeShowData.status === 'ACTIVE') {
+                    setActiveShow(activeShowData);
+                    const repertoireData = await getArtistRepertoire(artistIdRef.current);
+                    setRepertoire(repertoireData || []);
+                }
+            } catch (err) {
+                console.error('❌ Erro ao buscar show iniciado:', err);
+            }
+        };
+
+        const handleLiveStreamStarted = async () => {
+            console.log('📹 Transmissão iniciou via WebSocket!');
+            const currentShow = activeShowRef.current;
+            console.log('📋 Show atual:', currentShow?.id);
+            if (currentShow) {
+                try {
+                    console.log('🔍 Buscando informações da livestream...');
+                    const liveStream = await getLiveStreamInfo(currentShow.id);
+                    console.log('📦 Livestream info:', liveStream);
+                    if (liveStream?.isActive) {
+                        console.log('✅ Livestream ativa! Exibindo player.');
+                        setLiveStreamInfo(liveStream);
+                    } else {
+                        console.log('⚠️ Livestream não está ativa');
+                    }
+                } catch (err) {
+                    console.error('❌ Erro ao buscar livestream:', err);
+                }
+            } else {
+                console.log('⚠️ Nenhum show ativo para iniciar livestream');
+            }
+        };
+
+        const handleNewSongRequest = async () => {
+            console.log('🎵 Novo pedido via WebSocket - ID:', lastMessage.requestId);
+            const currentShow = activeShowRef.current;
+            if (currentShow) {
+                try {
+                    console.log('🔄 Buscando show atualizado para ver novo pedido...');
+                    const activeShowData = await getActiveShowByArtist(artistIdRef.current);
+                    if (activeShowData && activeShowData.status === 'ACTIVE') {
+                        console.log('✅ Show atualizado! Total de pedidos:', activeShowData.requests?.length);
+                        setActiveShow(activeShowData);
+                    }
+                } catch (err) {
+                    console.error('❌ Erro ao atualizar pedidos:', err);
+                }
+            } else {
+                console.log('⚠️ Não há show ativo para atualizar pedidos');
+            }
+        };
+
+        const handleRequestStatusUpdated = () => {
+            console.log('✏️ [PublicShowPage] Status do pedido atualizado via WebSocket', lastMessage);
+            const currentShow = activeShowRef.current;
+            
+            if (!currentShow) {
+                console.log('⚠️ [PublicShowPage] Sem show ativo');
+                return;
+            }
+
+            if (!lastMessage.requestId) {
+                console.log('⚠️ [PublicShowPage] requestId inválido na mensagem:', lastMessage);
+                return;
+            }
+
+            const requestId = lastMessage.requestId;
+            const newStatus = lastMessage.newStatus || lastMessage.status;
+            
+            console.log(`📝 [PublicShowPage] Pedido ${requestId} mudou para: ${newStatus}`);
+            console.log(`📋 [PublicShowPage] Pedidos atuais na fila:`, currentShow.requests?.length);
+
+            // Se foi marcado como PLAYED ou SKIPPED, remove da fila visualmente
+            if (newStatus === 'PLAYED' || newStatus === 'SKIPPED') {
+                console.log(`🗑️ [PublicShowPage] Removendo pedido ${requestId} da fila (${newStatus})`);
+                setActiveShow(prev => {
+                    const updatedRequests = prev.requests.filter(req => req.requestId !== requestId);
+                    console.log(`✅ [PublicShowPage] Fila atualizada: ${prev.requests.length} → ${updatedRequests.length} pedidos`);
+                    return {
+                        ...prev,
+                        requests: updatedRequests
+                    };
+                });
+            } else {
+                // Para outros status, atualiza o status do pedido
+                console.log(`♻️ [PublicShowPage] Atualizando status do pedido ${requestId} para ${newStatus}`);
+                setActiveShow(prev => ({
+                    ...prev,
+                    requests: prev.requests.map(req =>
+                        req.requestId === requestId
+                            ? { ...req, status: newStatus }
+                            : req
+                    )
+                }));
+            }
+        };
+
+        switch (messageType) {
+            case 'show-started':
+                handleShowStarted();
+                break;
+
+            case 'show-ended':
+                console.log('🛑 Show encerrou via WebSocket!');
+                setActiveShow(null);
+                setRepertoire([]);
+                setLiveStreamInfo(null);
+                break;
+
+            case 'new-song-request':
+            case 'NEW_SONG_REQUEST':
+                handleNewSongRequest();
+                break;
+
+            case 'request-status-updated':
+            case 'REQUEST_STATUS_UPDATED':
+                handleRequestStatusUpdated();
+                break;
+
+            case 'livestream-started':
+                handleLiveStreamStarted();
+                break;
+
+            case 'livestream-ended':
+                console.log('📴 Transmissão encerrada via WebSocket!');
+                setLiveStreamInfo(null);
+                break;
+
+            case 'viewer-count-updated':
+                if (lastMessage.count !== undefined) {
+                    setLiveStreamInfo(prev => {
+                        if (!prev) return prev; // Não atualiza se não há livestream
+                        return {
+                            ...prev,
+                            currentViewers: lastMessage.count
+                        };
+                    });
+                }
+                break;
+
+            default:
+                console.log('📩 Mensagem WebSocket:', messageType);
+        }
+    }, [lastMessage]); // ✅ REMOVIDO liveStreamInfo das dependências
 
     const pendingRequests = useMemo(() => {
         if (!activeShow || !activeShow.requests) return [];
@@ -154,12 +370,24 @@ const PublicShowPage = () => {
                 <main className="layout-column content-column">
                     {isLive ? (
                         <>
+                            {/* Live Stream Viewer */}
+                            {liveStreamInfo && liveStreamInfo.isActive && (
+                                <div className="card livestream-section">
+                                    <h2>📺 Transmissão ao Vivo</h2>
+                                    <LiveStreamViewer
+                                        showId={activeShow.id}
+                                        userId={viewerId}
+                                        onStreamEnd={() => setLiveStreamInfo(null)}
+                                    />
+                                </div>
+                            )}
+
                             {/* 1. Formulário de Pedido */}
                             <MakeRequestForm
                                 artistId={artistId}
                                 showId={activeShow.id}
                                 repertoire={repertoire}
-                                onSubmissionSuccess={fetchPageData}
+                                onSubmissionSuccess={refreshShowData}
                             />
 
                             {/* 2. Fila de Pedidos */}
