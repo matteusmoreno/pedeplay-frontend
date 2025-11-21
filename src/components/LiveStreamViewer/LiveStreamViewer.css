@@ -2,9 +2,13 @@
     position: relative;
     width: 100%;
     max-width: 100%;
-    background: #000;
-    border-radius: 8px;
+    background: rgba(30, 30, 46, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0 0 16px 16px;
+    border-top: none;
     overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .livestream-viewer:fullscreen {
@@ -47,7 +51,10 @@
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: #000;
+    background: #0a0a0a;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;

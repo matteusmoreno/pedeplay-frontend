@@ -1,15 +1,13 @@
-/* * ========================================
- * ARQUIVO: src/components/SongRequestCard/SongRequestCard.js
- * (Adicionada prop 'isPublicView')
- * ========================================
- */
-import React from 'react';
+/* ========================================
+ * SONG REQUEST CARD COMPONENT
+ * Com funcionalidade de "Ler mais" para mensagens longas
+ * ======================================== */
+import React, { useState } from 'react';
 import './SongRequestCard.css';
 
-// --- 1. Adicionada prop 'isPublicView' ---
 const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false }) => {
-
     const { requestId, songTitle, songArtist, tipAmount, clientMessage, status } = request;
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Formata o valor da gorjeta
     const formattedTip = new Intl.NumberFormat('pt-BR', {
@@ -19,8 +17,14 @@ const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false 
 
     const isPending = status === 'PENDING';
 
+    // Limite de caracteres para mensagem
+    const MAX_CHARS = 100;
+    const shouldTruncate = clientMessage && clientMessage.length > MAX_CHARS;
+    const displayMessage = shouldTruncate && !isExpanded 
+        ? clientMessage.slice(0, MAX_CHARS) + '...' 
+        : clientMessage;
+
     return (
-        // --- 2. Adiciona classe 'public-view' se for o caso ---
         <div className={`song-request-card ${status.toLowerCase()} ${isPublicView ? 'public-view' : ''}`}>
             <div className="card-header">
                 <h3 className="song-title">{songTitle}</h3>
@@ -28,9 +32,17 @@ const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false 
             </div>
 
             {clientMessage && (
-                <p className="client-message">
-                    <strong>Mensagem:</strong> "{clientMessage}"
-                </p>
+                <div className="client-message">
+                    <strong>Mensagem:</strong> "{displayMessage}"
+                    {shouldTruncate && (
+                        <button 
+                            className="read-more-btn"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                        >
+                            {isExpanded ? 'Mostrar menos' : 'Ler mais'}
+                        </button>
+                    )}
+                </div>
             )}
 
             <div className="card-footer">

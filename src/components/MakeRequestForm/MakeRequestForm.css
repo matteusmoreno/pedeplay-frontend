@@ -1,118 +1,180 @@
-/* * ========================================
- * ARQUIVO: src/components/MakeRequestForm/MakeRequestForm.css
- * (CSS com estilos de busca)
- * ========================================
- */
+/* ========================================
+ * MAKE REQUEST FORM - DESIGN MODERNO 2024
+ * Glassmorphism | Gradientes | Animações Suaves
+ * ======================================== */
 
-/* 1. O formulário agora é o card */
+/* Formulário Principal */
 .make-request-form {
-    padding: 2rem;
-    border: 1px solid var(--border-color);
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    background: rgba(30, 30, 46, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.6s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 2. Cabeçalho do formulário */
+.make-request-form:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 12px 48px rgba(102, 126, 234, 0.15);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Cabeçalho do Formulário */
 .form-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    color: var(--primary-color);
+    gap: 1rem;
     margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
 }
 
 .form-header svg {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+    color: #667eea;
 }
 
 .form-header h2 {
     margin: 0;
     font-size: 1.75rem;
-    color: var(--primary-color);
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, #667eea 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 
 /* --- INÍCIO DA CORREÇÃO: Estilos de Busca --- */
 
-/* 3. Container de busca relativo para o dropdown */
+/* ========================================
+ * BUSCA DE MÚSICA
+ * ======================================== */
+
 .search-song-group {
     position: relative;
+    margin-bottom: 1.5rem;
 }
 
-/* 4. Estilos do grupo de input (copiado de ArtistDashboard.css) */
 .search-input-group {
     display: flex;
     align-items: stretch;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.search-input-group:focus-within {
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .search-input-group .search-icon {
     flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    background-color: #333;
-    border: 1px solid var(--border-color);
-    border-right: none;
-    border-radius: var(--border-radius) 0 0 var(--border-radius);
-    color: var(--text-secondary);
-    font-size: 1rem;
-    width: 45px;
-    padding: 0.75rem;
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
+    width: 50px;
+    padding: 0;
+    border: none;
+    transition: color 0.3s ease;
+}
+
+.search-input-group:focus-within .search-icon {
+    color: #667eea;
 }
 
 .search-input-group input {
-    /* Herda de global.css, mas ajusta borda */
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    margin-bottom: 0;
-    box-sizing: border-box;
-    width: 100%;
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 1rem;
+    font-size: 1rem;
+    outline: none;
+    margin: 0;
 }
 
-/* 5. Ícone de "Selecionado" (check) */
+.search-input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Ícone de Música Selecionada */
 .search-icon-selected {
     flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    background-color: #333;
-    border: 1px solid var(--border-color);
-    border-left: none;
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    color: var(--color-success);
-    /* Verde */
-    font-size: 1rem;
-    width: 45px;
-    padding: 0.75rem;
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #00c853 0%, #64dd17 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    width: 50px;
+    padding: 0;
+    border: none;
+    animation: checkBounce 0.5s ease;
 }
 
-/* Se o check estiver presente, o input não tem borda arredondada */
-.search-input-group input:has(+ .search-icon-selected) {
-    border-radius: 0;
+@keyframes checkBounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
 }
 
+/* ========================================
+ * DROPDOWN DE RESULTADOS
+ * ======================================== */
 
-/* 6. Estilos do Dropdown de Resultados */
 .song-list-container.public-search-results {
     position: absolute;
-    top: 100%;
-    /* Abaixo do form-group */
+    top: calc(100% + 0.5rem);
     left: 0;
     right: 0;
-    z-index: 10;
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-top: none;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
-    max-height: 250px;
+    z-index: 100;
+    background: rgba(30, 30, 46, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    max-height: 300px;
     overflow-y: auto;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+    animation: dropdownSlide 0.3s ease;
+}
+
+@keyframes dropdownSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .song-list {
     list-style: none;
-    padding: 0;
+    padding: 0.5rem;
     margin: 0;
 }
 
@@ -120,137 +182,285 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.song-list-item:last-child {
-    border-bottom: none;
+    transition: all 0.2s ease;
+    margin-bottom: 0.25rem;
 }
 
 .song-list-item:hover {
-    background-color: rgba(187, 134, 252, 0.1);
-    /* Roxo hover */
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateX(4px);
 }
 
 .song-list-item div {
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
 }
 
 .song-list-item .song-title {
-    font-weight: 500;
-    color: var(--text-color);
-    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    font-size: 1rem;
 }
 
 .song-list-item .song-artist {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
 }
 
-/* --- FIM DA CORREÇÃO --- */
+/* Scrollbar do Dropdown */
+.song-list-container.public-search-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+.song-list-container.public-search-results::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.song-list-container.public-search-results::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+}
 
 
-/* 7. Grupo de Input de Gorjeta (moderno) */
+/* ========================================
+ * INPUT DE GORJETA
+ * ======================================== */
+
 .tip-input-group {
     display: flex;
     align-items: stretch;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.tip-input-group:focus-within {
+    border-color: rgba(0, 200, 83, 0.5);
+    box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .tip-input-group span {
     flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    background-color: #333;
-    border: 1px solid var(--border-color);
-    border-right: none;
-    border-radius: var(--border-radius) 0 0 var(--border-radius);
-    color: var(--color-success);
-    /* Cor de dinheiro */
-    font-size: 1rem;
-    width: 45px;
-    padding: 0.75rem;
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #00c853 0%, #64dd17 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    width: 50px;
+    padding: 0;
+    border: none;
 }
 
 .tip-input-group input {
-    /* Herda de global.css, mas ajusta borda */
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    margin-bottom: 0;
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 1rem;
+    font-size: 1rem;
+    outline: none;
+    margin: 0;
 }
 
-/* --- INÍCIO DA CORREÇÃO (Esconder setas do input number) --- */
+.tip-input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Remover setas do input number */
 .tip-input-group input[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
-    /* Firefox */
 }
 
 .tip-input-group input[type="number"]::-webkit-outer-spin-button,
 .tip-input-group input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
-    /* Chrome, Safari, Edge */
     margin: 0;
 }
 
-/* --- FIM DA CORREÇÃO --- */
 
+/* ========================================
+ * ELEMENTOS DO FORMULÁRIO
+ * ======================================== */
 
 .tip-info {
     display: block;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.75rem;
     font-style: italic;
 }
 
-
-/* 8. Labels e Textarea */
 .make-request-form label {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: var(--text-secondary);
+    gap: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.make-request-form label svg {
+    color: #667eea;
+}
+
+.make-request-form .form-group {
+    margin-bottom: 1.75rem;
 }
 
 textarea {
-    min-height: 80px;
-    /* Reduz a altura padrão */
+    min-height: 100px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    color: #fff;
+    padding: 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.3s ease;
 }
 
-/* 9. Mensagens (usa o estilo global) */
+textarea:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========================================
+ * MENSAGENS DE FEEDBACK
+ * ======================================== */
+
 .message {
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    margin-bottom: 1rem;
+    padding: 1.25rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
     text-align: center;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .message.error {
-    background-color: #ffebee;
-    color: #c62828;
-    border: 1px solid #c62828;
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
 }
 
 .message.success {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #2e7d32;
+    background: rgba(0, 200, 83, 0.15);
+    color: #00c853;
+    border: 1px solid rgba(0, 200, 83, 0.3);
 }
 
-/* 10. Botão (usa o global) */
+/* ========================================
+ * BOTÃO DE ENVIO
+ * ======================================== */
+
 .make-request-form button {
     width: 100%;
+    padding: 1.25rem;
     font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 16px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+.make-request-form button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.make-request-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+}
+
+.make-request-form button:hover::before {
+    left: 100%;
+}
+
+.make-request-form button:active {
+    transform: translateY(0);
 }
 
 .make-request-form button:disabled {
-    background-color: #999;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
     cursor: not-allowed;
+    box-shadow: none;
 }
 
-/* 11. REMOVIDOS estilos de 'select' e '.select-wrapper' antigos */
+.make-request-form button:disabled::before {
+    display: none;
+}
+
+/* ========================================
+ * RESPONSIVIDADE
+ * ======================================== */
+
+@media (max-width: 768px) {
+    .make-request-form {
+        padding: 2rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .make-request-form {
+        padding: 1.5rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.35rem;
+    }
+
+    .make-request-form button {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+}

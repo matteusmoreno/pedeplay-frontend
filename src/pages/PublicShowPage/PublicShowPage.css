@@ -1,23 +1,52 @@
-/* * ========================================
- * ARQUIVO: src/pages/PublicShowPage/PublicShowPage.css
- * (Reformulado com novo layout de 2 colunas)
- * ========================================
- */
+/* ========================================
+ * PÚBLICO SHOW PAGE - DESIGN PROFISSIONAL 2024
+ * Layout Moderno | Glassmorphism | Totalmente Responsivo
+ * ======================================== */
+
+:root {
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-dark: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 .public-show-page {
-    max-width: 1100px;
-    /* Layout um pouco mais largo */
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-    animation: fadeIn 0.3s ease-out;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+    padding: 2rem 1rem;
+    position: relative;
+    overflow-x: hidden;
 }
+
+/* Efeito de partículas no fundo */
+.public-show-page::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(245, 87, 108, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ========================================
+ * ANIMAÇÕES PROFISSIONAIS
+ * ======================================== */
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -27,7 +56,7 @@
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: translateX(-30px);
     }
     to {
         opacity: 1;
@@ -38,7 +67,7 @@
 @keyframes scaleIn {
     from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(0.9);
     }
     to {
         opacity: 1;
@@ -46,58 +75,108 @@
     }
 }
 
-/* --- INÍCIO DA REFORMULAÇÃO --- */
-
-/* 1. O Layout em Grid principal */
-.public-page-layout {
-    display: grid;
-    /* Coluna de info fixa em 320px, conteúdo ocupa o resto */
-    grid-template-columns: 320px 1fr;
-    gap: 2rem;
-    align-items: flex-start;
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
-/* 2. Coluna da Esquerda (Informações do Artista) */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* ========================================
+ * LAYOUT PRINCIPAL
+ * ======================================== */
+
+.public-page-layout {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 2.5rem;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+ * COLUNA DO ARTISTA (SIDEBAR)
+ * ======================================== */
+
 .layout-column.artist-info-column {
     position: sticky;
     top: 100px;
-    /* 80px (header) + 20px (margem) */
-    padding: 1.5rem;
-    animation: slideIn 0.4s ease-out;
-    /* Removemos o 'display:flex' para um layout de info vertical */
+    background: rgba(30, 30, 46, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.6s ease-out;
+    transition: var(--transition-smooth);
 }
 
-/* 3. Coluna da Direita (Conteúdo) */
+.layout-column.artist-info-column:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+}
+
 .layout-column.content-column {
-    /* Esta coluna vai rolar */
     min-width: 0;
-    animation: fadeIn 0.5s ease-out;
-    /* Corrige overflow de flexbox/grid */
+    animation: fadeIn 0.8s ease-out;
 }
 
-/* 4. REMOVIDO: .artist-header-card (substituído por .artist-info-column) */
+/* ========================================
+ * AVATAR DO ARTISTA
+ * ======================================== */
 
-
-/* --- Estilos dos Itens na Coluna de Info --- */
 .artist-info-column .artist-avatar {
-    width: 120px;
-    height: 120px;
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
     overflow: hidden;
-    background-color: #333;
-    border: 3px solid var(--primary-color);
     position: relative;
-    margin: 0 auto 1.5rem auto;
-    /* Centraliza o avatar */
+    margin: 0 auto 2rem auto;
+    background: var(--gradient-primary);
+    padding: 4px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.artist-info-column .artist-avatar::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(20px);
 }
 
 .profile-avatar-image {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 4px;
+    left: 4px;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
     object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid rgba(30, 30, 46, 0.9);
+    transition: var(--transition-smooth);
+}
+
+.artist-info-column:hover .profile-avatar-image {
+    transform: scale(1.05);
 }
 
 .profile-avatar-placeholder {
@@ -106,258 +185,532 @@
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 5rem;
-    color: #444;
+    color: rgba(255, 255, 255, 0.15);
+    background: var(--gradient-dark);
+    border-radius: 50%;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+/* ========================================
+ * INFORMAÇÕES DO ARTISTA
+ * ======================================== */
 
 .artist-info-column .artist-info {
     display: flex;
     flex-direction: column;
     text-align: center;
-    /* Centraliza todo o texto na coluna */
 }
 
 .artist-info-column .artist-name {
-    font-size: 1.75rem;
-    /* Um pouco menor para a coluna */
-    font-weight: 700;
-    color: var(--text-color);
-    margin: 0;
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, #667eea 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 0.5rem 0;
     line-height: 1.2;
+    letter-spacing: -0.5px;
 }
 
-/* --- 5. NOVO: Estilo da Localização --- */
+/* ========================================
+ * LOCALIZAÇÃO
+ * ======================================== */
+
 .artist-location {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Centraliza */
     gap: 0.5rem;
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    margin: 0.75rem 0 0 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 1.5rem 0;
+    font-weight: 500;
 }
 
 .artist-location svg {
-    font-size: 0.85rem;
+    font-size: 1rem;
+    color: var(--primary-color);
 }
 
-/* --- FIM: Estilo da Localização --- */
-
+/* ========================================
+ * BADGE STATUS (AO VIVO / OFFLINE)
+ * ======================================== */
 
 .artist-info-column .live-status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    font-weight: bold;
-    padding: 0.25rem 0.75rem;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
     border-radius: 50px;
-    margin: 1rem auto 0 auto;
-    /* Centraliza o badge */
+    margin: 0 auto 1.5rem auto;
     width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
 }
 
 .live-status-badge.live {
-    background-color: #c8e6c9;
-    color: #1b5e20;
-    animation: pulse-live 1.5s infinite;
+    background: linear-gradient(135deg, #00c853 0%, #64dd17 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 200, 83, 0.4);
+    animation: pulse-live 2s infinite;
+}
+
+.live-status-badge.live::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
 }
 
 .live-status-badge.offline {
-    background-color: #333;
-    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @keyframes pulse-live {
-    0% {
-        opacity: 1;
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(0, 200, 83, 0.4);
     }
-
     50% {
-        opacity: 0.6;
-    }
-
-    100% {
-        opacity: 1;
+        transform: scale(1.05);
+        box-shadow: 0 6px 30px rgba(0, 200, 83, 0.6);
     }
 }
+
+/* ========================================
+ * BIOGRAFIA
+ * ======================================== */
 
 .artist-info-column .artist-bio {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-top: 1.5rem;
-    line-height: 1.6;
-    text-align: left;
-    /* Biografia fica melhor alinhada à esquerda */
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.8;
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 0;
+    font-weight: 400;
 }
+
+/* ========================================
+ * REDES SOCIAIS
+ * ======================================== */
 
 .artist-info-column .artist-social-links {
     display: flex;
-    gap: 1.25rem;
-    margin-top: 1.5rem;
+    gap: 1rem;
+    margin-top: 2rem;
     justify-content: center;
-    /* Centraliza os ícones */
 }
 
 .artist-social-links a {
-    color: var(--text-secondary);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 1.5rem;
-    transition: color 0.2s;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.artist-social-links a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: var(--transition-smooth);
 }
 
 .artist-social-links a:hover {
-    color: var(--primary-color);
+    transform: translateY(-4px) scale(1.1);
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
 }
 
-/* --- 6. Seção da Fila (Agora na Coluna 2) --- */
+.artist-social-links a:hover::before {
+    opacity: 1;
+}
+
+.artist-social-links a svg {
+    position: relative;
+    z-index: 1;
+}
+
+.artist-social-links a:hover svg {
+    color: #fff;
+}
+
+/* ========================================
+ * SEÇÃO DA FILA DE PEDIDOS
+ * ======================================== */
+
 .song-queue-section {
     margin-top: 2rem;
-    /* Espaçamento do formulário */
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
+    background: rgba(30, 30, 46, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 1s ease-out;
+    transition: var(--transition-smooth);
+}
+
+.song-queue-section:hover {
+    border-color: rgba(102, 126, 234, 0.2);
 }
 
 .song-queue-section .form-header {
-    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.song-queue-section .form-header svg {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.song-queue-section .form-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
 }
 
 .queue-list-container {
-    /* Não precisa mais de altura máxima, pois a coluna rola */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     max-height: none;
-    overflow-y: auto;
-    padding-top: 0;
 }
 
 .queue-empty-message {
     text-align: center;
-    color: var(--text-secondary);
-    font-style: italic;
-    padding: 2rem 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
 }
 
-/* --- FIM DA REFORMULAÇÃO --- */
+/* ========================================
+ * MENSAGEM OFFLINE
+ * ======================================== */
 
-
-/* Card de Artista Offline (na Coluna 2) */
 .offline-message-card {
-    padding: 2rem;
+    padding: 4rem 2rem;
     text-align: center;
-    border: 1px solid var(--border-color);
+    background: rgba(30, 30, 46, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    animation: scaleIn 0.6s ease-out;
 }
 
 .offline-message-card h3 {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    font-weight: 800;
 }
 
 .offline-message-card p {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
 }
 
-/* Mensagens de Erro/Loading */
+/* ========================================
+ * MENSAGENS DE ERRO/LOADING
+ * ======================================== */
+
 .public-page-message {
     text-align: center;
-    font-size: 1.2rem;
-    padding: 4rem 1rem;
-    color: var(--text-secondary);
+    font-size: 1.3rem;
+    padding: 5rem 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(30, 30, 46, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    margin: 2rem;
+    animation: fadeIn 0.6s ease-out;
 }
 
 .public-page-message.error {
-    color: var(--color-danger);
-    font-weight: 500;
+    color: #ff6b6b;
+    font-weight: 600;
+    border-color: rgba(255, 107, 107, 0.2);
 }
 
-/* --- Responsividade --- */
-@media (max-width: 850px) {
+/* ========================================
+ * RESPONSIVIDADE PROFISSIONAL
+ * ======================================== */
+
+@media (max-width: 1200px) {
+    .public-page-layout {
+        grid-template-columns: 340px 1fr;
+        gap: 2rem;
+    }
+
+    .artist-info-column .artist-avatar {
+        width: 140px;
+        height: 140px;
+    }
+}
+
+@media (max-width: 992px) {
     .public-page-layout {
         grid-template-columns: 1fr;
-        /* Coluna única */
         gap: 2rem;
     }
 
     .layout-column.artist-info-column {
         position: static;
-        /* Remove o sticky */
         top: auto;
+        padding: 2rem;
+    }
+
+    .artist-info-column .artist-avatar {
+        width: 120px;
+        height: 120px;
+    }
+
+    .artist-info-column .artist-name {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .public-show-page {
+        padding: 1rem 0.5rem;
+    }
+
+    .public-page-layout {
+        gap: 1.5rem;
+    }
+
+    .layout-column.artist-info-column {
         padding: 1.5rem;
+        border-radius: 20px;
+    }
+
+    .artist-info-column .artist-avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    .artist-info-column .artist-name {
+        font-size: 1.5rem;
     }
 
     .artist-info-column .artist-bio {
-        text-align: center;
-        /* Centraliza a bio no mobile */
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+
+    .artist-social-links a {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
     }
 
     .song-queue-section {
         padding: 1.5rem;
+        border-radius: 20px;
+    }
+
+    .song-queue-section .form-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .offline-message-card {
+        padding: 3rem 1.5rem;
+    }
+
+    .offline-message-card h3 {
+        font-size: 1.5rem;
+    }
+
+    .offline-message-card p {
+        font-size: 1rem;
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
     .public-show-page {
-        padding: 0 0.5rem;
-        margin-top: 1rem;
+        padding: 0.5rem;
     }
 
-    .make-request-form {
-        padding: 1.5rem;
+    .layout-column.artist-info-column {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .artist-info-column .artist-avatar {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 1.5rem;
+    }
+
+    .artist-info-column .artist-name {
+        font-size: 1.35rem;
+    }
+
+    .live-status-badge {
+        font-size: 0.75rem;
+        padding: 0.6rem 1.2rem;
+    }
+
+    .artist-info-column .artist-bio {
+        font-size: 0.85rem;
+    }
+
+    .artist-social-links {
+        gap: 0.75rem;
+    }
+
+    .artist-social-links a {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .song-queue-section {
+        padding: 1.25rem;
+    }
+
+    .song-queue-section .form-header {
+        margin-bottom: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .queue-empty-message {
+        padding: 2rem 1rem;
+        font-size: 1rem;
     }
 }
 
-/* Live Stream Section */
+/* ========================================
+ * SEÇÃO LIVESTREAM
+ * ======================================== */
+
 .livestream-section {
     margin-bottom: 2rem;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    animation: scaleIn 0.8s ease-out;
 }
 
 .livestream-section h2 {
     margin: 0 0 1.5rem 0;
-    font-size: 1.5rem;
-    color: var(--color-text);
-}
-
-/* WebSocket Status Indicator */
-.ws-status-indicator {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(30, 30, 46, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px 16px 0 0;
+}
+
+/* ========================================
+ * INDICADOR DE STATUS WEBSOCKET
+ * ======================================== */
+
+.ws-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 1rem;
-    transition: all 0.3s ease;
+    transition: var(--transition-smooth);
+    backdrop-filter: blur(10px);
 }
 
 .ws-status-indicator.connected {
-    background: rgba(76, 175, 80, 0.1);
+    background: rgba(76, 175, 80, 0.15);
     color: #4caf50;
     border: 1px solid rgba(76, 175, 80, 0.3);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.2);
 }
 
 .ws-status-indicator.disconnected {
-    background: rgba(255, 152, 0, 0.1);
+    background: rgba(255, 152, 0, 0.15);
     color: #ff9800;
     border: 1px solid rgba(255, 152, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(255, 152, 0, 0.2);
 }
 
 .ws-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: currentColor;
+    position: relative;
+}
+
+.ws-dot::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+    filter: blur(4px);
 }
 
 .ws-status-indicator.connected .ws-dot {
-    animation: pulse-dot 2s infinite;
+    animation: pulse-dot 2s ease-in-out infinite;
 }
 
 .ws-status-indicator.disconnected .ws-dot {
-    animation: blink-dot 1s infinite;
+    animation: blink-dot 1s ease-in-out infinite;
 }
 
 @keyframes pulse-dot {
@@ -367,7 +720,7 @@
     }
     50% {
         opacity: 0.6;
-        transform: scale(1.2);
+        transform: scale(1.3);
     }
 }
 
@@ -376,70 +729,119 @@
         opacity: 1;
     }
     25%, 75% {
-        opacity: 0.3;
+        opacity: 0.2;
     }
 }
 
-/* === ANIMAÇÕES E TRANSIÇÕES PROFISSIONAIS === */
+/* ========================================
+ * CARDS E ELEMENTOS GERAIS
+ * ======================================== */
+
 .card {
-    animation: scaleIn 0.3s ease-out;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: scaleIn 0.5s ease-out;
+    transition: var(--transition-smooth);
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
 }
 
 .song-request-card {
-    animation: slideIn 0.4s ease-out;
+    animation: slideIn 0.6s ease-out;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    transition: var(--transition-smooth);
 }
 
-.livestream-section {
-    animation: scaleIn 0.5s ease-out;
+.song-request-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateX(8px);
 }
 
-/* Transições suaves nos botões */
+/* ========================================
+ * BOTÕES E INTERAÇÕES
+ * ======================================== */
+
 button, .control-button {
-    transition: all 0.2s ease;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+button::before, .control-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:hover::before, .control-button:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
 button:hover, .control-button:hover {
-    transform: scale(1.05);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
 }
 
 button:active, .control-button:active {
-    transform: scale(0.95);
+    transform: translateY(0) scale(0.98);
 }
 
-/* Loading state suave */
-.public-page-message {
-    animation: fadeIn 0.3s ease-out;
-}
+/* ========================================
+ * TRANSIÇÕES DE ENTRADA/SAÍDA
+ * ======================================== */
 
-/* Melhoria no badge ao vivo */
-.live-status-badge.live {
-    animation: pulse-live 2s infinite, scaleIn 0.3s ease-out;
-}
-
-/* Transições de entrada/saída suaves */
 .fade-enter {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-20px) scale(0.95);
 }
 
 .fade-enter-active {
     opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.4s, transform 0.4s;
 }
 
 .fade-exit {
     opacity: 1;
+    transform: scale(1);
 }
 
 .fade-exit-active {
     opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.2s, transform 0.2s;
+    transform: translateY(-20px) scale(0.95);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+/* ========================================
+ * SCROLLBAR CUSTOMIZADO
+ * ======================================== */
+
+.queue-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.queue-list-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.queue-list-container::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: 10px;
+}
+
+.queue-list-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
