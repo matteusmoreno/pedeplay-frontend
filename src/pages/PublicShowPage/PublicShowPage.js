@@ -1,8 +1,3 @@
-/* * ========================================
- * ARQUIVO: src/pages/PublicShowPage/PublicShowPage.js
- * (Layout de 2 colunas REFORMULADO para melhor UX)
- * ========================================
- */
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { getArtistDetails } from '../../services/artistService';
@@ -12,8 +7,8 @@ import { useWebSocket } from '../../hooks/useWebSocket';
 import SongRequestCard from '../../components/SongRequestCard/SongRequestCard';
 import MakeRequestForm from '../../components/MakeRequestForm/MakeRequestForm';
 import LiveStreamViewer from '../../components/LiveStreamViewer/LiveStreamViewer';
+import BookingModal from '../../components/BookingModal/BookingModal'; // <-- NOVO COMPONENTE
 import './PublicShowPage.css';
-// --- 1. Adicionar FaHistory e FaMapMarkerAlt ---
 import {
     FaUserCircle,
     FaInstagram,
@@ -21,7 +16,8 @@ import {
     FaYoutube,
     FaBroadcastTower,
     FaHistory,
-    FaMapMarkerAlt // <-- ADICIONADO
+    FaMapMarkerAlt,
+    FaCalendarCheck // <-- Ícone adicionado
 } from 'react-icons/fa';
 
 const PublicShowPage = () => {
@@ -33,17 +29,17 @@ const PublicShowPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [liveStreamInfo, setLiveStreamInfo] = useState(null);
-    
-    // Gera ou recupera viewerId persistente do sessionStorage
+    const [isBookingOpen, setIsBookingOpen] = useState(false); // <-- Estado do Modal
+
     const [viewerId] = useState(() => {
         const storageKey = `pedeplay-viewer-${artistId}`;
         let existingId = sessionStorage.getItem(storageKey);
-        
+
         if (!existingId) {
             existingId = `viewer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             sessionStorage.setItem(storageKey, existingId);
         }
-        
+
         return existingId;
     });
 
@@ -89,7 +85,7 @@ const PublicShowPage = () => {
                 // Busca live stream (apenas se houver show ativo)
                 const liveStream = await getLiveStreamInfo(activeShowData.id);
                 if (liveStream?.isActive) {
-                    console.log('� Live stream ativa encontrada');
+                    console.log('📹 Live stream ativa encontrada');
                     setLiveStreamInfo(liveStream);
                 }
             } else {
@@ -112,7 +108,7 @@ const PublicShowPage = () => {
         try {
             console.log('🔄 Atualizando dados do show...');
             const activeShowData = await getActiveShowByArtist(artistId);
-            
+
             if (activeShowData && activeShowData.status === 'ACTIVE') {
                 setActiveShow(activeShowData);
             } else {
@@ -138,7 +134,7 @@ const PublicShowPage = () => {
         console.log('📨 [PublicShowPage] WebSocket recebeu:', lastMessage.type, lastMessage);
 
         const messageType = lastMessage.type;
-        
+
         const handleShowStarted = async () => {
             console.log('🎬 Show iniciou via WebSocket!');
             try {
@@ -198,7 +194,7 @@ const PublicShowPage = () => {
         const handleRequestStatusUpdated = () => {
             console.log('✏️ [PublicShowPage] Status do pedido atualizado via WebSocket', lastMessage);
             const currentShow = activeShowRef.current;
-            
+
             if (!currentShow) {
                 console.log('⚠️ [PublicShowPage] Sem show ativo');
                 return;
@@ -211,16 +207,14 @@ const PublicShowPage = () => {
 
             const requestId = lastMessage.requestId;
             const newStatus = lastMessage.newStatus || lastMessage.status;
-            
+
             console.log(`📝 [PublicShowPage] Pedido ${requestId} mudou para: ${newStatus}`);
-            console.log(`📋 [PublicShowPage] Pedidos atuais na fila:`, currentShow.requests?.length);
 
             // Se foi marcado como PLAYED ou SKIPPED, remove da fila visualmente
             if (newStatus === 'PLAYED' || newStatus === 'SKIPPED') {
                 console.log(`🗑️ [PublicShowPage] Removendo pedido ${requestId} da fila (${newStatus})`);
                 setActiveShow(prev => {
                     const updatedRequests = prev.requests.filter(req => req.requestId !== requestId);
-                    console.log(`✅ [PublicShowPage] Fila atualizada: ${prev.requests.length} → ${updatedRequests.length} pedidos`);
                     return {
                         ...prev,
                         requests: updatedRequests
@@ -286,7 +280,7 @@ const PublicShowPage = () => {
             default:
                 console.log('📩 Mensagem WebSocket:', messageType);
         }
-    }, [lastMessage]); // ✅ REMOVIDO liveStreamInfo das dependências
+    }, [lastMessage]);
 
     const pendingRequests = useMemo(() => {
         if (!activeShow || !activeShow.requests) return [];
@@ -302,25 +296,22 @@ const PublicShowPage = () => {
     const hasSocialLinks = artist && artist.socialLinks && Object.values(artist.socialLinks).some(link => link);
     const isLive = activeShow && activeShow.status === 'ACTIVE';
 
-    if (isLoading) {
-        return <div className="public-page-message">Carregando...</div>;
-    }
-
-    if (error) {
-        return <div className="public-page-message error">{error}</div>;
-    }
-
-    if (!artist) {
-        return <div className="public-page-message error">Artista não encontrado.</div>;
-    }
+    if (isLoading) return <div className="public-page-message">Carregando...</div>;
+    if (error) return <div className="public-page-message error">{error}</div>;
+    if (!artist) return <div className="public-page-message error">Artista não encontrado.</div>;
 
     return (
         <div className="public-show-page">
+            {/* --- Modal de Contratação --- */}
+            <BookingModal
+                isOpen={isBookingOpen}
+                onClose={() => setIsBookingOpen(false)}
+                artistId={artistId}
+                artistName={artist.name}
+            />
 
-            {/* --- INÍCIO DA REFORMULAÇÃO --- */}
             <div className="public-page-layout">
-
-                {/* --- Coluna 1: Informações do Artista (Sticky) --- */}
+                {/* --- Coluna 1: Artista --- */}
                 <aside className="layout-column artist-info-column card">
                     <div className="artist-avatar">
                         {artist.profileImageUrl ? (
@@ -332,19 +323,23 @@ const PublicShowPage = () => {
                     <div className="artist-info">
                         <h1 className="artist-name">{artist.name}</h1>
 
-                        {/* --- NOVO: Localização --- */}
                         {artist.address && artist.address.city && (
                             <p className="artist-location">
                                 <FaMapMarkerAlt />
                                 {artist.address.city}, {artist.address.state}
                             </p>
                         )}
-                        {/* --- FIM: Localização --- */}
 
                         <div className={`live-status-badge ${isLive ? 'live' : 'offline'}`}>
                             <FaBroadcastTower />
                             <span>{isLive ? 'AO VIVO' : 'OFFLINE'}</span>
                         </div>
+
+                        {/* --- BOTÃO DE CONTRATAR (NOVO) --- */}
+                        <button className="btn-primary btn-hire" onClick={() => setIsBookingOpen(true)}>
+                            <FaCalendarCheck /> Contratar Show
+                        </button>
+                        {/* -------------------------------- */}
 
                         {artist.biography && (
                             <p className="artist-bio">{artist.biography}</p>
@@ -352,25 +347,18 @@ const PublicShowPage = () => {
 
                         {hasSocialLinks && (
                             <div className="artist-social-links">
-                                {artist.socialLinks.instagramUrl && (
-                                    <a href={artist.socialLinks.instagramUrl} target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
-                                )}
-                                {artist.socialLinks.facebookUrl && (
-                                    <a href={artist.socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer"><FaFacebook /></a>
-                                )}
-                                {artist.socialLinks.youtubeUrl && (
-                                    <a href={artist.socialLinks.youtubeUrl} target="_blank" rel="noopener noreferrer"><FaYoutube /></a>
-                                )}
+                                {artist.socialLinks.instagramUrl && <a href={artist.socialLinks.instagramUrl} target="_blank" rel="noreferrer"><FaInstagram /></a>}
+                                {artist.socialLinks.facebookUrl && <a href={artist.socialLinks.facebookUrl} target="_blank" rel="noreferrer"><FaFacebook /></a>}
+                                {artist.socialLinks.youtubeUrl && <a href={artist.socialLinks.youtubeUrl} target="_blank" rel="noreferrer"><FaYoutube /></a>}
                             </div>
                         )}
                     </div>
                 </aside>
 
-                {/* --- Coluna 2: Conteúdo Principal (Formulário e Fila) --- */}
+                {/* --- Coluna 2: Conteúdo --- */}
                 <main className="layout-column content-column">
                     {isLive ? (
                         <>
-                            {/* Live Stream Viewer */}
                             {liveStreamInfo && liveStreamInfo.isActive && (
                                 <div className="card livestream-section">
                                     <h2>📺 Transmissão ao Vivo</h2>
@@ -382,7 +370,6 @@ const PublicShowPage = () => {
                                 </div>
                             )}
 
-                            {/* 1. Formulário de Pedido */}
                             <MakeRequestForm
                                 artistId={artistId}
                                 showId={activeShow.id}
@@ -390,13 +377,11 @@ const PublicShowPage = () => {
                                 onSubmissionSuccess={refreshShowData}
                             />
 
-                            {/* 2. Fila de Pedidos */}
                             <section className="song-queue-section card">
                                 <div className="form-header">
                                     <FaHistory />
                                     <h2>Pedidos na Fila</h2>
                                 </div>
-
                                 {pendingRequests.length > 0 ? (
                                     <div className="queue-list-container">
                                         {pendingRequests.map(req => (
@@ -408,23 +393,19 @@ const PublicShowPage = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="queue-empty-message">
-                                        Ainda não há pedidos. Seja o primeiro!
-                                    </p>
+                                    <p className="queue-empty-message">Ainda não há pedidos. Seja o primeiro!</p>
                                 )}
                             </section>
                         </>
                     ) : (
-                        // Mensagem de Artista Offline
                         <div className="offline-message-card card">
                             <h3>Show Encerrado</h3>
-                            <p>O artista não está recebendo pedidos no momento. Volte mais tarde!</p>
+                            <p>O artista não está recebendo pedidos no momento.</p>
+                            <p style={{ marginTop: '1rem' }}>Gostou do artista? <br /><strong>Solicite um orçamento para o seu evento clicando em "Contratar Show".</strong></p>
                         </div>
                     )}
                 </main>
-
             </div>
-            {/* --- FIM DA REFORMULAÇÃO --- */}
         </div>
     );
 };

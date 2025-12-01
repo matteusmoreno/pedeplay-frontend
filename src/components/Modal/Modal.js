@@ -6,14 +6,14 @@ import React from 'react';
 import './Modal.css';
 import { FaTimes } from 'react-icons/fa';
 
-const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
+const Modal = ({ isOpen, onClose, onConfirm, title, children, size = 'medium', showActions = true }) => {
     if (!isOpen) {
         return null;
     }
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className={`modal-content modal-${size}`} onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h3 className="modal-title">{title}</h3>
                     <button className="btn-icon modal-close-btn" onClick={onClose}>
@@ -23,14 +23,16 @@ const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
                 <div className="modal-body">
                     {children}
                 </div>
-                <div className="modal-actions">
-                    <button className="btn-outline" onClick={onClose}>
-                        Cancelar
-                    </button>
-                    <button className="btn-danger" onClick={onConfirm}>
-                        Confirmar
-                    </button>
-                </div>
+                {showActions && (
+                    <div className="modal-actions">
+                        <button className="btn-outline" onClick={onClose}>
+                            Cancelar
+                        </button>
+                        <button className="btn-danger" onClick={onConfirm}>
+                            Confirmar
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
