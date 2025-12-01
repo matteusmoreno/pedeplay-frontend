@@ -1,0 +1,165 @@
+/* ========================================
+ * ARQUIVO: src/pages/ArtistDashboard/DashboardRepertoire.css
+ * Estilos específicos para a aba "Repertório"
+ * ========================================
+ */
+
+/* --- Card de Informações do Repertório --- */
+.repertoire-info-card {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.card-header-simple {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.card-header-simple h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+.repertoire-count {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* --- Lista de Músicas --- */
+.song-list-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.song-list-container.short-list {
+    max-height: 250px;
+}
+
+.song-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.song-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.song-list-item:last-child {
+    border-bottom: none;
+}
+
+.song-list-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.song-list-item .song-title {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.song-list-item .song-artist {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* --- Botões de Ação --- */
+.btn-icon {
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.btn-icon.add {
+    color: var(--color-success);
+}
+
+.btn-icon.add:hover {
+    background-color: rgba(67, 160, 71, 0.1);
+}
+
+.btn-icon.remove {
+    color: var(--color-danger);
+}
+
+.btn-icon.remove:hover {
+    background-color: rgba(229, 57, 53, 0.1);
+}
+
+/* --- Formulário de Ações do Repertório --- */
+.repertoire-actions-form {
+    background-color: var(--card-bg);
+    padding: 0 2rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.repertoire-form button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* --- Input de Busca --- */
+.search-input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.search-input-group .search-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background-color: #333;
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    width: 45px;
+    padding: 0.75rem;
+    box-sizing: border-box;
+}
+
+.search-input-group input {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 1024px) {
+    .repertoire-layout {
+        grid-template-columns: 1fr;
+    }
+}

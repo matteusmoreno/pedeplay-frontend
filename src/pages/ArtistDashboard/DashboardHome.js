@@ -25,6 +25,7 @@ import {
     FaTimesCircle,
     FaVideo
 } from 'react-icons/fa';
+import './DashboardHome.css';
 // --- 1. Importar o novo hook ---
 import { useNotification } from '../../context/NotificationContext';
 

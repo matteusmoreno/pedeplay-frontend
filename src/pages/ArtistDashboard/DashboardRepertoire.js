@@ -8,6 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getArtistRepertoire, addSongsToRepertoire, removeSongsFromRepertoire } from '../../services/artistService';
 import { getAllSongs, createSong } from '../../services/songService';
 import { FaPlus, FaTrash, FaSearch, FaChevronDown } from 'react-icons/fa';
+import './DashboardRepertoire.css';
 
 // Componente Accordion
 const AccordionSection = ({ title, icon, children, defaultOpen = false }) => {

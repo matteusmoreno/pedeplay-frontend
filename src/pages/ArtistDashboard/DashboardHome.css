@@ -1,0 +1,395 @@
+/* ========================================
+ * ARQUIVO: src/pages/ArtistDashboard/DashboardHome.css
+ * Estilos específicos para a aba "Modo Show"
+ * ========================================
+ */
+
+/* --- Card "Modo Show" Unificado --- */
+.modo-show-header {
+    align-items: flex-start;
+}
+
+.modo-show-title {
+    flex-grow: 1;
+}
+
+.show-explanation-text {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+    max-width: 600px;
+}
+
+.show-explanation-card {
+    display: none;
+}
+
+/* --- Aba "Modo Show" --- */
+.dashboard-tab-content.show-is-active .card-header {
+    border-left-color: var(--color-danger);
+}
+
+.show-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 4px;
+}
+
+.show-status {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.show-status.active {
+    color: var(--color-success);
+}
+
+.show-status.inactive {
+    color: var(--text-secondary);
+}
+
+.dashboard-tab-content.show-is-active .show-status.active::before {
+    content: 'REC';
+    font-size: 0.8rem;
+    color: white;
+    background-color: var(--color-danger);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.25rem;
+    animation: pulse-rec 1.5s infinite;
+}
+
+@keyframes pulse-rec {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.show-controls button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- Estatísticas do Show --- */
+.show-stats-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.stat-card svg {
+    font-size: 2rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.stat-card.timer {
+    background-color: #2a2a2a;
+    border-color: var(--color-danger);
+}
+
+.stat-card.timer svg {
+    color: var(--color-danger);
+}
+
+.stat-card.timer .stat-value {
+    color: var(--color-danger);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* --- Abas de Pedidos --- */
+.requests-list-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    margin-bottom: 3rem;
+}
+
+.requests-tabs {
+    display: flex;
+    background-color: #2a2a2a;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.requests-tab-btn {
+    flex: 1;
+    background-color: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.requests-tab-btn:hover {
+    color: var(--text-color);
+}
+
+.requests-tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-counter {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.requests-tab-btn.active .tab-counter {
+    background-color: var(--primary-color);
+    color: #121212;
+}
+
+.requests-list {
+    margin-bottom: 0;
+    padding: 1.5rem;
+}
+
+.requests-list h3 {
+    display: none;
+}
+
+.empty-state {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    padding: 2rem;
+    background-color: transparent;
+    border-radius: 0;
+}
+
+.empty-state-small {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 1rem 0;
+}
+
+/* --- Histórico de Shows --- */
+.past-shows-section {
+    margin-top: 2rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 0 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.past-shows-section.card {
+    padding: 0 2rem;
+}
+
+.past-shows-section .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.past-shows-section.open .accordion-header {
+    border-bottom-color: var(--border-color);
+}
+
+.past-shows-section .accordion-title-btn {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+}
+
+.past-shows-section .accordion-content {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.past-shows-section.open .accordion-content {
+    max-height: 2000px;
+    padding-bottom: 1.5rem;
+}
+
+.past-shows-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.past-shows-actions .btn-icon {
+    color: var(--text-color);
+}
+
+.past-shows-actions .btn-icon:hover {
+    color: var(--primary-color);
+}
+
+.past-shows-list-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.past-shows-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.past-show-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.past-show-item:last-child {
+    border-bottom: none;
+}
+
+.past-show-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.past-show-date {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.past-show-stats {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.past-show-metrics {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.past-show-metrics span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 1024px) {
+    .modo-show-header {
+        align-items: center;
+        padding: 1.5rem;
+    }
+
+    .show-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card.timer {
+        grid-row: 1;
+    }
+
+    .past-shows-section,
+    .past-shows-section.card {
+        padding: 0 1rem;
+    }
+
+    .past-shows-section .accordion-content {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .past-shows-section.open .accordion-content {
+        padding-bottom: 1rem;
+    }
+
+    /* Abas de Pedido (Mobile) */
+    .requests-tabs {
+        flex-direction: column;
+    }
+
+    .requests-tab-btn {
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .requests-tab-btn.active {
+        border-bottom: 1px solid var(--border-color);
+        background-color: rgba(187, 134, 252, 0.1);
+    }
+
+    .requests-list {
+        padding: 1rem;
+    }
+}

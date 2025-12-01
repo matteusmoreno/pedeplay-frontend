@@ -1,0 +1,112 @@
+/* ========================================
+ * ARQUIVO: src/pages/ArtistDashboard/DashboardFinances.css
+ * Estilos específicos para a aba "Finanças"
+ * ========================================
+ */
+
+/* --- Grid de Estatísticas (Finanças) --- */
+.finances-tab .show-stats-grid {
+    grid-template-columns: 2fr 1fr;
+}
+
+.stat-card.balance svg {
+    color: var(--color-success);
+}
+
+.stat-card.balance .stat-value {
+    color: var(--color-success);
+}
+
+/* --- Card de Saque --- */
+.withdraw-card {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.withdraw-card .stat-label {
+    font-size: 0.8rem;
+}
+
+.withdraw-card button {
+    width: 100%;
+}
+
+/* --- Card de Transações --- */
+.transactions-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.transactions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-desc {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.transaction-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.transaction-amount {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.transaction-item.success .transaction-amount {
+    color: var(--color-success);
+}
+
+.transaction-item.danger .transaction-amount {
+    color: var(--color-danger);
+}
+
+/* --- Card de Gráfico --- */
+.finances-chart-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.chart-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--border-color);
+}
+
+/* --- Responsividade --- */
+@media (max-width: 1024px) {
+    .finances-tab .show-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

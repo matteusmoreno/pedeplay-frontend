@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { FaDollarSign, FaHistory, FaChartLine } from 'react-icons/fa';
+import './DashboardFinances.css';
 
 // Helper para formatar moeda (copiado do DashboardHome)
 const formatCurrency = (value) => {

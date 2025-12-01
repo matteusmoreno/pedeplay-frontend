@@ -24,6 +24,7 @@ import {
     FaShareAlt,
     FaUser // <--- CORREÇÃO: Ícone adicionado aqui
 } from 'react-icons/fa';
+import './DashboardProfile.css';
 
 // --- Schema de Validação para UPDATE ---
 const updateProfileSchema = yup.object().shape({
