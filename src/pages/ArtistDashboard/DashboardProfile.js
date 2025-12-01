@@ -1,6 +1,6 @@
-/* * ========================================
+/* ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardProfile.js
- * (Aba "Perfil") - CORRIGIDO
+ * Perfil do Artista - Versão Aprimorada
  * ========================================
  */
 import React, { useState, useEffect, useRef } from 'react';
@@ -22,7 +22,14 @@ import {
     FaChevronDown,
     FaMapMarkerAlt,
     FaShareAlt,
-    FaUser // <--- CORREÇÃO: Ícone adicionado aqui
+    FaUser,
+    FaEdit,
+    FaSave,
+    FaTimes,
+    FaCheck,
+    FaCamera,
+    FaPhone,
+    FaCrown
 } from 'react-icons/fa';
 import './DashboardProfile.css';
 
@@ -113,10 +120,16 @@ const DashboardProfile = ({ artist, onUpdate }) => {
     const [profileImageUrl, setProfileImageUrl] = useState(artist.profileImageUrl);
     const [isCepLoading, setIsCepLoading] = useState(false);
     const [cepError, setCepError] = useState(null);
-
     const [addressFound, setAddressFound] = useState(true);
+    const [imageUploadProgress, setImageUploadProgress] = useState(0);
+    
+    // Estados para seções retráteis
+    const [isBasicInfoOpen, setIsBasicInfoOpen] = useState(true);
+    const [isAddressOpen, setIsAddressOpen] = useState(false);
+    const [isSocialOpen, setIsSocialOpen] = useState(false);
 
     const fileInputRef = useRef(null);
+    const alertTimeoutRef = useRef(null);
 
     const { register, handleSubmit, reset, setValue, watch, trigger, clearErrors, formState: { errors } } = useForm({
         resolver: yupResolver(updateProfileSchema),
@@ -141,10 +154,31 @@ const DashboardProfile = ({ artist, onUpdate }) => {
         if (artist.address?.cep) {
             setAddressFound(true);
         } else {
-            // Se não tem CEP, começa com os campos ocultos
             setAddressFound(false);
         }
     }, [artist, reset]);
+
+    // Auto-dismiss do alerta após 5 segundos
+    useEffect(() => {
+        if (message.text) {
+            // Limpa timeout anterior se existir
+            if (alertTimeoutRef.current) {
+                clearTimeout(alertTimeoutRef.current);
+            }
+            
+            // Define novo timeout
+            alertTimeoutRef.current = setTimeout(() => {
+                setMessage({ type: '', text: '' });
+            }, 5000);
+        }
+        
+        // Cleanup
+        return () => {
+            if (alertTimeoutRef.current) {
+                clearTimeout(alertTimeoutRef.current);
+            }
+        };
+    }, [message]);
 
     const getError = (fieldName) => {
         const fieldError = fieldName.split('.').reduce((acc, part) => acc && acc[part], errors);
@@ -224,14 +258,46 @@ const DashboardProfile = ({ artist, onUpdate }) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        // Validação de tamanho (máx 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            setMessage({ type: 'error', text: 'A imagem deve ter no máximo 5MB.' });
+            return;
+        }
+
+        // Validação de tipo
+        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+            setMessage({ type: 'error', text: 'Apenas arquivos JPG, JPEG ou PNG são permitidos.' });
+            return;
+        }
+
         setIsSubmitting(true);
         setMessage({ type: '', text: '' });
+        setImageUploadProgress(0);
+
         try {
+            // Simula progresso de upload
+            const progressInterval = setInterval(() => {
+                setImageUploadProgress((prev) => {
+                    if (prev >= 90) {
+                        clearInterval(progressInterval);
+                        return 90;
+                    }
+                    return prev + 10;
+                });
+            }, 200);
+
             const updatedArtist = await uploadProfileImage(artist.id, file);
-            setProfileImageUrl(updatedArtist.profileImageUrl);
-            setMessage({ type: 'success', text: 'Foto de perfil atualizada!' });
-            onUpdate();
+            clearInterval(progressInterval);
+            setImageUploadProgress(100);
+            
+            setTimeout(() => {
+                setProfileImageUrl(updatedArtist.profileImageUrl);
+                setMessage({ type: 'success', text: 'Foto de perfil atualizada com sucesso!' });
+                setImageUploadProgress(0);
+                onUpdate();
+            }, 500);
         } catch (error) {
+            setImageUploadProgress(0);
             setMessage({ type: 'error', text: error.message || 'Erro ao enviar a imagem.' });
         } finally {
             setIsSubmitting(false);
@@ -240,186 +306,398 @@ const DashboardProfile = ({ artist, onUpdate }) => {
 
     const hasSocialLinks = artist.socialLinks && Object.values(artist.socialLinks).some(link => link);
 
+    const closeAlert = () => {
+        if (alertTimeoutRef.current) {
+            clearTimeout(alertTimeoutRef.current);
+        }
+        setMessage({ type: '', text: '' });
+    };
+
     return (
         <div className="dashboard-tab-content profile-tab">
+            
+            {/* Header Section */}
+            <div className="profile-header">
+                <h1 className="profile-main-title">Meu Perfil</h1>
+                <p className="profile-subtitle">Gerencie suas informações pessoais e profissionais</p>
+            </div>
 
-            {/* --- 1. CARD DE INFORMAÇÕES (READ-ONLY) --- */}
-            <div className="profile-info-card">
-                <div className="profile-info-avatar">
-                    <div className="avatar-upload-container">
-                        {profileImageUrl ? (
-                            <img src={profileImageUrl} alt="Foto de Perfil" className="profile-avatar-image" />
-                        ) : (
-                            <FaUserCircle className="profile-avatar-placeholder" />
-                        )}
-                        <button
-                            type="button"
-                            className="btn-overlay"
-                            onClick={() => fileInputRef.current.click()}
-                            disabled={isSubmitting}
-                        >
-                            <FaUpload /> Alterar Foto
-                        </button>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleImageUpload}
-                            accept="image/png, image/jpeg"
-                            style={{ display: 'none' }}
-                        />
+            {/* Mensagens de Feedback */}
+            {message.text && (
+                <div className={`profile-alert profile-alert-${message.type}`}>
+                    <div className="profile-alert-icon">
+                        {message.type === 'success' ? <FaCheck /> : <FaTimes />}
                     </div>
+                    <div className="profile-alert-content">
+                        <p>{message.text}</p>
+                    </div>
+                    <button 
+                        type="button" 
+                        className="profile-alert-close"
+                        onClick={closeAlert}
+                        aria-label="Fechar alerta"
+                    >
+                        <FaTimes />
+                    </button>
                 </div>
-                <div className="profile-info-details">
-                    <h2 className="profile-info-name">{artist.name}</h2>
-                    <p className="profile-info-item">
-                        <FaEnvelope /> {artist.email}
-                    </p>
-                    <p className="profile-info-item">
-                        <FaIdCard /> Plano: <span className="plan-badge">{artist.subscription?.planType || 'FREE'}</span>
-                    </p>
-                    <p className="profile-info-item">
-                        <FaCalendarAlt /> Membro desde: {formatDate(artist.createdAt)}
-                    </p>
+            )}
 
-                    {hasSocialLinks && (
-                        <div className="profile-social-links">
-                            {artist.socialLinks.instagramUrl && (
-                                <a href={artist.socialLinks.instagramUrl} target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
+            {/* --- 1. CARD DE PERFIL PRINCIPAL --- */}
+            <div className="profile-hero-card">
+                <div className="profile-hero-content">
+                    {/* Avatar Section */}
+                    <div className="profile-avatar-section">
+                        <div className="profile-avatar-wrapper">
+                            {profileImageUrl ? (
+                                <img src={profileImageUrl} alt="Foto de Perfil" className="profile-avatar" />
+                            ) : (
+                                <div className="profile-avatar-empty">
+                                    <FaUserCircle />
+                                </div>
                             )}
-                            {artist.socialLinks.facebookUrl && (
-                                <a href={artist.socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer"><FaFacebook /></a>
+                            <button
+                                type="button"
+                                className="profile-avatar-change-btn"
+                                onClick={() => fileInputRef.current.click()}
+                                disabled={isSubmitting}
+                                title="Alterar foto de perfil"
+                            >
+                                <FaCamera />
+                            </button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleImageUpload}
+                                accept="image/png, image/jpeg, image/jpg"
+                                style={{ display: 'none' }}
+                            />
+                        </div>
+                        {imageUploadProgress > 0 && (
+                            <div className="profile-avatar-progress">
+                                <div 
+                                    className="profile-avatar-progress-bar" 
+                                    style={{ width: `${imageUploadProgress}%` }}
+                                ></div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Info Section */}
+                    <div className="profile-hero-info">
+                        <div className="profile-hero-name-section">
+                            <h2 className="profile-hero-name">{artist.name}</h2>
+                            {artist.subscription?.planType && artist.subscription.planType !== 'FREE' && (
+                                <span className="profile-plan-badge premium">
+                                    <FaCrown /> {artist.subscription.planType}
+                                </span>
                             )}
-                            {artist.socialLinks.youtubeUrl && (
-                                <a href={artist.socialLinks.youtubeUrl} target="_blank" rel="noopener noreferrer"><FaYoutube /></a>
-                            )}
-                            {artist.socialLinks.linkedInUrl && (
-                                <a href={artist.socialLinks.linkedInUrl} target="_blank" rel="noopener noreferrer"><FaLinkedin /></a>
+                            {artist.subscription?.planType === 'FREE' && (
+                                <span className="profile-plan-badge free">FREE</span>
                             )}
                         </div>
-                    )}
+
+                        {artist.biography && (
+                            <p className="profile-hero-bio">{artist.biography}</p>
+                        )}
+
+                        <div className="profile-hero-stats">
+                            <div className="profile-stat-item">
+                                <FaEnvelope className="profile-stat-icon" />
+                                <div className="profile-stat-details">
+                                    <span className="profile-stat-label">Email</span>
+                                    <span className="profile-stat-value">{artist.email}</span>
+                                </div>
+                            </div>
+                            <div className="profile-stat-item">
+                                <FaCalendarAlt className="profile-stat-icon" />
+                                <div className="profile-stat-details">
+                                    <span className="profile-stat-label">Membro desde</span>
+                                    <span className="profile-stat-value">{formatDate(artist.createdAt)}</span>
+                                </div>
+                            </div>
+                            {artist.address?.city && (
+                                <div className="profile-stat-item">
+                                    <FaMapMarkerAlt className="profile-stat-icon" />
+                                    <div className="profile-stat-details">
+                                        <span className="profile-stat-label">Localização</span>
+                                        <span className="profile-stat-value">{artist.address.city}, {artist.address.state}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {hasSocialLinks && (
+                            <div className="profile-social-section">
+                                <p className="profile-social-title">Redes Sociais</p>
+                                <div className="profile-social-links">
+                                    {artist.socialLinks.instagramUrl && (
+                                        <a href={artist.socialLinks.instagramUrl} target="_blank" rel="noopener noreferrer" className="profile-social-link instagram">
+                                            <FaInstagram />
+                                        </a>
+                                    )}
+                                    {artist.socialLinks.facebookUrl && (
+                                        <a href={artist.socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer" className="profile-social-link facebook">
+                                            <FaFacebook />
+                                        </a>
+                                    )}
+                                    {artist.socialLinks.youtubeUrl && (
+                                        <a href={artist.socialLinks.youtubeUrl} target="_blank" rel="noopener noreferrer" className="profile-social-link youtube">
+                                            <FaYoutube />
+                                        </a>
+                                    )}
+                                    {artist.socialLinks.linkedInUrl && (
+                                        <a href={artist.socialLinks.linkedInUrl} target="_blank" rel="noopener noreferrer" className="profile-social-link linkedin">
+                                            <FaLinkedin />
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {message.text && (
-                <div className={`form-message ${message.type}-message`}>{message.text}</div>
-            )}
+            {/* --- 2. SEÇÕES DE EDIÇÃO --- */}
+            <form onSubmit={handleSubmit(onSubmit)} className="profile-edit-form">
 
-            {/* --- 2. SEÇÕES DE EDIÇÃO (ACCORDION) --- */}
-            <form onSubmit={handleSubmit(onSubmit)} className="profile-form">
+                {/* Informações Básicas */}
+                <div className="profile-section-card">
+                    <button 
+                        type="button"
+                        className="profile-section-header"
+                        onClick={() => setIsBasicInfoOpen(!isBasicInfoOpen)}
+                    >
+                        <div className="profile-section-title">
+                            <FaUser className="profile-section-icon" />
+                            <h3>Informações Básicas</h3>
+                        </div>
+                        <FaChevronDown className={`profile-section-chevron ${isBasicInfoOpen ? 'open' : ''}`} />
+                    </button>
 
-                <AccordionSection title="Dados Pessoais" icon={<FaUser />}>
-                    <div className="form-group">
-                        <label htmlFor="name">Nome Artístico</label>
-                        <input id="name" type="text" {...register('name')} />
-                        {getError('name')}
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="email">Email de Login</label>
-                        <input id="email" type="email" {...register('email')} />
-                        {getError('email')}
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="biography">Biografia</label>
-                        <textarea id="biography" {...register('biography')} />
-                        {getError('biography')}
-                    </div>
-                </AccordionSection>
+                    <div className={`profile-section-content ${isBasicInfoOpen ? 'open' : ''}`}>
+                        <div className="profile-form-row">
+                            <div className="profile-form-group">
+                                <label htmlFor="name" className="profile-label">
+                                    Nome Artístico <span className="profile-label-required">*</span>
+                                </label>
+                                <input 
+                                    id="name" 
+                                    type="text" 
+                                    className="profile-input" 
+                                    placeholder="Digite seu nome artístico"
+                                    {...register('name')} 
+                                />
+                                {getError('name')}
+                            </div>
 
-                <AccordionSection title="Endereço" icon={<FaMapMarkerAlt />}>
-                    <div className="form-group">
-                        <label htmlFor="cep">CEP</label>
-                        <div className="cep-input-group">
-                            <div className="form-group">
+                            <div className="profile-form-group">
+                                <label htmlFor="email" className="profile-label">
+                                    Email de Login <span className="profile-label-required">*</span>
+                                </label>
+                                <input 
+                                    id="email" 
+                                    type="email" 
+                                    className="profile-input" 
+                                    placeholder="seu@email.com"
+                                    {...register('email')} 
+                                />
+                                {getError('email')}
+                            </div>
+                        </div>
+
+                        <div className="profile-form-group">
+                            <label htmlFor="biography" className="profile-label">
+                                Biografia
+                            </label>
+                            <textarea 
+                                id="biography" 
+                                className="profile-textarea" 
+                                placeholder="Conte um pouco sobre você, sua carreira e estilo musical..."
+                                rows="4"
+                                {...register('biography')} 
+                            />
+                            {getError('biography')}
+                            <span className="profile-input-hint">
+                                Uma boa biografia ajuda a criar conexão com seu público
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Endereço */}
+                <div className="profile-section-card">
+                    <button 
+                        type="button"
+                        className="profile-section-header"
+                        onClick={() => setIsAddressOpen(!isAddressOpen)}
+                    >
+                        <div className="profile-section-title">
+                            <FaMapMarkerAlt className="profile-section-icon" />
+                            <h3>Endereço</h3>
+                        </div>
+                        <FaChevronDown className={`profile-section-chevron ${isAddressOpen ? 'open' : ''}`} />
+                    </button>
+
+                    <div className={`profile-section-content ${isAddressOpen ? 'open' : ''}`}>
+                        <div className="profile-form-group">
+                            <label htmlFor="cep" className="profile-label">CEP</label>
+                            <div className="profile-cep-group">
                                 <input
                                     id="cep"
                                     type="text"
+                                    className="profile-input"
                                     {...register('cep', { onChange: handleCepChange })}
                                     maxLength={9}
                                     placeholder="00000-000"
                                 />
+                                <button
+                                    type="button"
+                                    className="profile-btn-cep"
+                                    onClick={handleCepSearch}
+                                    disabled={isCepLoading}
+                                >
+                                    {isCepLoading ? 'Buscando...' : 'Buscar CEP'}
+                                </button>
                             </div>
-                            <button
-                                type="button"
-                                className="btn-secondary"
-                                onClick={handleCepSearch}
-                                disabled={isCepLoading}
-                            >
-                                {isCepLoading ? '...' : 'Buscar'}
-                            </button>
+                            {getError('cep')}
+                            {cepError && <span className="error-message">{cepError}</span>}
                         </div>
-                        {getError('cep')}
-                        {cepError && <span className="error-message">{cepError}</span>}
-                        {isCepLoading && <span className="loading-message">Buscando...</span>}
-                    </div>
 
-                    <div className={`address-details ${addressFound ? 'visible' : ''}`}>
-                        <div className="form-group">
-                            <label htmlFor="street">Rua</label>
-                            <input id="street" type="text" {...register('street')} readOnly />
-                            {getError('street')}
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="neighborhood">Bairro</label>
-                            <input id="neighborhood" type="text" {...register('neighborhood')} readOnly />
-                            {getError('neighborhood')}
-                        </div>
-                        <div className="address-fields-grid">
-                            <div className="form-group">
-                                <label htmlFor="city">Cidade</label>
-                                <input id="city" type="text" {...register('city')} readOnly />
-                                {getError('city')}
+                        <div className={`profile-address-details ${addressFound ? 'visible' : ''}`}>
+                            <div className="profile-form-row">
+                                <div className="profile-form-group profile-form-group-large">
+                                    <label htmlFor="street" className="profile-label">Rua</label>
+                                    <input id="street" type="text" className="profile-input" {...register('street')} readOnly />
+                                    {getError('street')}
+                                </div>
+                                <div className="profile-form-group">
+                                    <label htmlFor="number" className="profile-label">Número</label>
+                                    <input id="number" type="text" className="profile-input" placeholder="123" {...register('number')} />
+                                    {getError('number')}
+                                </div>
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="state">Estado</label>
-                                <input id="state" type="text" {...register('state')} readOnly />
-                                {getError('state')}
-                            </div>
-                        </div>
-                        <div className="address-fields-grid-auto">
-                            <div className="form-group">
-                                <label htmlFor="number">Número</label>
-                                <input id="number" type="text" {...register('number')} />
-                                {getError('number')}
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="complement">Complemento</label>
-                                <input id="complement" type="text" {...register('complement')} />
-                                {getError('complement')}
-                            </div>
-                        </div>
-                    </div>
-                </AccordionSection>
 
-                <AccordionSection title="Redes Sociais" icon={<FaShareAlt />}>
-                    <div className="form-group">
-                        <label htmlFor="socialLinks.instagramUrl">Instagram</label>
-                        <div className="social-input-group">
-                            <span className="social-icon"><FaInstagram /></span>
-                            <input id="socialLinks.instagramUrl" type="text" {...register('socialLinks.instagramUrl')} placeholder="https://instagram.com/seu_usuario" />
-                        </div>
-                        {getError('socialLinks.instagramUrl')}
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="socialLinks.facebookUrl">Facebook</label>
-                        <div className="social-input-group">
-                            <span className="social-icon"><FaFacebook /></span>
-                            <input id="socialLinks.facebookUrl" type="text" {...register('socialLinks.facebookUrl')} placeholder="https://facebook.com/seu_usuario" />
-                        </div>
-                        {getError('socialLinks.facebookUrl')}
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="socialLinks.youtubeUrl">YouTube</label>
-                        <div className="social-input-group">
-                            <span className="social-icon"><FaYoutube /></span>
-                            <input id="socialLinks.youtubeUrl" type="text" {...register('socialLinks.youtubeUrl')} placeholder="https://youtube.com/seu_canal" />
-                        </div>
-                        {getError('socialLinks.youtubeUrl')}
-                    </div>
-                </AccordionSection>
+                            <div className="profile-form-row">
+                                <div className="profile-form-group">
+                                    <label htmlFor="neighborhood" className="profile-label">Bairro</label>
+                                    <input id="neighborhood" type="text" className="profile-input" {...register('neighborhood')} readOnly />
+                                    {getError('neighborhood')}
+                                </div>
+                                <div className="profile-form-group">
+                                    <label htmlFor="complement" className="profile-label">Complemento</label>
+                                    <input id="complement" type="text" className="profile-input" placeholder="Apto, Bloco..." {...register('complement')} />
+                                    {getError('complement')}
+                                </div>
+                            </div>
 
-                <button type="submit" className="btn-primary btn-submit-profile" disabled={isSubmitting}>
-                    {isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
-                </button>
+                            <div className="profile-form-row">
+                                <div className="profile-form-group">
+                                    <label htmlFor="city" className="profile-label">Cidade</label>
+                                    <input id="city" type="text" className="profile-input" {...register('city')} readOnly />
+                                    {getError('city')}
+                                </div>
+                                <div className="profile-form-group profile-form-group-small">
+                                    <label htmlFor="state" className="profile-label">Estado</label>
+                                    <input id="state" type="text" className="profile-input" {...register('state')} readOnly />
+                                    {getError('state')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Redes Sociais */}
+                <div className="profile-section-card">
+                    <button 
+                        type="button"
+                        className="profile-section-header"
+                        onClick={() => setIsSocialOpen(!isSocialOpen)}
+                    >
+                        <div className="profile-section-title">
+                            <FaShareAlt className="profile-section-icon" />
+                            <h3>Redes Sociais</h3>
+                        </div>
+                        <FaChevronDown className={`profile-section-chevron ${isSocialOpen ? 'open' : ''}`} />
+                    </button>
+
+                    <div className={`profile-section-content ${isSocialOpen ? 'open' : ''}`}>
+                        <div className="profile-form-row">
+                            <div className="profile-form-group">
+                                <label htmlFor="socialLinks.instagramUrl" className="profile-label">
+                                    <FaInstagram /> Instagram
+                                </label>
+                                <input 
+                                    id="socialLinks.instagramUrl" 
+                                    type="text" 
+                                    className="profile-input" 
+                                    placeholder="https://instagram.com/seu_usuario"
+                                    {...register('socialLinks.instagramUrl')} 
+                                />
+                                {getError('socialLinks.instagramUrl')}
+                            </div>
+
+                            <div className="profile-form-group">
+                                <label htmlFor="socialLinks.facebookUrl" className="profile-label">
+                                    <FaFacebook /> Facebook
+                                </label>
+                                <input 
+                                    id="socialLinks.facebookUrl" 
+                                    type="text" 
+                                    className="profile-input" 
+                                    placeholder="https://facebook.com/seu_usuario"
+                                    {...register('socialLinks.facebookUrl')} 
+                                />
+                                {getError('socialLinks.facebookUrl')}
+                            </div>
+                        </div>
+
+                        <div className="profile-form-row">
+                            <div className="profile-form-group">
+                                <label htmlFor="socialLinks.youtubeUrl" className="profile-label">
+                                    <FaYoutube /> YouTube
+                                </label>
+                                <input 
+                                    id="socialLinks.youtubeUrl" 
+                                    type="text" 
+                                    className="profile-input" 
+                                    placeholder="https://youtube.com/seu_canal"
+                                    {...register('socialLinks.youtubeUrl')} 
+                                />
+                                {getError('socialLinks.youtubeUrl')}
+                            </div>
+
+                            <div className="profile-form-group">
+                                <label htmlFor="socialLinks.linkedInUrl" className="profile-label">
+                                    <FaLinkedin /> LinkedIn
+                                </label>
+                                <input 
+                                    id="socialLinks.linkedInUrl" 
+                                    type="text" 
+                                    className="profile-input" 
+                                    placeholder="https://linkedin.com/in/seu_perfil"
+                                    {...register('socialLinks.linkedInUrl')} 
+                                />
+                                {getError('socialLinks.linkedInUrl')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Botão de Salvar */}
+                <div className="profile-form-actions">
+                    <button type="submit" className="profile-btn-save" disabled={isSubmitting}>
+                        {isSubmitting ? (
+                            <>
+                                <span className="profile-btn-spinner"></span>
+                                Salvando...
+                            </>
+                        ) : (
+                            <>
+                                <FaSave /> Salvar Alterações
+                            </>
+                        )}
+                    </button>
+                </div>
             </form>
         </div>
     );

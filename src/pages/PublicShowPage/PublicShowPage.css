@@ -762,16 +762,18 @@
 }
 
 /* ========================================
- * BOTÕES E INTERAÇÕES
+ * BOTÕES E INTERAÇÕES (APENAS NESTA PÁGINA)
  * ======================================== */
 
-button, .control-button {
+.public-show-page button,
+.public-show-page .control-button {
     transition: var(--transition-smooth);
     position: relative;
     overflow: hidden;
 }
 
-button::before, .control-button::before {
+.public-show-page button::before,
+.public-show-page .control-button::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -784,17 +786,20 @@ button::before, .control-button::before {
     transition: width 0.6s, height 0.6s;
 }
 
-button:hover::before, .control-button:hover::before {
+.public-show-page button:hover::before,
+.public-show-page .control-button:hover::before {
     width: 300px;
     height: 300px;
 }
 
-button:hover, .control-button:hover {
+.public-show-page button:hover,
+.public-show-page .control-button:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
 }
 
-button:active, .control-button:active {
+.public-show-page button:active,
+.public-show-page .control-button:active {
     transform: translateY(0) scale(0.98);
 }
 
