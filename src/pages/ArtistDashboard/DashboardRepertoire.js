@@ -1,28 +1,28 @@
-/* * ========================================
+/* ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardRepertoire.js
- * (Aba "Repertório")
+ * Repertório do Artista - Design Aprimorado
  * ========================================
  */
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getArtistRepertoire, addSongsToRepertoire, removeSongsFromRepertoire } from '../../services/artistService';
 import { getAllSongs, createSong } from '../../services/songService';
-import { FaPlus, FaTrash, FaSearch, FaChevronDown } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaSearch, FaChevronDown, FaMusic, FaMicrophone, FaTimes, FaCheck } from 'react-icons/fa';
 import './DashboardRepertoire.css';
 
 // Componente Accordion
 const AccordionSection = ({ title, icon, children, defaultOpen = false }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     return (
-        <div className={`accordion-section ${isOpen ? 'open' : ''}`}>
-            <button type="button" className="accordion-header" onClick={() => setIsOpen(!isOpen)}>
-                <div className="accordion-title">
+        <div className={`repertoire-accordion ${isOpen ? 'open' : ''}`}>
+            <button type="button" className="repertoire-accordion-header" onClick={() => setIsOpen(!isOpen)}>
+                <div className="repertoire-accordion-title">
                     {icon}
                     <span>{title}</span>
                 </div>
-                <FaChevronDown className="accordion-icon" />
+                <FaChevronDown className="repertoire-accordion-icon" />
             </button>
-            <div className="accordion-content">
+            <div className="repertoire-accordion-content">
                 {children}
             </div>
         </div>
@@ -39,6 +39,16 @@ const DashboardRepertoire = ({ artist }) => {
     const [newTitle, setNewTitle] = useState('');
     const [newArtist, setNewArtist] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+
+    // Auto-dismiss alert após 5 segundos
+    useEffect(() => {
+        if (message.text) {
+            const timer = setTimeout(() => {
+                setMessage({ type: '', text: '' });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [message]);
 
     // Função para carregar todos os dados
     const loadData = async () => {
@@ -136,118 +146,177 @@ const DashboardRepertoire = ({ artist }) => {
 
     return (
         <div className="dashboard-tab-content repertoire-tab">
-
-            {/* --- 1. CARD DE EXIBIÇÃO --- */}
-            <div className="repertoire-info-card card">
-                <div className="card-header-simple">
-                    <h3>Meu Repertório ({myRepertoire.length})</h3>
-                    <span className="repertoire-count">
-                        Plano {artist.subscription?.planType || 'FREE'}: {myRepertoire.length} / {artist.subscription?.planType === 'FREE' ? '300' : 'Ilimitado'}
-                    </span>
+            {/* Header com Estatísticas */}
+            <div className="repertoire-header">
+                <div className="repertoire-header-content">
+                    <div className="repertoire-header-icon">
+                        <FaMusic />
+                    </div>
+                    <div className="repertoire-header-text">
+                        <h2>Meu Repertório</h2>
+                        <p>Gerencie as músicas que você toca</p>
+                    </div>
                 </div>
-                <div className="song-list-container">
-                    <ul className="song-list">
-                        {myRepertoire.length > 0 ? (
-                            myRepertoire.map(song => (
-                                <li key={song.id} className="song-list-item">
-                                    <div>
-                                        <span className="song-title">{song.title}</span>
-                                        <span className="song-artist">{song.artistName}</span>
-                                    </div>
-                                    <button
-                                        className="btn-icon remove"
-                                        onClick={() => handleRemoveSong(song)}
-                                        title="Remover do repertório"
-                                    >
-                                        <FaTrash />
-                                    </button>
-                                </li>
-                            ))
-                        ) : (
-                            <p className="empty-state-small">Seu repertório está vazio. Adicione músicas abaixo.</p>
-                        )}
-                    </ul>
+                <div className="repertoire-stats">
+                    <div className="repertoire-stat-card">
+                        <span className="repertoire-stat-number">{myRepertoire.length}</span>
+                        <span className="repertoire-stat-label">Músicas</span>
+                    </div>
+                    <div className="repertoire-stat-card">
+                        <span className="repertoire-stat-number">
+                            {artist.subscription?.planType === 'FREE' ? '300' : '∞'}
+                        </span>
+                        <span className="repertoire-stat-label">Limite</span>
+                    </div>
                 </div>
             </div>
 
             {/* Mensagens de Sucesso/Erro */}
             {message.text && (
-                <div className={`form-message ${message.type}-message`}>{message.text}</div>
+                <div className={`repertoire-alert repertoire-alert-${message.type}`}>
+                    {message.type === 'success' ? <FaCheck /> : <FaTimes />}
+                    <span>{message.text}</span>
+                    <button 
+                        className="repertoire-alert-close" 
+                        onClick={() => setMessage({ type: '', text: '' })}
+                    >
+                        <FaTimes />
+                    </button>
+                </div>
             )}
 
-            {/* --- 2. SEÇÕES DE AÇÃO (ACCORDION) --- */}
-            <div className="repertoire-actions-form card">
+            {/* Lista do Repertório */}
+            <div className="repertoire-main-card">
+                <div className="repertoire-card-header">
+                    <h3><FaMusic /> Músicas no Repertório</h3>
+                    <input
+                        type="text"
+                        className="repertoire-quick-search"
+                        placeholder="Buscar no repertório..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="repertoire-songs-grid">
+                    {myRepertoire.length > 0 ? (
+                        myRepertoire
+                            .filter(song => 
+                                song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                song.artistName.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map(song => (
+                                <div key={song.id} className="repertoire-song-card">
+                                    <div className="repertoire-song-icon">
+                                        <FaMicrophone />
+                                    </div>
+                                    <div className="repertoire-song-info">
+                                        <span className="repertoire-song-title">{song.title}</span>
+                                        <span className="repertoire-song-artist">{song.artistName}</span>
+                                    </div>
+                                    <button
+                                        className="repertoire-remove-btn"
+                                        onClick={() => handleRemoveSong(song)}
+                                        title="Remover do repertório"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </div>
+                            ))
+                    ) : (
+                        <div className="repertoire-empty-state">
+                            <FaMusic className="repertoire-empty-icon" />
+                            <h3>Repertório Vazio</h3>
+                            <p>Comece adicionando músicas do banco de dados ou criando novas</p>
+                        </div>
+                    )}
+                </div>
+            </div>
 
-                {/* --- INÍCIO DA CORREÇÃO --- */}
-                {/* Alterado 'defaultOpen={true}' para 'defaultOpen={false}' (ou removido) */}
+            {/* Ações - Adicionar e Criar */}
+            <div className="repertoire-actions-container">
                 <AccordionSection title="Adicionar do Banco de Músicas" icon={<FaSearch />} defaultOpen={false}>
-                    {/* --- FIM DA CORREÇÃO --- */}
-
-                    <div className="form-group">
-                        <label htmlFor="searchSong">Buscar Música</label>
-                        <div className="search-input-group">
-                            <span className="search-icon"><FaSearch /></span>
+                    <div className="repertoire-search-section">
+                        <div className="repertoire-search-input-wrapper">
+                            <FaSearch className="repertoire-search-icon" />
                             <input
-                                id="searchSong"
                                 type="text"
+                                className="repertoire-search-input"
                                 placeholder="Buscar por título ou artista..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                    </div>
-                    <div className="song-list-container short-list">
-                        <ul className="song-list">
+                        <div className="repertoire-available-list">
                             {availableSongs.length > 0 ? (
                                 availableSongs.map(song => (
-                                    <li key={song.id} className="song-list-item">
-                                        <div>
-                                            <span className="song-title">{song.title}</span>
-                                            <span className="song-artist">{song.artistName}</span>
+                                    <div key={song.id} className="repertoire-available-song">
+                                        <div className="repertoire-available-info">
+                                            <FaMicrophone className="repertoire-available-icon" />
+                                            <div>
+                                                <span className="repertoire-available-title">{song.title}</span>
+                                                <span className="repertoire-available-artist">{song.artistName}</span>
+                                            </div>
                                         </div>
                                         <button
-                                            className="btn-icon add"
+                                            className="repertoire-add-btn"
                                             onClick={() => handleAddSong(song)}
                                             title="Adicionar ao repertório"
                                         >
-                                            <FaPlus />
+                                            <FaPlus /> Adicionar
                                         </button>
-                                    </li>
+                                    </div>
                                 ))
                             ) : (
-                                <p className="empty-state-small">
-                                    {searchTerm ? 'Nenhuma música encontrada.' : 'Todas as músicas já estão no seu repertório.'}
-                                </p>
+                                <div className="repertoire-no-results">
+                                    <FaSearch className="repertoire-no-results-icon" />
+                                    <p>{searchTerm ? 'Nenhuma música encontrada.' : 'Todas as músicas já estão no seu repertório.'}</p>
+                                </div>
                             )}
-                        </ul>
+                        </div>
                     </div>
                 </AccordionSection>
 
-                {/* A seção de "Criar" é seu próprio formulário */}
-                <AccordionSection title="Criar Nova Música" icon={<FaPlus />}>
-                    <form onSubmit={handleCreateSong} className="repertoire-form">
-                        <div className="form-group">
-                            <label htmlFor="newTitle">Título da Música</label>
-                            <input
-                                id="newTitle"
-                                type="text"
-                                value={newTitle}
-                                onChange={(e) => setNewTitle(e.target.value)}
-                                placeholder="Ex: Garota de Ipanema"
-                            />
+                <AccordionSection title="Criar Nova Música" icon={<FaPlus />} defaultOpen={false}>
+                    <form onSubmit={handleCreateSong} className="repertoire-create-form">
+                        <div className="repertoire-form-grid">
+                            <div className="repertoire-form-group">
+                                <label htmlFor="newTitle">Título da Música</label>
+                                <input
+                                    id="newTitle"
+                                    type="text"
+                                    className="repertoire-input"
+                                    value={newTitle}
+                                    onChange={(e) => setNewTitle(e.target.value)}
+                                    placeholder="Ex: Garota de Ipanema"
+                                />
+                            </div>
+                            <div className="repertoire-form-group">
+                                <label htmlFor="newArtist">Artista Original</label>
+                                <input
+                                    id="newArtist"
+                                    type="text"
+                                    className="repertoire-input"
+                                    value={newArtist}
+                                    onChange={(e) => setNewArtist(e.target.value)}
+                                    placeholder="Ex: Tom Jobim"
+                                />
+                            </div>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="newArtist">Artista Original</label>
-                            <input
-                                id="newArtist"
-                                type="text"
-                                value={newArtist}
-                                onChange={(e) => setNewArtist(e.target.value)}
-                                placeholder="Ex: Tom Jobim"
-                            />
-                        </div>
-                        <button type="submit" className="btn-primary" disabled={isCreating}>
-                            <FaPlus /> {isCreating ? 'Criando...' : 'Criar e Adicionar'}
+                        <button 
+                            type="submit" 
+                            className="repertoire-create-btn" 
+                            disabled={isCreating || !newTitle || !newArtist}
+                        >
+                            {isCreating ? (
+                                <>
+                                    <span className="repertoire-spinner"></span>
+                                    Criando...
+                                </>
+                            ) : (
+                                <>
+                                    <FaPlus /> Criar e Adicionar
+                                </>
+                            )}
                         </button>
                     </form>
                 </AccordionSection>

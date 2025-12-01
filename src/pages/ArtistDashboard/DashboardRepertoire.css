@@ -1,165 +1,691 @@
 /* ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardRepertoire.css
- * Estilos específicos para a aba "Repertório"
+ * Repertório do Artista - Design Aprimorado
  * ========================================
  */
 
-/* --- Card de Informações do Repertório --- */
-.repertoire-info-card {
+.repertoire-tab {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- Header com Estatísticas --- */
+.repertoire-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
     margin-bottom: 2rem;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-}
-
-.card-header-simple {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-}
-
-.card-header-simple h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 600;
-}
-
-.repertoire-count {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-}
-
-/* --- Lista de Músicas --- */
-.song-list-container {
-    max-height: 300px;
-    overflow-y: auto;
-    padding-right: 0.5rem;
-}
-
-.song-list-container.short-list {
-    max-height: 250px;
-}
-
-.song-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.song-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0.25rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.song-list-item:last-child {
-    border-bottom: none;
-}
-
-.song-list-item div {
-    display: flex;
-    flex-direction: column;
-}
-
-.song-list-item .song-title {
-    font-weight: 500;
-    color: var(--text-color);
-    font-size: 0.95rem;
-}
-
-.song-list-item .song-artist {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* --- Botões de Ação --- */
-.btn-icon {
-    background: transparent;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-}
-
-.btn-icon.add {
-    color: var(--color-success);
-}
-
-.btn-icon.add:hover {
-    background-color: rgba(67, 160, 71, 0.1);
-}
-
-.btn-icon.remove {
-    color: var(--color-danger);
-}
-
-.btn-icon.remove:hover {
-    background-color: rgba(229, 57, 53, 0.1);
-}
-
-/* --- Formulário de Ações do Repertório --- */
-.repertoire-actions-form {
-    background-color: var(--card-bg);
-    padding: 0 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(187, 134, 252, 0.1) 0%, rgba(55, 0, 179, 0.1) 100%);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
 }
 
-.repertoire-form button {
-    width: 100%;
+.repertoire-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.repertoire-header-icon {
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #121212;
+    flex-shrink: 0;
+}
+
+.repertoire-header-text h2 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.repertoire-header-text p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.repertoire-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.repertoire-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    min-width: 100px;
+}
+
+.repertoire-stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.repertoire-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Alertas --- */
+.repertoire-alert {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.repertoire-alert-success {
+    background-color: rgba(67, 160, 71, 0.1);
+    border: 1px solid var(--color-success);
+    color: var(--color-success);
+}
+
+.repertoire-alert-error {
+    background-color: rgba(229, 57, 53, 0.1);
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+}
+
+.repertoire-alert-close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: opacity 0.2s, background-color 0.2s;
+    opacity: 0.7;
+}
+
+.repertoire-alert-close:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* --- Card Principal do Repertório --- */
+.repertoire-main-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.repertoire-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.repertoire-card-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.repertoire-quick-search {
+    max-width: 300px;
+    padding: 0.5rem 1rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+
+.repertoire-quick-search:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.repertoire-quick-search::placeholder {
+    color: var(--text-secondary);
+}
+
+/* --- Grid de Músicas --- */
+.repertoire-songs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.repertoire-song-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.repertoire-song-card:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.repertoire-song-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 8px;
+    font-size: 1.25rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.repertoire-song-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.repertoire-song-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.repertoire-song-artist {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.repertoire-remove-btn {
+    background-color: transparent;
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.repertoire-remove-btn:hover {
+    background-color: rgba(229, 57, 53, 0.1);
+}
+
+/* --- Empty State --- */
+.repertoire-empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.repertoire-empty-icon {
+    font-size: 4rem;
+    color: var(--text-secondary);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+.repertoire-empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.repertoire-empty-state p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* --- Container de Ações --- */
+.repertoire-actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* --- Accordion Customizado --- */
+.repertoire-accordion {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: border-color 0.3s;
+}
+
+.repertoire-accordion.open {
+    border-color: var(--primary-color);
+}
+
+.repertoire-accordion-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.repertoire-accordion-header:hover {
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.repertoire-accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.repertoire-accordion-title svg {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+
+.repertoire-accordion-icon {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s;
+}
+
+.repertoire-accordion.open .repertoire-accordion-icon {
+    transform: rotate(180deg);
+}
+
+.repertoire-accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+}
+
+.repertoire-accordion.open .repertoire-accordion-content {
+    max-height: 800px;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+/* --- Seção de Busca --- */
+.repertoire-search-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.repertoire-search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.repertoire-search-icon {
+    position: absolute;
+    left: 1rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.repertoire-search-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 2.75rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.repertoire-search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.repertoire-search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* --- Lista de Músicas Disponíveis --- */
+.repertoire-available-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.repertoire-available-song {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.repertoire-available-song:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.repertoire-available-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.repertoire-available-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.repertoire-available-info > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.repertoire-available-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.repertoire-available-artist {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.repertoire-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--color-success);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.repertoire-add-btn:hover {
+    background-color: #388e3c;
+}
+
+/* --- Sem Resultados --- */
+.repertoire-no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.repertoire-no-results-icon {
+    font-size: 3rem;
+    color: var(--text-secondary);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+.repertoire-no-results p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* --- Formulário de Criação --- */
+.repertoire-create-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.repertoire-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.repertoire-form-group {
+    display: flex;
+    flex-direction: column;
     gap: 0.5rem;
 }
 
-/* --- Input de Busca --- */
-.search-input-group {
-    display: flex;
-    align-items: stretch;
+.repertoire-form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
 }
 
-.search-input-group .search-icon {
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    background-color: #333;
+.repertoire-input {
+    padding: 0.875rem 1rem;
+    background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-right: none;
-    border-radius: var(--border-radius) 0 0 var(--border-radius);
-    color: var(--text-secondary);
-    font-size: 1rem;
-    width: 45px;
-    padding: 0.75rem;
-    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    transition: border-color 0.2s, background-color 0.2s;
 }
 
-.search-input-group input {
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    margin-bottom: 0;
-    box-sizing: border-box;
-    width: 100%;
+.repertoire-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.repertoire-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.repertoire-create-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background-color: var(--primary-color);
+    color: #121212;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.repertoire-create-btn:hover:not(:disabled) {
+    background-color: #9c6fe0;
+}
+
+.repertoire-create-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.repertoire-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-top-color: #121212;
+    border-radius: 50%;
+    animation: repertoire-spin 0.8s linear infinite;
+}
+
+@keyframes repertoire-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* --- Responsividade --- */
 @media (max-width: 1024px) {
-    .repertoire-layout {
+    .repertoire-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .repertoire-songs-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .repertoire-form-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .repertoire-header {
+        padding: 1.5rem;
+    }
+
+    .repertoire-header-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+
+    .repertoire-header-text h2 {
+        font-size: 1.5rem;
+    }
+
+    .repertoire-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .repertoire-card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .repertoire-quick-search {
+        max-width: 100%;
+    }
+
+    .repertoire-songs-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .repertoire-available-song {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .repertoire-add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .repertoire-header {
+        padding: 1rem;
+    }
+
+    .repertoire-header-content {
+        gap: 1rem;
+    }
+
+    .repertoire-stat-card {
+        padding: 0.75rem 1rem;
+        min-width: 80px;
+    }
+
+    .repertoire-stat-number {
+        font-size: 1.5rem;
+    }
+
+    .repertoire-accordion-header {
+        padding: 1rem;
+    }
+
+    .repertoire-accordion.open .repertoire-accordion-content {
+        padding: 0 1rem 1rem 1rem;
     }
 }
