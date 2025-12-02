@@ -1,112 +1,488 @@
 /* ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardFinances.css
- * Estilos específicos para a aba "Finanças"
+ * Finanças do Artista - Design Aprimorado
  * ========================================
  */
 
-/* --- Grid de Estatísticas (Finanças) --- */
-.finances-tab .show-stats-grid {
-    grid-template-columns: 2fr 1fr;
+.finances-tab {
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.stat-card.balance svg {
-    color: var(--color-success);
-}
-
-.stat-card.balance .stat-value {
-    color: var(--color-success);
-}
-
-/* --- Card de Saque --- */
-.withdraw-card {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.withdraw-card .stat-label {
-    font-size: 0.8rem;
-}
-
-.withdraw-card button {
-    width: 100%;
-}
-
-/* --- Card de Transações --- */
-.transactions-card {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-}
-
-.transactions-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.transaction-item {
+/* --- Header --- */
+.finances-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0.5rem;
-    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(67, 160, 71, 0.1) 0%, rgba(46, 125, 50, 0.1) 100%);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
 }
 
-.transaction-item:last-child {
-    border-bottom: none;
-}
-
-.transaction-info {
+.finances-header-content {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
 }
 
-.transaction-desc {
-    font-weight: 500;
+.finances-header-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-success);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.finances-header-text h2 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
     color: var(--text-color);
 }
 
-.transaction-date {
+.finances-header-text p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* --- Grid de Estatísticas --- */
+.finances-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.finances-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.75rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: border-color 0.2s;
+}
+
+.finances-stat-card:hover {
+    border-color: var(--primary-color);
+}
+
+.finances-stat-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.finances-balance .finances-stat-icon {
+    background: linear-gradient(135deg, var(--color-success) 0%, #388e3c 100%);
+    color: white;
+}
+
+.finances-earnings .finances-stat-icon {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.finances-withdrawals .finances-stat-icon {
+    background: linear-gradient(135deg, #3700b3 0%, #6200ea 100%);
+    color: white;
+}
+
+.finances-stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.finances-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.finances-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1;
+}
+
+.finances-balance .finances-stat-value {
+    color: var(--color-success);
+}
+
+.finances-stat-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.85rem;
     color: var(--text-secondary);
 }
 
-.transaction-amount {
-    font-weight: bold;
-    font-size: 1.1rem;
+/* --- Card de Saque --- */
+.finances-withdraw-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
 }
 
-.transaction-item.success .transaction-amount {
-    color: var(--color-success);
+.finances-withdraw-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-.transaction-item.danger .transaction-amount {
-    color: var(--color-danger);
+.finances-withdraw-info p {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.finances-withdraw-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background-color: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 6px;
+    color: #ff9800;
+    font-size: 0.9rem;
+}
+
+.finances-withdraw-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2.5rem;
+    background-color: var(--color-success);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.finances-withdraw-btn:hover:not(:disabled) {
+    background-color: #388e3c;
+}
+
+.finances-withdraw-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* --- Card de Gráfico --- */
 .finances-chart-card {
-    margin-top: 2rem;
-    padding: 1.5rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    overflow: hidden;
 }
 
-.chart-placeholder {
+.finances-chart-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.finances-chart-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.finances-chart-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    background: 
+        repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.02),
+            rgba(255, 255, 255, 0.02) 10px,
+            transparent 10px,
+            transparent 20px
+        );
+}
+
+.finances-chart-icon {
+    font-size: 4rem;
+    color: var(--text-secondary);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+.finances-chart-placeholder p {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.finances-chart-placeholder span {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* --- Card de Transações --- */
+.finances-transactions-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.finances-transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.finances-transactions-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.finances-transactions-count {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.finances-transactions-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.finances-transaction-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.finances-transaction-item:last-child {
+    border-bottom: none;
+}
+
+.finances-transaction-item:hover {
+    background-color: rgba(187, 134, 252, 0.05);
+}
+
+.finances-transaction-icon {
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 250px;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: var(--border-radius);
-    border: 2px dashed var(--border-color);
+    border-radius: 50%;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.finances-transaction-income .finances-transaction-icon {
+    background-color: rgba(67, 160, 71, 0.1);
+    color: var(--color-success);
+}
+
+.finances-transaction-outcome .finances-transaction-icon {
+    background-color: rgba(229, 57, 53, 0.1);
+    color: var(--color-danger);
+}
+
+.finances-transaction-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.finances-transaction-desc {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.finances-transaction-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.finances-transaction-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.finances-transaction-income .finances-transaction-amount {
+    color: var(--color-success);
+}
+
+.finances-transaction-outcome .finances-transaction-amount {
+    color: var(--color-danger);
+}
+
+/* --- Empty State --- */
+.finances-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.finances-empty-icon {
+    font-size: 4rem;
+    color: var(--text-secondary);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+.finances-empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.finances-empty-state p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
 }
 
 /* --- Responsividade --- */
 @media (max-width: 1024px) {
-    .finances-tab .show-stats-grid {
+    .finances-stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .finances-withdraw-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .finances-withdraw-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .finances-header {
+        padding: 1.5rem;
+    }
+
+    .finances-header-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+
+    .finances-header-text h2 {
+        font-size: 1.5rem;
+    }
+
+    .finances-stat-card {
+        padding: 1.5rem;
+    }
+
+    .finances-stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .finances-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .finances-withdraw-card {
+        padding: 1.5rem;
+    }
+
+    .finances-transaction-item {
+        padding: 1rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .finances-header {
+        padding: 1rem;
+    }
+
+    .finances-header-content {
+        gap: 1rem;
+    }
+
+    .finances-stat-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.25rem;
+    }
+
+    .finances-transaction-item {
+        flex-wrap: wrap;
+        padding: 1rem;
+    }
+
+    .finances-transaction-amount {
+        width: 100%;
+        text-align: right;
+        margin-top: 0.5rem;
     }
 }

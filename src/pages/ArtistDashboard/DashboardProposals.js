@@ -15,7 +15,12 @@ import {
     FaEnvelope,
     FaCalendarDay,
     FaFilter,
-    FaClock
+    FaClock,
+    FaMapMarkerAlt,
+    FaMusic,
+    FaCheckCircle,
+    FaTimesCircle,
+    FaBan
 } from 'react-icons/fa';
 import './DashboardProposals.css';
 
@@ -91,75 +96,116 @@ const DashboardProposals = () => {
         total: contracts.length,
         pending: contracts.filter(c => c.status === 'PENDING_CONFIRMATION').length,
         confirmed: contracts.filter(c => c.status === 'CONFIRMED').length,
+        rejected: contracts.filter(c => c.status === 'REJECTED').length,
         completed: contracts.filter(c => c.status === 'COMPLETED').length
     };
 
     return (
         <div className="proposals-container">
+            {/* Header com Estatísticas */}
             <div className="proposals-header">
-                <div className="header-title">
-                    <h2><FaMoneyBillWave /> Propostas de Show</h2>
-                    <p>Gerencie as solicitações de contratação para seus shows</p>
-                </div>
-
-                <div className="proposals-stats">
-                    <div className="stat-card">
-                        <span className="stat-number">{contractStats.total}</span>
-                        <span className="stat-label">Total</span>
+                <div className="proposals-header-content">
+                    <div className="proposals-header-icon">
+                        <FaMoneyBillWave />
                     </div>
-                    <div className="stat-card pending">
-                        <span className="stat-number">{contractStats.pending}</span>
-                        <span className="stat-label">Pendentes</span>
-                    </div>
-                    <div className="stat-card confirmed">
-                        <span className="stat-number">{contractStats.confirmed}</span>
-                        <span className="stat-label">Confirmados</span>
-                    </div>
-                    <div className="stat-card completed">
-                        <span className="stat-number">{contractStats.completed}</span>
-                        <span className="stat-label">Concluídos</span>
+                    <div className="proposals-header-text">
+                        <h2>Propostas de Show</h2>
+                        <p>Gerencie solicitações de contratação</p>
                     </div>
                 </div>
             </div>
 
+            {/* Cards de Estatísticas */}
+            <div className="proposals-stats-grid">
+                <div className="proposals-stat-card proposals-stat-total">
+                    <div className="proposals-stat-icon">
+                        <FaMoneyBillWave />
+                    </div>
+                    <div className="proposals-stat-content">
+                        <span className="proposals-stat-number">{contractStats.total}</span>
+                        <span className="proposals-stat-label">Total</span>
+                    </div>
+                </div>
+                <div className="proposals-stat-card proposals-stat-pending">
+                    <div className="proposals-stat-icon">
+                        <FaClock />
+                    </div>
+                    <div className="proposals-stat-content">
+                        <span className="proposals-stat-number">{contractStats.pending}</span>
+                        <span className="proposals-stat-label">Pendentes</span>
+                    </div>
+                </div>
+                <div className="proposals-stat-card proposals-stat-confirmed">
+                    <div className="proposals-stat-icon">
+                        <FaCheckCircle />
+                    </div>
+                    <div className="proposals-stat-content">
+                        <span className="proposals-stat-number">{contractStats.confirmed}</span>
+                        <span className="proposals-stat-label">Confirmados</span>
+                    </div>
+                </div>
+                <div className="proposals-stat-card proposals-stat-rejected">
+                    <div className="proposals-stat-icon">
+                        <FaTimesCircle />
+                    </div>
+                    <div className="proposals-stat-content">
+                        <span className="proposals-stat-number">{contractStats.rejected}</span>
+                        <span className="proposals-stat-label">Recusados</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Filtros */}
             <div className="proposals-filters">
-                <FaFilter />
-                <button
-                    className={`filter-btn ${filterStatus === 'ALL' ? 'active' : ''}`}
-                    onClick={() => setFilterStatus('ALL')}
-                >
-                    Todas
-                </button>
-                <button
-                    className={`filter-btn ${filterStatus === 'PENDING_CONFIRMATION' ? 'active' : ''}`}
-                    onClick={() => setFilterStatus('PENDING_CONFIRMATION')}
-                >
-                    Pendentes
-                </button>
-                <button
-                    className={`filter-btn ${filterStatus === 'CONFIRMED' ? 'active' : ''}`}
-                    onClick={() => setFilterStatus('CONFIRMED')}
-                >
-                    Confirmados
-                </button>
-                <button
-                    className={`filter-btn ${filterStatus === 'COMPLETED' ? 'active' : ''}`}
-                    onClick={() => setFilterStatus('COMPLETED')}
-                >
-                    Concluídos
-                </button>
+                <div className="proposals-filters-label">
+                    <FaFilter />
+                    <span>Filtrar por:</span>
+                </div>
+                <div className="proposals-filters-buttons">
+                    <button
+                        className={`proposals-filter-btn ${filterStatus === 'ALL' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('ALL')}
+                    >
+                        Todas ({contractStats.total})
+                    </button>
+                    <button
+                        className={`proposals-filter-btn ${filterStatus === 'PENDING_CONFIRMATION' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('PENDING_CONFIRMATION')}
+                    >
+                        Pendentes ({contractStats.pending})
+                    </button>
+                    <button
+                        className={`proposals-filter-btn ${filterStatus === 'CONFIRMED' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('CONFIRMED')}
+                    >
+                        Confirmados ({contractStats.confirmed})
+                    </button>
+                    <button
+                        className={`proposals-filter-btn ${filterStatus === 'REJECTED' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('REJECTED')}
+                    >
+                        Recusados ({contractStats.rejected})
+                    </button>
+                    <button
+                        className={`proposals-filter-btn ${filterStatus === 'COMPLETED' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('COMPLETED')}
+                    >
+                        Concluídos ({contractStats.completed})
+                    </button>
+                </div>
             </div>
 
+            {/* Lista de Propostas */}
             {loading ? (
-                <div className="loading-state">
-                    <FaClock />
+                <div className="proposals-loading">
+                    <FaClock className="proposals-loading-icon" />
                     <p>Carregando propostas...</p>
                 </div>
             ) : (
-                <div className="proposals-grid">
+                <div className="proposals-list">
                     {filteredContracts.length === 0 ? (
-                        <div className="empty-state">
-                            <FaMoneyBillWave />
+                        <div className="proposals-empty">
+                            <FaMoneyBillWave className="proposals-empty-icon" />
                             <h3>Nenhuma proposta encontrada</h3>
                             <p>
                                 {filterStatus === 'ALL'
@@ -169,56 +215,81 @@ const DashboardProposals = () => {
                         </div>
                     ) : (
                         filteredContracts.map(contract => {
-                            const { fullDate } = formatDateTime(contract.createdAt);
+                            const { date, time } = formatDateTime(contract.createdAt);
+                            const statusIcon = {
+                                'PENDING_CONFIRMATION': <FaClock />,
+                                'CONFIRMED': <FaCheckCircle />,
+                                'REJECTED': <FaBan />,
+                                'COMPLETED': <FaCheck />,
+                                'CANCELED': <FaTimes />
+                            };
+
                             return (
-                                <div key={contract.id} className={`proposal-card ${contract.status.toLowerCase()}`}>
-                                    <div className="proposal-status-indicator">
-                                        <span className="status-badge">{getStatusLabel(contract.status)}</span>
+                                <div key={contract.id} className={`proposals-card proposals-card-${contract.status.toLowerCase()}`}>
+                                    <div className="proposals-card-status">
+                                        {statusIcon[contract.status]}
+                                        <span>{getStatusLabel(contract.status)}</span>
                                     </div>
 
-                                    <div className="proposal-header">
-                                        <div className="customer-info">
-                                            <div className="customer-avatar">
+                                    <div className="proposals-card-header">
+                                        <div className="proposals-customer">
+                                            <div className="proposals-customer-avatar">
                                                 <FaUser />
                                             </div>
-                                            <div className="customer-details">
+                                            <div className="proposals-customer-info">
                                                 <h3>{contract.customer.name}</h3>
-                                                <div className="customer-contact">
+                                                <div className="proposals-customer-contacts">
                                                     <span><FaWhatsapp /> {contract.customer.phoneNumber}</span>
                                                     <span><FaEnvelope /> {contract.customer.email}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="proposal-value">
-                                            <span className="value-label">Valor</span>
-                                            <span className="value-amount">{formatCurrency(contract.totalPrice)}</span>
+                                        <div className="proposals-card-value">
+                                            <span className="proposals-value-label">Valor</span>
+                                            <span className="proposals-value-amount">{formatCurrency(contract.totalPrice)}</span>
                                         </div>
                                     </div>
 
-                                    <div className="proposal-info">
-                                        <div className="info-item">
+                                    <div className="proposals-card-details">
+                                        <div className="proposals-detail-item">
                                             <FaCalendarDay />
                                             <div>
-                                                <span className="info-label">Data da Solicitação</span>
-                                                <span className="info-value">{fullDate}</span>
+                                                <span className="proposals-detail-label">Solicitado em</span>
+                                                <span className="proposals-detail-value">{date} às {time}</span>
                                             </div>
                                         </div>
+                                        {contract.eventLocation && (
+                                            <div className="proposals-detail-item">
+                                                <FaMapMarkerAlt />
+                                                <div>
+                                                    <span className="proposals-detail-label">Local</span>
+                                                    <span className="proposals-detail-value">{contract.eventLocation}</span>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {contract.status === 'PENDING_CONFIRMATION' && (
-                                        <div className="proposal-actions">
+                                        <div className="proposals-card-actions">
                                             <button
-                                                className="btn-action btn-confirm"
+                                                className="proposals-btn proposals-btn-accept"
                                                 onClick={() => handleContractAction(contract.id, 'confirm')}
                                             >
-                                                <FaCheck /> Aceitar Proposta
+                                                <FaCheck /> Aceitar
                                             </button>
                                             <button
-                                                className="btn-action btn-reject"
+                                                className="proposals-btn proposals-btn-reject"
                                                 onClick={() => handleContractAction(contract.id, 'reject')}
                                             >
                                                 <FaTimes /> Recusar
                                             </button>
+                                        </div>
+                                    )}
+
+                                    {contract.status === 'REJECTED' && (
+                                        <div className="proposals-card-rejected-info">
+                                            <FaBan />
+                                            <span>Esta proposta foi recusada</span>
                                         </div>
                                     )}
                                 </div>

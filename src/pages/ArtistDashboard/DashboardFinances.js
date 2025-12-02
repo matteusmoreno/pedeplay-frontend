@@ -1,13 +1,13 @@
-/* * ========================================
+/* ========================================
  * ARQUIVO: src/pages/ArtistDashboard/DashboardFinances.js
- * (Aba "Finanças") - Correção de Alinhamento
+ * Finanças do Artista - Design Aprimorado
  * ========================================
  */
-import React from 'react';
-import { FaDollarSign, FaHistory, FaChartLine } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaDollarSign, FaHistory, FaChartLine, FaWallet, FaArrowUp, FaArrowDown, FaInfoCircle, FaClock } from 'react-icons/fa';
 import './DashboardFinances.css';
 
-// Helper para formatar moeda (copiado do DashboardHome)
+// Helper para formatar moeda
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
@@ -16,90 +16,152 @@ const formatCurrency = (value) => {
 };
 
 const DashboardFinances = ({ artist }) => {
-
-    // O saldo vem dos detalhes do artista (artist.balance)
+    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
     const currentBalance = artist.balance || 0;
+    const minWithdraw = 50;
+    const canWithdraw = currentBalance >= minWithdraw;
+
+    // Dados mockados para exemplo (substituir com dados reais do backend)
+    const mockTransactions = [
+        { id: 1, type: 'income', description: 'Gorjeta - Pedido de Música', amount: 10.00, date: '2025-12-01T14:30:00' },
+        { id: 2, type: 'income', description: 'Gorjeta - Pedido de Música', amount: 5.00, date: '2025-12-01T13:15:00' },
+        { id: 3, type: 'income', description: 'Show - Bar do João', amount: 150.00, date: '2025-11-30T22:00:00' },
+    ];
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(date);
+    };
 
     return (
         <div className="dashboard-tab-content finances-tab">
-
-            {/* 1. Card de Saldo Atual */}
-            <div className="card-header">
-                <h2>Finanças</h2>
+            {/* Header com Resumo Financeiro */}
+            <div className="finances-header">
+                <div className="finances-header-content">
+                    <div className="finances-header-icon">
+                        <FaWallet />
+                    </div>
+                    <div className="finances-header-text">
+                        <h2>Finanças</h2>
+                        <p>Gerencie seus ganhos e saques</p>
+                    </div>
+                </div>
             </div>
 
-            <div className="show-stats-grid">
-                <div className="stat-card balance">
-                    <FaDollarSign />
-                    <div className="stat-info">
-                        <span className="stat-value">{formatCurrency(currentBalance)}</span>
-                        <span className="stat-label">Saldo Disponível</span>
+            {/* Cards de Estatísticas */}
+            <div className="finances-stats-grid">
+                {/* Saldo Disponível */}
+                <div className="finances-stat-card finances-balance">
+                    <div className="finances-stat-icon">
+                        <FaDollarSign />
+                    </div>
+                    <div className="finances-stat-content">
+                        <span className="finances-stat-label">Saldo Disponível</span>
+                        <span className="finances-stat-value">{formatCurrency(currentBalance)}</span>
+                        <span className="finances-stat-info">
+                            <FaInfoCircle /> Disponível para saque
+                        </span>
                     </div>
                 </div>
 
-                {/* Card de Saque (desabilitado por enquanto) */}
-                <div className="stat-card withdraw-card">
-                    <button className="btn-primary" disabled={true}>
-                        Solicitar Saque
-                    </button>
-                    <span className="stat-label">Valor mínimo para saque: R$ 50,00</span>
+                {/* Ganhos do Mês */}
+                <div className="finances-stat-card finances-earnings">
+                    <div className="finances-stat-icon">
+                        <FaArrowUp />
+                    </div>
+                    <div className="finances-stat-content">
+                        <span className="finances-stat-label">Ganhos do Mês</span>
+                        <span className="finances-stat-value">{formatCurrency(165.00)}</span>
+                        <span className="finances-stat-info">
+                            <FaClock /> Dezembro 2025
+                        </span>
+                    </div>
+                </div>
+
+                {/* Saques Realizados */}
+                <div className="finances-stat-card finances-withdrawals">
+                    <div className="finances-stat-icon">
+                        <FaArrowDown />
+                    </div>
+                    <div className="finances-stat-content">
+                        <span className="finances-stat-label">Saques Realizados</span>
+                        <span className="finances-stat-value">{formatCurrency(0)}</span>
+                        <span className="finances-stat-info">
+                            <FaClock /> Dezembro 2025
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            {/* --- Seção do Gráfico --- */}
-            <div className="finances-chart-card card">
-                <div className="card-header-simple">
-                    {/* --- INÍCIO DA CORREÇÃO DE HTML --- */}
-                    <h3>
-                        <FaChartLine />
-                        <span>Evolução de Ganhos</span>
-                    </h3>
-                    {/* --- FIM DA CORREÇÃO DE HTML --- */}
+            {/* Card de Saque */}
+            <div className="finances-withdraw-card">
+                <div className="finances-withdraw-info">
+                    <h3><FaWallet /> Solicitar Saque</h3>
+                    <p>Valor mínimo: {formatCurrency(minWithdraw)}</p>
+                    {!canWithdraw && (
+                        <div className="finances-withdraw-warning">
+                            <FaInfoCircle />
+                            <span>Você precisa ter pelo menos {formatCurrency(minWithdraw)} para solicitar um saque</span>
+                        </div>
+                    )}
                 </div>
-                <div className="chart-placeholder">
-                    <p className="empty-state-small">
-                        O gráfico com a evolução de seus ganhos diários aparecerá aqui em breve.
-                    </p>
+                <button 
+                    className="finances-withdraw-btn" 
+                    disabled={!canWithdraw}
+                    onClick={() => setShowWithdrawModal(true)}
+                >
+                    <FaDollarSign /> Solicitar Saque
+                </button>
+            </div>
+
+            {/* Gráfico de Ganhos */}
+            <div className="finances-chart-card">
+                <div className="finances-chart-header">
+                    <h3><FaChartLine /> Evolução de Ganhos</h3>
+                </div>
+                <div className="finances-chart-placeholder">
+                    <FaChartLine className="finances-chart-icon" />
+                    <p>Gráfico com a evolução dos seus ganhos diários</p>
+                    <span>Em breve</span>
                 </div>
             </div>
 
-
-            {/* 2. Histórico de Transações (Card) */}
-            <div className="transactions-card card">
-                <div className="card-header-simple">
-                    {/* --- INÍCIO DA CORREÇÃO DE HTML --- */}
-                    <h3>
-                        <FaHistory />
-                        <span>Histórico de Transações</span>
-                    </h3>
-                    {/* --- FIM DA CORREÇÃO DE HTML --- */}
+            {/* Histórico de Transações */}
+            <div className="finances-transactions-card">
+                <div className="finances-transactions-header">
+                    <h3><FaHistory /> Histórico de Transações</h3>
+                    <span className="finances-transactions-count">{mockTransactions.length} transações</span>
                 </div>
-                <div className="song-list-container">
-                    {/* NOTA: O backend ainda não tem um endpoint para listar
-                      as transações. Quando tiver, podemos implementar aqui.
-                    */}
-                    <p className="empty-state-small">
-                        Histórico de transações (gorjetas e saques) aparecerá aqui em breve.
-                    </p>
-
-                    {/* Exemplo de como será a lista (comentado):
-                    <ul className="transactions-list">
-                        <li className="transaction-item success">
-                            <div className="transaction-info">
-                                <span className="transaction-desc">Gorjeta (Pedido de Música)</span>
-                                <span className="transaction-date">02/11/2025 às 14:30</span>
+                <div className="finances-transactions-list">
+                    {mockTransactions.length > 0 ? (
+                        mockTransactions.map(transaction => (
+                            <div key={transaction.id} className={`finances-transaction-item finances-transaction-${transaction.type}`}>
+                                <div className="finances-transaction-icon">
+                                    {transaction.type === 'income' ? <FaArrowUp /> : <FaArrowDown />}
+                                </div>
+                                <div className="finances-transaction-info">
+                                    <span className="finances-transaction-desc">{transaction.description}</span>
+                                    <span className="finances-transaction-date">{formatDate(transaction.date)}</span>
+                                </div>
+                                <span className="finances-transaction-amount">
+                                    {transaction.type === 'income' ? '+ ' : '- '}
+                                    {formatCurrency(transaction.amount)}
+                                </span>
                             </div>
-                            <span className="transaction-amount">+ R$ 5,00</span>
-                        </li>
-                        <li className="transaction-item danger">
-                            <div className="transaction-info">
-                                <span className="transaction-desc">Taxa de Saque</span>
-                                <span className="transaction-date">01/11/2025 às 10:00</span>
-                            </div>
-                            <span className="transaction-amount">- R$ 1,50</span>
-                        </li>
-                    </ul>
-                    */}
+                        ))
+                    ) : (
+                        <div className="finances-empty-state">
+                            <FaHistory className="finances-empty-icon" />
+                            <h3>Nenhuma Transação</h3>
+                            <p>Suas transações aparecerão aqui</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
