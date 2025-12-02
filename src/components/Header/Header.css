@@ -1,43 +1,237 @@
-/* * ========================================
- * ARQUIVO: src/components/Header/Header.css
- * (Refatorado para layout moderno)
- * ========================================
- */
-
 .header {
-    background-color: var(--card-bg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    padding: 1rem 0;
+    background: linear-gradient(135deg, rgba(13, 13, 13, 0.98), rgba(26, 26, 26, 0.95));
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    padding: 0;
     position: sticky;
     top: 0;
     z-index: 1000;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+}
+
+.header-dashboard {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .header-container {
-    /* --- INÍCIO DA CORREÇÃO DE LAYOUT --- */
-    /* Remove max-width para ser full-width */
+    max-width: 1600px;
     margin: 0 auto;
-    /* Alinha o conteúdo com o padding do dashboard (2.5rem) */
-    padding: 0 2.5rem;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* --- FIM DA CORREÇÃO DE LAYOUT --- */
+    gap: 2rem;
 }
 
+/* === Logo === */
 .header-logo {
-    font-size: 1.75rem;
-    font-weight: bold;
-    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* === Navigation === */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
     text-decoration: none;
 }
 
-.header nav {
-    display: flex;
-    align-items: center;
+.nav-link svg {
+    font-size: 1rem;
+    opacity: 0.8;
 }
 
-/* --- REMOVIDO --- */
-/* Os estilos .header-welcome e .header-link 
-   foram movidos para UserMenu.css 
-*/
+.nav-link:hover {
+    background: rgba(138, 43, 226, 0.1);
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.nav-link:hover svg {
+    opacity: 1;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* === Buttons === */
+.btn-secondary-outline {
+    padding: 0.65rem 1.5rem;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-secondary-outline:hover {
+    border-color: var(--primary-color);
+    background: rgba(138, 43, 226, 0.1);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    padding: 0.65rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: var(--border-radius);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(138, 43, 226, 0.5);
+}
+
+/* === Mobile Menu === */
+.mobile-menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+    color: var(--primary-color);
+}
+
+/* === Responsividade === */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 0.25rem;
+    }
+
+    .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 0.75rem 1.5rem;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .header-nav {
+        position: fixed;
+        top: 73px;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, rgba(13, 13, 13, 0.98), rgba(26, 26, 26, 0.98));
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        gap: 0;
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.4s ease;
+    }
+
+    .header-nav.mobile-open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+    }
+
+    .nav-link {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 1rem 1.5rem;
+        border-radius: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary-outline,
+    .btn-primary {
+        width: 100%;
+        padding: 0.85rem 1.5rem;
+    }
+
+    .logo-text {
+        font-size: 1.5rem;
+    }
+}

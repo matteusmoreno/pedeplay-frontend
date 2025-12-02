@@ -72,7 +72,7 @@ const HomePage = () => {
             </section>
 
             {/* Features Section */}
-            <section className="features-section">
+            <section id="features" className="features-section">
                 <div className="container">
                     <div className="section-header">
                         <h2 className="section-title">Tudo que você precisa para profissionalizar sua carreira</h2>
@@ -182,7 +182,7 @@ const HomePage = () => {
             </section>
 
             {/* How It Works Section */}
-            <section className="how-it-works-section">
+            <section id="how-it-works" className="how-it-works-section">
                 <div className="container">
                     <h2 className="section-title">Como funciona?</h2>
                     <div className="steps-grid">
@@ -211,7 +211,7 @@ const HomePage = () => {
             </section>
 
             {/* Benefits Section */}
-            <section className="benefits-section">
+            <section id="benefits" className="benefits-section">
                 <div className="container">
                     <div className="benefits-content">
                         <div className="benefits-text">

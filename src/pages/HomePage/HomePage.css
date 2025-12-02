@@ -308,22 +308,37 @@
     border-top: 1px solid var(--border-color);
 }
 
+.how-it-works-section .container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.how-it-works-section .section-title {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
 .steps-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
+    gap: 2.5rem;
     max-width: 1400px;
     margin: 0 auto;
 }
 
 .step-card {
     text-align: center;
-    padding: 2.5rem 2rem;
+    padding: 3rem 2rem;
     background: linear-gradient(135deg, rgba(138, 43, 226, 0.05), rgba(75, 0, 130, 0.05));
     border: 1px solid rgba(138, 43, 226, 0.2);
     border-radius: 16px;
     transition: all 0.3s ease;
     position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .step-card:hover {
@@ -366,13 +381,21 @@
     background-color: var(--background-color);
 }
 
-.benefits-content {
+.benefits-section .container {
     max-width: 1400px;
     margin: 0 auto;
+}
+
+.benefits-content {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
     align-items: center;
+}
+
+.benefits-text .section-title {
+    text-align: left;
+    margin-bottom: 3rem;
 }
 
 .benefits-list {
@@ -598,9 +621,17 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
+    .steps-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .benefits-content {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 4rem;
+    }
+
+    .benefits-text .section-title {
+        text-align: center;
     }
 
     .benefits-visual {
@@ -635,10 +666,40 @@
     .features-grid,
     .steps-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 
     .section-title {
         font-size: 2.2rem;
+    }
+
+    .how-it-works-section,
+    .benefits-section {
+        padding: 4rem 1.5rem;
+    }
+
+    .step-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .benefits-content {
+        gap: 3rem;
+    }
+
+    .benefit-item {
+        gap: 1rem;
+    }
+
+    .benefit-item h4 {
+        font-size: 1.2rem;
+    }
+
+    .benefit-item p {
+        font-size: 0.95rem;
+    }
+
+    .benefits-card {
+        padding: 3rem 2rem;
     }
 
     .cta-title {
