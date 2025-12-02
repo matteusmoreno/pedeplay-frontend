@@ -1,28 +1,27 @@
-/* * ========================================
- * ARQUIVO: src/pages/RegisterPage/RegisterPage.js
- * (Adicionado login automático pós-cadastro)
- * ========================================
- */
 import React, { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
+import { 
+    FaUserCircle, 
+    FaUser, 
+    FaMapMarkerAlt, 
+    FaShareAlt,
+    FaCheckCircle,
+    FaArrowRight,
+    FaArrowLeft 
+} from 'react-icons/fa';
 import { registerArtist } from '../../services/artistService';
-import './RegisterPage.css';
-
-// --- INÍCIO DA CORREÇÃO 1: Importar serviços de login ---
 import { login as apiLogin } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
-// --- FIM DA CORREÇÃO 1 ---
+import './RegisterPage.css';
 
 // Importando os componentes de etapa
-import RegisterSteps from './RegisterSteps';
 import Step1Account from './Step1Account';
 import Step2Personal from './Step2Personal';
 import Step3Address from './Step3Address';
 import Step4Social from './Step4Social';
-import StepIllustration from './StepIllustration/StepIllustration';
 
 // Esquema de validação com Yup
 const schema = yup.object().shape({
@@ -62,23 +61,40 @@ const fieldsByStep = {
     4: ['instagramUrl', 'facebookUrl', 'youtubeUrl', 'linkedInUrl']
 };
 
-// Títulos para cada etapa
-const stepTitles = {
-    1: 'Crie sua Conta',
-    2: 'Informações Pessoais',
-    3: 'Seu Endereço',
-    4: 'Redes Sociais'
-};
+// Configuração das etapas
+const steps = [
+    { 
+        number: 1, 
+        title: 'Crie sua Conta', 
+        subtitle: 'Configure suas credenciais de acesso',
+        icon: FaUserCircle 
+    },
+    { 
+        number: 2, 
+        title: 'Informações Pessoais', 
+        subtitle: 'Conte-nos mais sobre você',
+        icon: FaUser 
+    },
+    { 
+        number: 3, 
+        title: 'Seu Endereço', 
+        subtitle: 'Onde você está localizado',
+        icon: FaMapMarkerAlt 
+    },
+    { 
+        number: 4, 
+        title: 'Redes Sociais', 
+        subtitle: 'Conecte suas redes (opcional)',
+        icon: FaShareAlt 
+    }
+];
 
 const RegisterPage = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [apiError, setApiError] = useState(null);
     const [apiSuccess, setApiSuccess] = useState(null);
     const navigate = useNavigate();
-
-    // --- INÍCIO DA CORREÇÃO 2: Obter o 'login' do contexto ---
     const { login: contextLogin } = useAuth();
-    // --- FIM DA CORREÇÃO 2 ---
 
     const methods = useForm({
         resolver: yupResolver(schema),
@@ -105,97 +121,132 @@ const RegisterPage = () => {
         setApiError(null);
         setApiSuccess(null);
         try {
-            // 1. Cria o artista
             await registerArtist(data);
-
-            // --- INÍCIO DA CORREÇÃO 3: Fazer login automático ---
-
-            // 2. Faz o login com os dados recém-cadastrados
             const token = await apiLogin(data.email, data.password);
-
-            // 3. Define o estado de autenticação no contexto
             contextLogin(token);
-
             setApiSuccess('Cadastro realizado com sucesso! Redirecionando...');
-
-            // 4. Redireciona para a HomePage (/)
             setTimeout(() => {
-                navigate('/');
-            }, 2000); // Um pequeno delay para o usuário ler a mensagem
-
-            // --- FIM DA CORREÇÃO 3 ---
-
+                navigate('/dashboard');
+            }, 1500);
         } catch (error) {
             setApiError(error.message || 'Erro no cadastro.');
         }
     };
 
-    return (
-        <div className="register-container">
-            <div className="register-layout-card">
+    const currentStepData = steps[currentStep - 1];
 
-                {/* Coluna da Esquerda: Ilustração e Etapas */}
-                <div className="register-sidebar">
-                    <RegisterSteps currentStep={currentStep} />
-                    <StepIllustration currentStep={currentStep} />
+    return (
+        <div className="register-page">
+            <div className="register-container">
+                {/* Header com Logo */}
+                <div className="register-header">
+                    <Link to="/" className="register-logo">
+                        PedePlay
+                    </Link>
+                    <div className="register-login-link">
+                        Já tem uma conta? <Link to="/login">Entrar</Link>
+                    </div>
                 </div>
 
-                {/* Coluna da Direita: Formulário */}
-                <div className="register-content">
-                    <FormProvider {...methods}>
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <h2 className="register-title">{stepTitles[currentStep]}</h2>
+                {/* Progress Bar */}
+                <div className="register-progress">
+                    <div className="progress-bar-container">
+                        <div 
+                            className="progress-bar-fill" 
+                            style={{ width: `${(currentStep / 4) * 100}%` }}
+                        />
+                    </div>
+                    <div className="progress-text">
+                        Etapa {currentStep} de 4
+                    </div>
+                </div>
 
+                {/* Steps Indicator */}
+                <div className="steps-indicator">
+                    {steps.map((step) => {
+                        const Icon = step.icon;
+                        const isActive = currentStep === step.number;
+                        const isCompleted = currentStep > step.number;
+                        
+                        return (
+                            <div 
+                                key={step.number}
+                                className={`step-indicator ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                            >
+                                <div className="step-indicator-icon">
+                                    {isCompleted ? <FaCheckCircle /> : <Icon />}
+                                </div>
+                                <div className="step-indicator-text">
+                                    <div className="step-indicator-title">{step.title}</div>
+                                    <div className="step-indicator-subtitle">{step.subtitle}</div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Form Card */}
+                <div className="register-card">
+                    <div className="register-card-header">
+                        <h2 className="register-card-title">{currentStepData.title}</h2>
+                        <p className="register-card-subtitle">{currentStepData.subtitle}</p>
+                    </div>
+
+                    <FormProvider {...methods}>
+                        <form onSubmit={handleSubmit(onSubmit)} className="register-form">
                             {apiError && (
-                                <div className="form-message error-message">
+                                <div className="alert alert-error">
                                     {apiError}
                                 </div>
                             )}
-                            {apiSuccess && <div className="form-message success-message">{apiSuccess}</div>}
+                            {apiSuccess && (
+                                <div className="alert alert-success">
+                                    <FaCheckCircle /> {apiSuccess}
+                                </div>
+                            )}
 
-                            <div className="step-fieldset">
+                            <div className="form-content">
                                 {currentStep === 1 && <Step1Account />}
                                 {currentStep === 2 && <Step2Personal />}
                                 {currentStep === 3 && <Step3Address />}
                                 {currentStep === 4 && <Step4Social />}
                             </div>
 
-                            {/* Navegação */}
-                            <div className="register-navigation">
-                                <button
-                                    type="button"
-                                    className="btn-outline"
-                                    onClick={handleBack}
-                                    disabled={currentStep === 1 || isSubmitting}
-                                >
-                                    Voltar
-                                </button>
+                            <div className="form-navigation">
+                                {currentStep > 1 && (
+                                    <button
+                                        type="button"
+                                        className="btn-back"
+                                        onClick={handleBack}
+                                        disabled={isSubmitting}
+                                    >
+                                        <FaArrowLeft /> Voltar
+                                    </button>
+                                )}
+
+                                <div className="spacer" />
 
                                 {currentStep < 4 ? (
                                     <button
                                         type="button"
-                                        className="btn-primary"
+                                        className="btn-next"
                                         onClick={handleNext}
                                         disabled={isSubmitting}
                                     >
-                                        Próximo
+                                        Próximo <FaArrowRight />
                                     </button>
                                 ) : (
                                     <button
                                         type="submit"
-                                        className="btn-primary"
-                                        disabled={isSubmitting || apiSuccess} // Desabilita após o sucesso
+                                        className="btn-submit"
+                                        disabled={isSubmitting || apiSuccess}
                                     >
-                                        {isSubmitting ? 'Finalizando...' : 'Finalizar Cadastro'}
+                                        {isSubmitting ? 'Finalizando...' : 'Criar Conta'} <FaCheckCircle />
                                     </button>
                                 )}
                             </div>
                         </form>
                     </FormProvider>
-
-                    <div className="login-link">
-                        <p>Já tem uma conta? <Link to="/login">Faça Login</Link></p>
-                    </div>
                 </div>
             </div>
         </div>
