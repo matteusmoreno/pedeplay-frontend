@@ -21,7 +21,9 @@ import {
     FaChartLine,
     FaFilter,
     FaCalendarCheck,
-    FaExclamationCircle
+    FaExclamationCircle,
+    FaBriefcase,
+    FaMoon
 } from 'react-icons/fa';
 import './DashboardAgenda.css';
 
@@ -44,10 +46,12 @@ const DashboardAgenda = () => {
     const [slotStatus, setSlotStatus] = useState('AVAILABLE');
     const [isCreating, setIsCreating] = useState(false);
     
-    // Apply to All Day Modal
-    const [showApplyAllModal, setShowApplyAllModal] = useState(false);
-    const [applyAllPrice, setApplyAllPrice] = useState('');
-    const [applyAllStatus, setApplyAllStatus] = useState('AVAILABLE');
+    // Apply to Range Modal
+    const [showApplyRangeModal, setShowApplyRangeModal] = useState(false);
+    const [rangeStartHour, setRangeStartHour] = useState('8');
+    const [rangeEndHour, setRangeEndHour] = useState('18');
+    const [rangePrice, setRangePrice] = useState('');
+    const [rangeStatus, setRangeStatus] = useState('AVAILABLE');
     
     // Confirmation Modal
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -74,12 +78,18 @@ const DashboardAgenda = () => {
         const booked = futureSlots.filter(a => a.availabilityStatus === 'BOOKED').length;
         const unavailable = futureSlots.filter(a => a.availabilityStatus === 'UNAVAILABLE').length;
         
+        // Soma apenas os horários BOOKED (já confirmados)
         const totalEarnings = futureSlots
             .filter(a => a.availabilityStatus === 'BOOKED')
-            .reduce((sum, a) => sum + a.price, 0);
+            .reduce((sum, a) => sum + (a.price || 0), 0);
+        
+        // Soma AVAILABLE + BOOKED para projeção total
+        const projectedEarnings = futureSlots
+            .filter(a => a.availabilityStatus === 'AVAILABLE' || a.availabilityStatus === 'BOOKED')
+            .reduce((sum, a) => sum + (a.price || 0), 0);
         
         const avgPrice = futureSlots.length > 0
-            ? futureSlots.reduce((sum, a) => sum + a.price, 0) / futureSlots.length
+            ? futureSlots.reduce((sum, a) => sum + (a.price || 0), 0) / futureSlots.length
             : 0;
 
         return {
@@ -88,6 +98,7 @@ const DashboardAgenda = () => {
             booked,
             unavailable,
             totalEarnings,
+            projectedEarnings,
             avgPrice
         };
     }, [availabilities]);
@@ -274,20 +285,29 @@ const DashboardAgenda = () => {
         );
     };
     
-    // Apply to all hours in the day
-    const handleApplyToAllDay = () => {
-        if (applyAllStatus !== 'UNAVAILABLE' && (!applyAllPrice || parseFloat(applyAllPrice) <= 0)) {
+    // Apply to hour range
+    const handleApplyToRange = () => {
+        if (rangeStatus !== 'UNAVAILABLE' && (!rangePrice || parseFloat(rangePrice) <= 0)) {
             addToast('Atenção', 'Defina um preço válido para horários disponíveis ou reservados.', 'info');
             return;
         }
         
+        const start = parseInt(rangeStartHour);
+        const end = parseInt(rangeEndHour);
+        
+        if (start >= end) {
+            addToast('Atenção', 'O horário inicial deve ser menor que o horário final.', 'info');
+            return;
+        }
+        
+        const totalHours = end - start;
         showConfirmation(
-            'Aplicar a Todas as Horas',
-            'Isso irá configurar todos os horários vazios do dia e sobrescrever horários disponíveis ou indisponíveis. Horários já reservados serão mantidos. Deseja continuar?',
+            'Aplicar ao Período',
+            `Isso irá configurar ${totalHours} horário(s) (${start}:00 às ${end}:00) neste dia. Horários já reservados serão mantidos. Deseja continuar?`,
             async () => {
                 setIsCreating(true);
                 try {
-            const finalPrice = applyAllStatus === 'UNAVAILABLE' ? 0 : parseFloat(applyAllPrice);
+            const finalPrice = rangeStatus === 'UNAVAILABLE' ? 0 : parseFloat(rangePrice);
             const now = new Date();
             let successCount = 0;
             let skippedBooked = 0;
@@ -300,7 +320,10 @@ const DashboardAgenda = () => {
                 return `${year}-${month}-${day}T${hour}:00:00`;
             };
             
-            for (let hour = 0; hour < 24; hour++) {
+            const start = parseInt(rangeStartHour);
+            const end = parseInt(rangeEndHour);
+            
+            for (let hour = start; hour < end; hour++) {
                 const startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), hour, 0, 0);
                 const endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), hour + 1, 0, 0);
                 
@@ -325,20 +348,22 @@ const DashboardAgenda = () => {
                     artistId: user.id,
                     startTime: formatDateTime(startDate),
                     endTime: formatDateTime(endDate),
-                    availabilityStatus: applyAllStatus,
+                    availabilityStatus: rangeStatus,
                     price: finalPrice
                 });
                 successCount++;
             }
             
-            let message = `${successCount} horários configurados com sucesso!`;
+            let message = `${successCount} horário(s) configurado(s) com sucesso!`;
             if (skippedBooked > 0) {
                 message += ` ${skippedBooked} horário(s) reservado(s) foram mantidos.`;
             }
             addToast('Sucesso', message, 'success');
-            setShowApplyAllModal(false);
-            setApplyAllPrice('');
-            setApplyAllStatus('AVAILABLE');
+            setShowApplyRangeModal(false);
+            setRangePrice('');
+            setRangeStatus('AVAILABLE');
+            setRangeStartHour('8');
+            setRangeEndHour('18');
             fetchData();
         } catch (error) {
             addToast('Erro', error.message || 'Não foi possível configurar os horários. Tente novamente.', 'error');
@@ -473,7 +498,7 @@ const DashboardAgenda = () => {
                         </div>
                         <div className="stat-content-agenda">
                             <span className="stat-value-agenda">{formatCurrency(agendaStats.totalEarnings)}</span>
-                            <span className="stat-label-agenda">Projeção de Receita</span>
+                            <span className="stat-label-agenda">Receita Confirmada</span>
                         </div>
                     </div>
                 </div>
@@ -539,11 +564,11 @@ const DashboardAgenda = () => {
 
                         <button 
                             className="btn-apply-all-day"
-                            onClick={() => setShowApplyAllModal(true)}
-                            title="Aplicar mesmo preço/status para todos os horários do dia"
+                            onClick={() => setShowApplyRangeModal(true)}
+                            title="Aplicar preço/status para um período de horários"
                         >
-                            <FaCalendarDay />
-                            <span>Aplicar a Todo Dia</span>
+                            <FaClock />
+                            <span>Aplicar ao Período</span>
                         </button>
                     </div>
                     
@@ -738,19 +763,19 @@ const DashboardAgenda = () => {
                 </div>
             )}
             
-            {/* === MODAL APLICAR A TODO DIA === */}
-            {showApplyAllModal && (
-                <div className="modal-overlay-agenda" onClick={() => setShowApplyAllModal(false)}>
+            {/* === MODAL APLICAR AO PERÍODO === */}
+            {showApplyRangeModal && (
+                <div className="modal-overlay-agenda" onClick={() => setShowApplyRangeModal(false)}>
                     <div className="modal-content-agenda" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header-agenda">
                             <div className="modal-title-agenda">
-                                <FaCalendarDay />
+                                <FaClock />
                                 <div>
-                                    <h3>Aplicar a Todo Dia</h3>
+                                    <h3>Aplicar ao Período</h3>
                                     <p>{selectedDate?.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
                                 </div>
                             </div>
-                            <button className="modal-close-agenda" onClick={() => setShowApplyAllModal(false)}>
+                            <button className="modal-close-agenda" onClick={() => setShowApplyRangeModal(false)}>
                                 ×
                             </button>
                         </div>
@@ -758,13 +783,76 @@ const DashboardAgenda = () => {
                         <div className="modal-body-agenda">
                             <div className="form-group-agenda">
                                 <label className="form-label-agenda">
+                                    <FaClock />
+                                    <span>Período de Horários</span>
+                                </label>
+                                <div className="range-inputs">
+                                    <div className="range-input-group">
+                                        <label>De:</label>
+                                        <select 
+                                            value={rangeStartHour} 
+                                            onChange={(e) => setRangeStartHour(e.target.value)}
+                                            className="range-select"
+                                        >
+                                            {hourOptions.map(h => (
+                                                <option key={h.value} value={h.value}>{h.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <span className="range-separator">até</span>
+                                    <div className="range-input-group">
+                                        <label>Até:</label>
+                                        <select 
+                                            value={rangeEndHour} 
+                                            onChange={(e) => setRangeEndHour(e.target.value)}
+                                            className="range-select"
+                                        >
+                                            {hourOptions.map(h => (
+                                                <option key={h.value} value={h.value}>{h.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="quick-ranges">
+                                    <button 
+                                        className="quick-range-btn"
+                                        onClick={() => {
+                                            setRangeStartHour('0');
+                                            setRangeEndHour('24');
+                                        }}
+                                    >
+                                        <FaCalendarDay /> Dia Todo
+                                    </button>
+                                    <button 
+                                        className="quick-range-btn"
+                                        onClick={() => {
+                                            setRangeStartHour('8');
+                                            setRangeEndHour('18');
+                                        }}
+                                    >
+                                        <FaBriefcase /> Comercial
+                                    </button>
+                                    <button 
+                                        className="quick-range-btn"
+                                        onClick={() => {
+                                            setRangeStartHour('18');
+                                            setRangeEndHour('24');
+                                        }}
+                                    >
+                                        <FaMoon /> Noturno
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div className="form-group-agenda">
+                                <label className="form-label-agenda">
                                     <FaFilter />
-                                    <span>Status para Todos os Horários</span>
+                                    <span>Status dos Horários</span>
                                 </label>
                                 <div className="status-options-agenda">
                                     <button
-                                        className={`status-btn-agenda available ${applyAllStatus === 'AVAILABLE' ? 'active' : ''}`}
-                                        onClick={() => setApplyAllStatus('AVAILABLE')}
+                                        className={`status-btn-agenda available ${rangeStatus === 'AVAILABLE' ? 'active' : ''}`}
+                                        onClick={() => setRangeStatus('AVAILABLE')}
                                     >
                                         <FaCheckCircle />
                                         <div>
@@ -773,8 +861,8 @@ const DashboardAgenda = () => {
                                         </div>
                                     </button>
                                     <button
-                                        className={`status-btn-agenda unavailable ${applyAllStatus === 'UNAVAILABLE' ? 'active' : ''}`}
-                                        onClick={() => setApplyAllStatus('UNAVAILABLE')}
+                                        className={`status-btn-agenda unavailable ${rangeStatus === 'UNAVAILABLE' ? 'active' : ''}`}
+                                        onClick={() => setRangeStatus('UNAVAILABLE')}
                                     >
                                         <FaTimesCircle />
                                         <div>
@@ -783,8 +871,8 @@ const DashboardAgenda = () => {
                                         </div>
                                     </button>
                                     <button
-                                        className={`status-btn-agenda booked ${applyAllStatus === 'BOOKED' ? 'active' : ''}`}
-                                        onClick={() => setApplyAllStatus('BOOKED')}
+                                        className={`status-btn-agenda booked ${rangeStatus === 'BOOKED' ? 'active' : ''}`}
+                                        onClick={() => setRangeStatus('BOOKED')}
                                     >
                                         <FaCalendarCheck />
                                         <div>
@@ -795,49 +883,49 @@ const DashboardAgenda = () => {
                                 </div>
                             </div>
                             
-                            {applyAllStatus !== 'UNAVAILABLE' && (
+                            {rangeStatus !== 'UNAVAILABLE' && (
                                 <div className="form-group-agenda">
                                     <label className="form-label-agenda">
                                         <FaMoneyBillWave />
-                                        <span>Preço para Todos os Horários</span>
+                                        <span>Preço dos Horários</span>
                                     </label>
                                     <div className="input-wrapper-agenda">
                                         <span className="input-prefix">R$</span>
                                         <input
                                             type="text"
-                                            value={applyAllPrice}
+                                            value={rangePrice}
                                             onChange={e => {
                                                 const value = e.target.value.replace(/[^0-9.,]/g, '');
-                                                setApplyAllPrice(value);
+                                                setRangePrice(value);
                                             }}
                                             placeholder="0,00"
                                             className="modal-input-agenda"
                                         />
                                     </div>
-                                    <small className="form-hint">Este valor será aplicado a todas as 24 horas do dia</small>
+                                    <small className="form-hint">Este valor será aplicado a todos os horários do período selecionado</small>
                                 </div>
                             )}
                             
                             <div className="warning-box">
-                                <FaTimesCircle />
+                                <FaExclamationCircle />
                                 <div>
                                     <strong>Atenção!</strong>
-                                    <p>Isso irá configurar todos os horários vazios do dia e sobrescrever horários disponíveis ou indisponíveis. <strong>Horários já reservados serão mantidos</strong> e não podem ser alterados.</p>
+                                    <p>Isso irá configurar todos os horários vazios do período selecionado e sobrescrever horários disponíveis ou indisponíveis. <strong>Horários já reservados serão mantidos</strong> e não podem ser alterados.</p>
                                 </div>
                             </div>
                         </div>
                         
                         <div className="modal-footer-agenda">
                             <div className="modal-actions-right" style={{ width: '100%', justifyContent: 'flex-end' }}>
-                                <button className="btn-cancel-agenda" onClick={() => setShowApplyAllModal(false)}>
+                                <button className="btn-cancel-agenda" onClick={() => setShowApplyRangeModal(false)}>
                                     Cancelar
                                 </button>
                                 <button 
                                     className="btn-save-agenda" 
-                                    onClick={handleApplyToAllDay} 
+                                    onClick={handleApplyToRange} 
                                     disabled={isCreating}
                                 >
-                                    {isCreating ? 'Aplicando...' : 'Aplicar a Todas as Horas'}
+                                    {isCreating ? 'Aplicando...' : 'Aplicar ao Período'}
                                 </button>
                             </div>
                         </div>
