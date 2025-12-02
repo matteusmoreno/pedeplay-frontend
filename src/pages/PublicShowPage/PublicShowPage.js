@@ -7,7 +7,7 @@ import { useWebSocket } from '../../hooks/useWebSocket';
 import SongRequestCard from '../../components/SongRequestCard/SongRequestCard';
 import MakeRequestForm from '../../components/MakeRequestForm/MakeRequestForm';
 import LiveStreamViewer from '../../components/LiveStreamViewer/LiveStreamViewer';
-import BookingModal from '../../components/BookingModal/BookingModal'; // <-- NOVO COMPONENTE
+import BookingModal from '../../components/BookingModal/BookingModal';
 import './PublicShowPage.css';
 import {
     FaUserCircle,
@@ -17,7 +17,14 @@ import {
     FaBroadcastTower,
     FaHistory,
     FaMapMarkerAlt,
-    FaCalendarCheck // <-- Ícone adicionado
+    FaCalendarCheck,
+    FaMusic,
+    FaUsers,
+    FaFireAlt,
+    FaClock,
+    FaInfoCircle,
+    FaCheckCircle,
+    FaTimesCircle
 } from 'react-icons/fa';
 
 const PublicShowPage = () => {
@@ -293,16 +300,74 @@ const PublicShowPage = () => {
             });
     }, [activeShow]);
 
+    // Estatísticas do show
+    const showStats = useMemo(() => {
+        if (!activeShow || !activeShow.requests) return {
+            total: 0,
+            pending: 0,
+            played: 0,
+            totalTips: 0
+        };
+
+        const stats = activeShow.requests.reduce((acc, req) => {
+            acc.total++;
+            if (req.status === 'PENDING') acc.pending++;
+            if (req.status === 'PLAYED') acc.played++;
+            acc.totalTips += req.tipAmount || 0;
+            return acc;
+        }, { total: 0, pending: 0, played: 0, totalTips: 0 });
+
+        return stats;
+    }, [activeShow]);
+
     const hasSocialLinks = artist && artist.socialLinks && Object.values(artist.socialLinks).some(link => link);
     const isLive = activeShow && activeShow.status === 'ACTIVE';
 
-    if (isLoading) return <div className="public-page-message">Carregando...</div>;
-    if (error) return <div className="public-page-message error">{error}</div>;
-    if (!artist) return <div className="public-page-message error">Artista não encontrado.</div>;
+    // Formatadores
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value);
+    };
+
+    if (isLoading) {
+        return (
+            <div className="public-show-page">
+                <div className="public-loading">
+                    <div className="loading-spinner"></div>
+                    <p>Carregando informações do artista...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="public-show-page">
+                <div className="public-error">
+                    <FaTimesCircle className="error-icon" />
+                    <h2>Erro ao Carregar</h2>
+                    <p>{error}</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!artist) {
+        return (
+            <div className="public-show-page">
+                <div className="public-error">
+                    <FaInfoCircle className="error-icon" />
+                    <h2>Artista Não Encontrado</h2>
+                    <p>O artista que você está procurando não foi encontrado.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="public-show-page">
-            {/* --- Modal de Contratação --- */}
             <BookingModal
                 isOpen={isBookingOpen}
                 onClose={() => setIsBookingOpen(false)}
@@ -310,101 +375,262 @@ const PublicShowPage = () => {
                 artistName={artist.name}
             />
 
-            <div className="public-page-layout">
-                {/* --- Coluna 1: Artista --- */}
-                <aside className="layout-column artist-info-column card">
-                    <div className="artist-avatar">
-                        {artist.profileImageUrl ? (
-                            <img src={artist.profileImageUrl} alt={artist.name} className="profile-avatar-image" />
-                        ) : (
-                            <FaUserCircle className="profile-avatar-placeholder" />
-                        )}
-                    </div>
-                    <div className="artist-info">
-                        <h1 className="artist-name">{artist.name}</h1>
+            <div className="public-page-container">
+                {/* === HEADER DO ARTISTA === */}
+                <header className="show-header">
+                    <div className="show-header-background"></div>
+                    <div className="show-header-content">
+                        <div className="artist-profile">
+                            <div className="artist-avatar-wrapper">
+                                {artist.profileImageUrl ? (
+                                    <img 
+                                        src={artist.profileImageUrl} 
+                                        alt={artist.name} 
+                                        className="artist-avatar-img" 
+                                    />
+                                ) : (
+                                    <div className="artist-avatar-placeholder">
+                                        <FaUserCircle />
+                                    </div>
+                                )}
+                                <div className={`status-indicator ${isLive ? 'live' : 'offline'}`}>
+                                    <span className="status-dot"></span>
+                                </div>
+                            </div>
 
-                        {artist.address && artist.address.city && (
-                            <p className="artist-location">
-                                <FaMapMarkerAlt />
-                                {artist.address.city}, {artist.address.state}
-                            </p>
-                        )}
+                            <div className="artist-main-info">
+                                <h1 className="artist-name">{artist.name}</h1>
+                                
+                                {artist.address && artist.address.city && (
+                                    <p className="artist-location">
+                                        <FaMapMarkerAlt />
+                                        <span>{artist.address.city}, {artist.address.state}</span>
+                                    </p>
+                                )}
 
-                        <div className={`live-status-badge ${isLive ? 'live' : 'offline'}`}>
-                            <FaBroadcastTower />
-                            <span>{isLive ? 'AO VIVO' : 'OFFLINE'}</span>
+                                <div className="artist-badges">
+                                    <div className={`status-badge ${isLive ? 'live' : 'offline'}`}>
+                                        <FaBroadcastTower />
+                                        <span>{isLive ? 'AO VIVO AGORA' : 'OFFLINE'}</span>
+                                    </div>
+                                    {isLive && liveStreamInfo?.currentViewers !== undefined && (
+                                        <div className="viewers-badge">
+                                            <FaUsers />
+                                            <span>{liveStreamInfo.currentViewers} assistindo</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* --- BOTÃO DE CONTRATAR (NOVO) --- */}
-                        <button className="btn-primary btn-hire" onClick={() => setIsBookingOpen(true)}>
-                            <FaCalendarCheck /> Contratar Show
-                        </button>
-                        {/* -------------------------------- */}
+                        <div className="artist-actions">
+                            <button 
+                                className="btn-hire-show" 
+                                onClick={() => setIsBookingOpen(true)}
+                            >
+                                <FaCalendarCheck />
+                                <span>Contratar Show</span>
+                            </button>
 
-                        {artist.biography && (
-                            <p className="artist-bio">{artist.biography}</p>
-                        )}
-
-                        {hasSocialLinks && (
-                            <div className="artist-social-links">
-                                {artist.socialLinks.instagramUrl && <a href={artist.socialLinks.instagramUrl} target="_blank" rel="noreferrer"><FaInstagram /></a>}
-                                {artist.socialLinks.facebookUrl && <a href={artist.socialLinks.facebookUrl} target="_blank" rel="noreferrer"><FaFacebook /></a>}
-                                {artist.socialLinks.youtubeUrl && <a href={artist.socialLinks.youtubeUrl} target="_blank" rel="noreferrer"><FaYoutube /></a>}
-                            </div>
-                        )}
-                    </div>
-                </aside>
-
-                {/* --- Coluna 2: Conteúdo --- */}
-                <main className="layout-column content-column">
-                    {isLive ? (
-                        <>
-                            {liveStreamInfo && liveStreamInfo.isActive && (
-                                <div className="card livestream-section">
-                                    <h2>📺 Transmissão ao Vivo</h2>
-                                    <LiveStreamViewer
-                                        showId={activeShow.id}
-                                        userId={viewerId}
-                                        onStreamEnd={() => setLiveStreamInfo(null)}
-                                    />
+                            {hasSocialLinks && (
+                                <div className="artist-social">
+                                    {artist.socialLinks.instagramUrl && (
+                                        <a 
+                                            href={artist.socialLinks.instagramUrl} 
+                                            target="_blank" 
+                                            rel="noreferrer"
+                                            className="social-link"
+                                            aria-label="Instagram"
+                                        >
+                                            <FaInstagram />
+                                        </a>
+                                    )}
+                                    {artist.socialLinks.facebookUrl && (
+                                        <a 
+                                            href={artist.socialLinks.facebookUrl} 
+                                            target="_blank" 
+                                            rel="noreferrer"
+                                            className="social-link"
+                                            aria-label="Facebook"
+                                        >
+                                            <FaFacebook />
+                                        </a>
+                                    )}
+                                    {artist.socialLinks.youtubeUrl && (
+                                        <a 
+                                            href={artist.socialLinks.youtubeUrl} 
+                                            target="_blank" 
+                                            rel="noreferrer"
+                                            className="social-link"
+                                            aria-label="YouTube"
+                                        >
+                                            <FaYoutube />
+                                        </a>
+                                    )}
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </header>
 
-                            <MakeRequestForm
-                                artistId={artistId}
-                                showId={activeShow.id}
-                                repertoire={repertoire}
-                                onSubmissionSuccess={refreshShowData}
-                            />
+                {/* === BIOGRAFIA (SE HOUVER) === */}
+                {artist.biography && (
+                    <section className="artist-bio-section">
+                        <div className="bio-content">
+                            <FaInfoCircle className="bio-icon" />
+                            <p>{artist.biography}</p>
+                        </div>
+                    </section>
+                )}
 
-                            <section className="song-queue-section card">
-                                <div className="form-header">
-                                    <FaHistory />
-                                    <h2>Pedidos na Fila</h2>
+                {/* === ESTATÍSTICAS DO SHOW (SE ATIVO) === */}
+                {isLive && (
+                    <section className="show-stats-section">
+                        <div className="stats-grid">
+                            <div className="stat-card">
+                                <div className="stat-icon total">
+                                    <FaMusic />
                                 </div>
+                                <div className="stat-info">
+                                    <span className="stat-value">{showStats.total}</span>
+                                    <span className="stat-label">Total de Pedidos</span>
+                                </div>
+                            </div>
+
+                            <div className="stat-card">
+                                <div className="stat-icon pending">
+                                    <FaClock />
+                                </div>
+                                <div className="stat-info">
+                                    <span className="stat-value">{showStats.pending}</span>
+                                    <span className="stat-label">Na Fila</span>
+                                </div>
+                            </div>
+
+                            <div className="stat-card">
+                                <div className="stat-icon played">
+                                    <FaCheckCircle />
+                                </div>
+                                <div className="stat-info">
+                                    <span className="stat-value">{showStats.played}</span>
+                                    <span className="stat-label">Tocadas</span>
+                                </div>
+                            </div>
+
+                            <div className="stat-card">
+                                <div className="stat-icon tips">
+                                    <FaFireAlt />
+                                </div>
+                                <div className="stat-info">
+                                    <span className="stat-value">{formatCurrency(showStats.totalTips)}</span>
+                                    <span className="stat-label">Em Gorjetas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* === CONTEÚDO PRINCIPAL === */}
+                <div className="show-main-content">
+                    {isLive ? (
+                        <>
+                            {/* Live Stream */}
+                            {liveStreamInfo && liveStreamInfo.isActive && (
+                                <section className="livestream-card">
+                                    <div className="livestream-header">
+                                        <h2>
+                                            <FaBroadcastTower />
+                                            <span>Transmissão ao Vivo</span>
+                                        </h2>
+                                        <div className="live-indicator">
+                                            <span className="live-dot"></span>
+                                            <span>AO VIVO</span>
+                                        </div>
+                                    </div>
+                                    <div className="livestream-player">
+                                        <LiveStreamViewer
+                                            showId={activeShow.id}
+                                            userId={viewerId}
+                                            onStreamEnd={() => setLiveStreamInfo(null)}
+                                        />
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Formulário de Pedido */}
+                            <section className="request-form-card">
+                                <MakeRequestForm
+                                    artistId={artistId}
+                                    showId={activeShow.id}
+                                    repertoire={repertoire}
+                                    onSubmissionSuccess={refreshShowData}
+                                />
+                            </section>
+
+                            {/* Fila de Pedidos */}
+                            <section className="queue-card">
+                                <div className="queue-header">
+                                    <div className="queue-title">
+                                        <FaHistory />
+                                        <h2>Fila de Pedidos</h2>
+                                    </div>
+                                    <div className="queue-count">
+                                        <span className="count-badge">{pendingRequests.length}</span>
+                                        <span className="count-label">
+                                            {pendingRequests.length === 1 ? 'pedido' : 'pedidos'}
+                                        </span>
+                                    </div>
+                                </div>
+
                                 {pendingRequests.length > 0 ? (
-                                    <div className="queue-list-container">
-                                        {pendingRequests.map(req => (
-                                            <SongRequestCard
-                                                key={req.requestId}
-                                                request={req}
-                                                isPublicView={true}
-                                            />
+                                    <div className="queue-list">
+                                        {pendingRequests.map((req, index) => (
+                                            <div key={req.requestId} className="queue-item-wrapper">
+                                                <div className="queue-position">
+                                                    <span>{index + 1}</span>
+                                                </div>
+                                                <SongRequestCard
+                                                    request={req}
+                                                    isPublicView={true}
+                                                />
+                                            </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="queue-empty-message">Ainda não há pedidos. Seja o primeiro!</p>
+                                    <div className="queue-empty">
+                                        <FaMusic className="empty-icon" />
+                                        <h3>Nenhum pedido na fila</h3>
+                                        <p>Seja o primeiro a fazer um pedido!</p>
+                                    </div>
                                 )}
                             </section>
                         </>
                     ) : (
-                        <div className="offline-message-card card">
-                            <h3>Show Encerrado</h3>
-                            <p>O artista não está recebendo pedidos no momento.</p>
-                            <p style={{ marginTop: '1rem' }}>Gostou do artista? <br /><strong>Solicite um orçamento para o seu evento clicando em "Contratar Show".</strong></p>
-                        </div>
+                        <section className="offline-card">
+                            <div className="offline-icon-wrapper">
+                                <FaBroadcastTower className="offline-icon" />
+                            </div>
+                            <h2>Show Encerrado</h2>
+                            <p className="offline-message">
+                                O artista não está recebendo pedidos no momento.
+                            </p>
+                            <div className="offline-cta">
+                                <FaInfoCircle />
+                                <p>
+                                    Gostou do {artist.name}?<br />
+                                    <strong>Solicite um orçamento para o seu evento!</strong>
+                                </p>
+                                <button 
+                                    className="btn-hire-offline" 
+                                    onClick={() => setIsBookingOpen(true)}
+                                >
+                                    <FaCalendarCheck />
+                                    <span>Contratar Show</span>
+                                </button>
+                            </div>
+                        </section>
                     )}
-                </main>
+                </div>
             </div>
         </div>
     );
