@@ -23,10 +23,16 @@ import {
     FaChevronDown,
     FaCheckCircle,
     FaTimesCircle,
-    FaVideo
+    FaVideo,
+    FaBroadcastTower,
+    FaUsers,
+    FaFireAlt,
+    FaChartLine,
+    FaHistory,
+    FaExternalLinkAlt,
+    FaInfoCircle
 } from 'react-icons/fa';
 import './DashboardHome.css';
-// --- 1. Importar o novo hook ---
 import { useNotification } from '../../context/NotificationContext';
 
 // --- Funções Helper (Inalteradas) ---
@@ -79,6 +85,11 @@ const DashboardHome = ({ artist }) => {
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [requestTab, setRequestTab] = useState('PENDING');
     const [isLiveStreamOpen, setIsLiveStreamOpen] = useState(false);
+    const [showStats, setShowStats] = useState({
+        avgTipAmount: 0,
+        topTipper: null,
+        mostRequestedSong: null
+    });
 
     // --- Lógica de Áudio (Inalterada) ---
     const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
@@ -147,6 +158,34 @@ const DashboardHome = ({ artist }) => {
             .filter(req => req.status === 'CANCELED')
             .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
     }, [requests]);
+
+    // Estatísticas avançadas do show
+    useEffect(() => {
+        if (!activeShow || !requests.length) return;
+
+        const tipsReceived = requests.filter(req => req.tipAmount > 0);
+        const avgTip = tipsReceived.length > 0
+            ? tipsReceived.reduce((sum, req) => sum + req.tipAmount, 0) / tipsReceived.length
+            : 0;
+
+        const topTipper = tipsReceived.length > 0
+            ? tipsReceived.reduce((prev, current) => (prev.tipAmount > current.tipAmount) ? prev : current)
+            : null;
+
+        const songCount = {};
+        requests.forEach(req => {
+            songCount[req.songTitle] = (songCount[req.songTitle] || 0) + 1;
+        });
+        const mostRequested = Object.keys(songCount).length > 0
+            ? Object.keys(songCount).reduce((a, b) => songCount[a] > songCount[b] ? a : b)
+            : null;
+
+        setShowStats({
+            avgTipAmount: avgTip,
+            topTipper: topTipper,
+            mostRequestedSong: mostRequested
+        });
+    }, [activeShow, requests]);
 
 
     const fetchPastShows = useCallback(async () => {
@@ -388,8 +427,7 @@ const DashboardHome = ({ artist }) => {
 
 
     return (
-        <div className={`dashboard-tab-content ${activeShow ? 'show-is-active' : ''}`}>
-
+        <div className="show-mode-container">
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -400,156 +438,302 @@ const DashboardHome = ({ artist }) => {
                 <p>Esta ação não pode ser desfeita e o show será movido para o seu histórico.</p>
             </Modal>
 
-            <div className="card-header modo-show-header">
-                <div className="modo-show-title">
-                    <h2>Modo Show</h2>
-                    {!activeShow && (
-                        <p className="show-explanation-text">
-                            Ao "Iniciar Novo Show", você ativa sua página pública e habilita o recebimento de pedidos de música e gorjetas em tempo real. Use esta função apenas quando estiver ao vivo.
-                        </p>
-                    )}
+            {/* === HEADER DO MODO SHOW === */}
+            <div className="show-mode-header">
+                <div className="show-header-content">
+                    <div className="show-header-info">
+                        <div className="show-header-icon">
+                            <FaBroadcastTower />
+                        </div>
+                        <div className="show-header-text">
+                            <h2>Modo Show</h2>
+                            <p>
+                                {activeShow
+                                    ? 'Gerenciando seu show ao vivo'
+                                    : 'Inicie um show para receber pedidos e gorjetas em tempo real'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="show-header-actions">
+                        {activeShow ? (
+                            <>
+                                <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
+                                    <span className="status-dot"></span>
+                                    <span>{isConnected ? 'Conectado' : 'Desconectado'}</span>
+                                </div>
+                                <button 
+                                    className="btn-livestream" 
+                                    onClick={() => setIsLiveStreamOpen(true)}
+                                >
+                                    <FaVideo />
+                                    <span>Transmitir</span>
+                                </button>
+                                <button 
+                                    className="btn-end-show" 
+                                    onClick={handleEndShow} 
+                                    disabled={isLoading}
+                                >
+                                    <FaStop />
+                                    <span>Encerrar</span>
+                                </button>
+                            </>
+                        ) : (
+                            <button 
+                                className="btn-start-show" 
+                                onClick={handleStartShow} 
+                                disabled={isLoading}
+                            >
+                                <FaPlay />
+                                <span>Iniciar Novo Show</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
 
-                {error && <p className="dashboard-error">{error}</p>}
-
-                {activeShow ? (
-                    <div className="show-controls">
-                        <div className={`show-status ${isConnected ? 'active' : 'inactive'}`}>
-                            <FaSatelliteDish />
-                            {isConnected ? 'CONECTADO' : 'OFFLINE'}
-                        </div>
-                        <button 
-                            className="btn-livestream" 
-                            onClick={() => setIsLiveStreamOpen(true)}
-                        >
-                            <FaVideo /> Transmitir ao Vivo
-                        </button>
-                        <button className="btn-danger" onClick={handleEndShow} disabled={isLoading}>
-                            <FaStop /> Encerrar Show
-                        </button>
-                    </div>
-                ) : (
-                    <div className="show-controls">
-                        <button className="btn-primary" onClick={handleStartShow} disabled={isLoading}>
-                            <FaPlay /> Iniciar Novo Show
-                        </button>
+                {error && (
+                    <div className="show-error-alert">
+                        <FaInfoCircle />
+                        <span>{error}</span>
                     </div>
                 )}
             </div>
 
+            {/* === ESTATÍSTICAS DO SHOW ATIVO === */}
             {activeShow && (
-                <div className="show-stats-grid">
-                    <div className="stat-card timer">
-                        <FaClock />
-                        <div className="stat-info">
-                            <span className="stat-value">{showDuration}</span>
-                            <span className="stat-label">Tempo de Show</span>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <FaMusic />
-                        <div className="stat-info">
-                            <span className="stat-value">{activeShow.totalRequests}</span>
-                            <span className="stat-label">Pedidos Recebidos</span>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <FaGift />
-                        <div className="stat-info">
-                            <span className="stat-value">{formatCurrency(activeShow.totalTipsValue)}</span>
-                            <span className="stat-label">Total em Gorjetas</span>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {activeShow && (
-                <div className="requests-list-container">
-                    <div className="requests-tabs">
-                        <button
-                            className={`requests-tab-btn ${requestTab === 'PENDING' ? 'active' : ''}`}
-                            onClick={() => handleRequestTabClick('PENDING')}
-                        >
-                            <FaMusic />
-                            <span>Fila</span>
-                            <span className="tab-counter">{pendingRequests.length}</span>
-                        </button>
-                        <button
-                            className={`requests-tab-btn ${requestTab === 'PLAYED' ? 'active' : ''}`}
-                            onClick={() => handleRequestTabClick('PLAYED')}
-                        >
-                            <FaCheckCircle />
-                            <span>Tocadas</span>
-                            <span className="tab-counter">{playedRequests.length}</span>
-                        </button>
-                        <button
-                            className={`requests-tab-btn ${requestTab === 'CANCELED' ? 'active' : ''}`}
-                            onClick={() => handleRequestTabClick('CANCELED')}
-                        >
-                            <FaTimesCircle />
-                            <span>Canceladas</span>
-                            <span className="tab-counter">{canceledRequests.length}</span>
-                        </button>
-                    </div>
-
-                    <div className="requests-list">
-                        {renderRequestList()}
-                    </div>
-                </div>
-            )}
-
-            {!activeShow && (
-                <div className={`past-shows-section card ${isHistoryOpen ? 'open' : ''}`}>
-                    <div className="accordion-header">
-                        <button 
-                            type="button" 
-                            className="accordion-title-btn"
-                            onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-                        >
-                            <div className="accordion-title">
-                                <FaCalendarCheck />
-                                <span>Histórico de Shows</span>
+                <>
+                    <div className="show-stats-primary">
+                        <div className="stat-card-large timer">
+                            <div className="stat-icon">
+                                <FaClock />
                             </div>
-                            <FaChevronDown className="accordion-icon" />
+                            <div className="stat-content">
+                                <span className="stat-value-large">{showDuration}</span>
+                                <span className="stat-label">Tempo ao Vivo</span>
+                                <span className="stat-sublabel">Show em andamento</span>
+                            </div>
+                        </div>
+
+                        <div className="stat-card-large">
+                            <div className="stat-icon total">
+                                <FaMusic />
+                            </div>
+                            <div className="stat-content">
+                                <span className="stat-value-large">{activeShow.totalRequests}</span>
+                                <span className="stat-label">Total de Pedidos</span>
+                                <span className="stat-sublabel">
+                                    {pendingRequests.length} na fila
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="stat-card-large">
+                            <div className="stat-icon tips">
+                                <FaGift />
+                            </div>
+                            <div className="stat-content">
+                                <span className="stat-value-large">{formatCurrency(activeShow.totalTipsValue)}</span>
+                                <span className="stat-label">Total em Gorjetas</span>
+                                <span className="stat-sublabel">
+                                    Média: {formatCurrency(showStats.avgTipAmount)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Estatísticas Secundárias */}
+                    <div className="show-stats-secondary">
+                        <div className="stat-item">
+                            <div className="stat-item-icon">
+                                <FaCheckCircle />
+                            </div>
+                            <div className="stat-item-info">
+                                <span className="stat-item-value">{playedRequests.length}</span>
+                                <span className="stat-item-label">Músicas Tocadas</span>
+                            </div>
+                        </div>
+
+                        <div className="stat-item">
+                            <div className="stat-item-icon">
+                                <FaFireAlt />
+                            </div>
+                            <div className="stat-item-info">
+                                <span className="stat-item-label">Maior Gorjeta</span>
+                                <span className="stat-item-value" title={showStats.topTipper ? `${showStats.topTipper.requesterName} - ${formatCurrency(showStats.topTipper.tipAmount)}` : 'Nenhuma gorjeta ainda'}>
+                                    {showStats.topTipper 
+                                        ? formatCurrency(showStats.topTipper.tipAmount)
+                                        : '-'}
+                                </span>
+                                {showStats.topTipper && (
+                                    <span className="stat-item-sublabel">
+                                        {showStats.topTipper.requesterName}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="stat-item">
+                            <div className="stat-item-icon">
+                                <FaChartLine />
+                            </div>
+                            <div className="stat-item-info">
+                                <span className="stat-item-value">
+                                    {showStats.mostRequestedSong || '-'}
+                                </span>
+                                <span className="stat-item-label">Mais Pedida</span>
+                            </div>
+                        </div>
+
+                        <div className="stat-item">
+                            <div className="stat-item-icon">
+                                <FaTimesCircle />
+                            </div>
+                            <div className="stat-item-info">
+                                <span className="stat-item-value">{canceledRequests.length}</span>
+                                <span className="stat-item-label">Cancelados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Link Público do Show */}
+                    <div className="show-public-link">
+                        <FaExternalLinkAlt />
+                        <div className="link-info">
+                            <span className="link-label">Link Público do Show</span>
+                            <a 
+                                href={`${window.location.origin}/show/${user.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="link-url"
+                            >
+                                {window.location.origin}/show/{user.id}
+                            </a>
+                        </div>
+                        <button 
+                            className="btn-copy-link"
+                            onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/show/${user.id}`);
+                                addToast('Link copiado!', 'Link público copiado para a área de transferência', 'success');
+                            }}
+                        >
+                            Copiar Link
                         </button>
-                        <div className="past-shows-actions">
+                    </div>
+                </>
+            )}
+
+            {/* === LISTA DE PEDIDOS === */}
+            {activeShow && (
+                <div className="requests-section">
+                    <div className="requests-header">
+                        <h3>
+                            <FaMusic />
+                            <span>Gerenciar Pedidos</span>
+                        </h3>
+                    </div>
+
+                    <div className="requests-tabs-container">
+                        <div className="requests-tabs">
                             <button
-                                className="btn-icon"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    fetchPastShows();
-                                }}
+                                className={`requests-tab ${requestTab === 'PENDING' ? 'active' : ''}`}
+                                onClick={() => handleRequestTabClick('PENDING')}
+                            >
+                                <FaClock />
+                                <span>Fila de Espera</span>
+                                <span className="tab-badge">{pendingRequests.length}</span>
+                            </button>
+                            <button
+                                className={`requests-tab ${requestTab === 'PLAYED' ? 'active' : ''}`}
+                                onClick={() => handleRequestTabClick('PLAYED')}
+                            >
+                                <FaCheckCircle />
+                                <span>Tocadas</span>
+                                <span className="tab-badge">{playedRequests.length}</span>
+                            </button>
+                            <button
+                                className={`requests-tab ${requestTab === 'CANCELED' ? 'active' : ''}`}
+                                onClick={() => handleRequestTabClick('CANCELED')}
+                            >
+                                <FaTimesCircle />
+                                <span>Canceladas</span>
+                                <span className="tab-badge">{canceledRequests.length}</span>
+                            </button>
+                        </div>
+
+                        <div className="requests-content">
+                            {renderRequestList()}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* === HISTÓRICO DE SHOWS (QUANDO NÃO HÁ SHOW ATIVO) === */}
+            {!activeShow && (
+                <div className="history-section">
+                    <div className="history-header">
+                        <div className="history-title">
+                            <FaHistory />
+                            <h3>Histórico de Shows</h3>
+                            <button
+                                className="btn-refresh"
+                                onClick={fetchPastShows}
                                 disabled={isLoadingPastShows}
                                 type="button"
+                                title="Atualizar histórico"
                             >
                                 <FaRedoAlt />
                             </button>
                         </div>
+                        <button
+                            className="btn-toggle-history"
+                            onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                            type="button"
+                        >
+                            <span>{isHistoryOpen ? 'Recolher' : 'Expandir'}</span>
+                            <FaChevronDown className={isHistoryOpen ? 'rotated' : ''} />
+                        </button>
                     </div>
 
-                    <div className="accordion-content">
+                    <div className={`history-content ${isHistoryOpen ? 'expanded' : 'collapsed'}`}>
                         {isLoadingPastShows ? (
-                            <p>Carregando histórico...</p>
+                            <div className="history-loading">
+                                <div className="loading-spinner-small"></div>
+                                <p>Carregando histórico...</p>
+                            </div>
                         ) : pastShows.length === 0 ? (
-                            <p className="empty-state-small">Nenhum show anterior encontrado.</p>
+                            <div className="history-empty">
+                                <FaMusic className="empty-icon" />
+                                <h4>Nenhum Show Realizado</h4>
+                                <p>Seus shows anteriores aparecerão aqui</p>
+                            </div>
                         ) : (
-                            <div className="past-shows-list-container">
-                                <ul className="past-shows-list">
-                                    {pastShows.map(show => (
-                                        <li key={show.id} className="past-show-item">
-                                            <div className="past-show-info">
-                                                <span className="past-show-date">{formatDateTime(show.startTime)}</span>
-                                                <span className="past-show-stats">
-                                                    Duração: {formatDurationFromSeconds(show.durationInSeconds)}
-                                                </span>
+                            <div className="history-list">
+                                {pastShows.map(show => (
+                                    <div key={show.id} className="history-card">
+                                        <div className="history-card-header">
+                                            <div className="history-date">
+                                                <FaCalendarCheck />
+                                                <span>{formatDateTime(show.startTime)}</span>
                                             </div>
-                                            <div className="past-show-metrics">
-                                                <span>{show.totalRequests} Pedidos</span>
+                                            <div className="history-duration">
+                                                <FaClock />
+                                                <span>{formatDurationFromSeconds(show.durationInSeconds)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="history-card-stats">
+                                            <div className="history-stat">
+                                                <FaMusic />
+                                                <span>{show.totalRequests}</span>
+                                                <small>pedidos</small>
+                                            </div>
+                                            <div className="history-stat">
+                                                <FaGift />
                                                 <span>{formatCurrency(show.totalTipsValue)}</span>
+                                                <small>gorjetas</small>
                                             </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
