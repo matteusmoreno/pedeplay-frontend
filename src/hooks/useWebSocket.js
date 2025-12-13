@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useRef } from 'react';
 
-const WS_URL = 'ws://localhost:8383/shows/live/';
+const WS_URL = 'wss://pedeplay.onrender.com';
 const RECONNECT_DELAY = 3000; // 3 segundos
 
 export const useWebSocket = (artistId) => {

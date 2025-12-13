@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-const WS_BASE_URL = 'ws://localhost:8383';
+const WS_BASE_URL = 'wss://pedeplay.onrender.com';
 
-/**
- * Hook para gerenciar conexão WebSocket de live stream
- * VERSÃO CORRIGIDA - Não reconecta quando servidor rejeita
- */
 export const useLiveStreamWebSocket = (showId, userId, role) => {
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState(null);
     const wsRef = useRef(null);
     const reconnectTimeoutRef = useRef(null);
     const onMessageCallbackRef = useRef(null);
-    const shouldReconnectRef = useRef(true); // Flag de controle
+    const shouldReconnectRef = useRef(true);
 
     /**
      * Conecta ao WebSocket
