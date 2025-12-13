@@ -51,7 +51,7 @@ const LoginPage = () => {
                 <div className="login-form-section">
                     <div className="login-header">
                         <Link to="/" className="login-logo">
-                            PedePlay
+                            Contrrat
                         </Link>
                     </div>
 

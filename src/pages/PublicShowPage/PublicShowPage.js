@@ -39,7 +39,7 @@ const PublicShowPage = () => {
     const [isBookingOpen, setIsBookingOpen] = useState(false); // <-- Estado do Modal
 
     const [viewerId] = useState(() => {
-        const storageKey = `pedeplay-viewer-${artistId}`;
+        const storageKey = `contrrat-viewer-${artistId}`;
         let existingId = sessionStorage.getItem(storageKey);
 
         if (!existingId) {

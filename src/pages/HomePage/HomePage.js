@@ -34,7 +34,7 @@ const HomePage = () => {
                     </h1>
                     <p className="hero-subtitle">
                         Da gestão de agenda e propostas até pedidos ao vivo e transmissões. 
-                        PedePlay é a solução completa para artistas modernos que querem 
+                        Contrrat é a solução completa para artistas modernos que querem 
                         profissionalizar sua carreira e monetizar seu talento.
                     </p>
                     <div className="hero-stats">
@@ -215,7 +215,7 @@ const HomePage = () => {
                 <div className="container">
                     <div className="benefits-content">
                         <div className="benefits-text">
-                            <h2 className="section-title">Por que escolher o PedePlay?</h2>
+                            <h2 className="section-title">Por que escolher o Contrrat?</h2>
                             <div className="benefits-list">
                                 <div className="benefit-item">
                                     <FaCheckCircle />
@@ -281,7 +281,7 @@ const HomePage = () => {
                     <div className="cta-content">
                         <h2 className="cta-title">Pronto para profissionalizar sua carreira?</h2>
                         <p className="cta-subtitle">
-                            Junte-se a centenas de artistas que já estão usando o PedePlay para 
+                            Junte-se a centenas de artistas que já estão usando o Contrrat para 
                             gerenciar sua agenda, receber propostas e interagir com o público.
                         </p>
                         <div className="cta-actions">
@@ -301,7 +301,7 @@ const HomePage = () => {
                 <div className="container">
                     <div className="footer-content">
                         <div className="footer-brand">
-                            <h3>PedePlay</h3>
+                            <h3>Contrrat</h3>
                             <p>A plataforma completa para artistas modernos</p>
                         </div>
                         <div className="footer-links">
@@ -312,12 +312,12 @@ const HomePage = () => {
                             </div>
                             <div className="footer-column">
                                 <h4>Contato</h4>
-                                <a href="mailto:contato@pedeplay.com">contato@pedeplay.com</a>
+                                <a href="mailto:contato@contrrat.com">contato@contrrat.com</a>
                             </div>
                         </div>
                     </div>
                     <div className="footer-bottom">
-                        <p>PedePlay © 2025. Todos os direitos reservados.</p>
+                        <p>Contrrat © 2025. Todos os direitos reservados.</p>
                     </div>
                 </div>
             </footer>

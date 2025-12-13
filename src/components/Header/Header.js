@@ -35,7 +35,7 @@ const Header = () => {
         <header className={`header ${isDashboard ? 'header-dashboard' : ''}`}>
             <div className="header-container">
                 <Link to="/" className="header-logo">
-                    <span className="logo-text">PedePlay</span>
+                    <span className="logo-text">Contrrat</span>
                 </Link>
 
                 {!isDashboard && (

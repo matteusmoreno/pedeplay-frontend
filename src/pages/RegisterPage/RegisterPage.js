@@ -141,7 +141,7 @@ const RegisterPage = () => {
                 {/* Header com Logo */}
                 <div className="register-header">
                     <Link to="/" className="register-logo">
-                        PedePlay
+                        Contrrat
                     </Link>
                     <div className="register-login-link">
                         Já tem uma conta? <Link to="/login">Entrar</Link>
