@@ -1,11 +1,12 @@
 /* * ========================================
  * ARQUIVO: src/hooks/useWebSocket.js
- * (Corrigido para retornar apenas a última mensagem)
+ * (URL Hardcoded para Produção no Render)
  * ========================================
  */
 import { useState, useEffect, useRef } from 'react';
 
-const WS_URL = 'wss://pedeplay.onrender.com';
+// ✅ CORREÇÃO: URL completa com o caminho /shows/live/ e WSS (Seguro)
+const WS_URL = 'wss://pedeplay.onrender.com/shows/live/';
 const RECONNECT_DELAY = 3000; // 3 segundos
 
 export const useWebSocket = (artistId) => {
@@ -27,6 +28,7 @@ export const useWebSocket = (artistId) => {
         const connect = () => {
             if (!shouldReconnect.current) return;
 
+            // Monta a URL: wss://pedeplay.onrender.com/shows/live/ARTISTA_ID
             const wsUrl = `${WS_URL}${artistId}`;
             console.log('🔌 Conectando WebSocket:', wsUrl);
             
@@ -86,6 +88,5 @@ export const useWebSocket = (artistId) => {
         };
     }, [artistId]);
 
-    // 3. Retorna o objeto da última mensagem
     return { lastMessage, isConnected };
 };

@@ -1,5 +1,11 @@
+/* * ========================================
+ * ARQUIVO: src/hooks/useLiveStreamWebSocket.js
+ * (URL Hardcoded para Produção no Render)
+ * ========================================
+ */
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+// ✅ CORREÇÃO: URL base apenas do domínio (sem barra no final)
 const WS_BASE_URL = 'wss://pedeplay.onrender.com';
 
 export const useLiveStreamWebSocket = (showId, userId, role) => {
@@ -20,6 +26,7 @@ export const useLiveStreamWebSocket = (showId, userId, role) => {
         }
 
         try {
+            // Monta a URL: wss://pedeplay.onrender.com/livestream/SHOW_ID/USER_ID/ROLE
             const wsUrl = `${WS_BASE_URL}/livestream/${showId}/${userId}/${role}`;
             console.log('Connecting to WebSocket:', wsUrl);
 
@@ -59,9 +66,7 @@ export const useLiveStreamWebSocket = (showId, userId, role) => {
                 console.log('WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
                 setIsConnected(false);
 
-                // 🔧 CORREÇÃO: Não reconecta em casos específicos
-                // Código 1008 = CANNOT_ACCEPT (broadcaster já ativo)
-                // Código 1013 = TRY_AGAIN_LATER (cooldown ativo)
+                // Não reconecta em casos específicos
                 if (event.code === 1008) {
                     console.warn('🚫 Broadcaster já ativo. NÃO reconectando.');
                     shouldReconnectRef.current = false;
@@ -76,14 +81,13 @@ export const useLiveStreamWebSocket = (showId, userId, role) => {
                     return;
                 }
 
-                // Código 1000 = NORMAL_CLOSURE (fechamento normal pelo usuário)
                 if (event.code === 1000) {
                     console.log('🔌 Desconexão normal. NÃO reconectando.');
                     shouldReconnectRef.current = false;
                     return;
                 }
 
-                // ✅ Apenas reconecta em caso de erro de rede (código 1006)
+                // Apenas reconecta em caso de erro de rede
                 if (event.code === 1006 && shouldReconnectRef.current) {
                     console.log('🔄 Erro de rede. Tentando reconectar em 5 segundos...');
                     reconnectTimeoutRef.current = setTimeout(() => {
@@ -110,7 +114,6 @@ export const useLiveStreamWebSocket = (showId, userId, role) => {
         }
 
         if (wsRef.current) {
-            // Fecha com código 1000 (fechamento normal)
             wsRef.current.close(1000, 'User disconnected');
             wsRef.current = null;
         }
@@ -124,12 +127,10 @@ export const useLiveStreamWebSocket = (showId, userId, role) => {
     const sendMessage = useCallback((message) => {
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             if (message instanceof ArrayBuffer || message instanceof Blob) {
-                // Envia dados binários
                 wsRef.current.send(message);
             } else if (typeof message === 'string') {
                 wsRef.current.send(message);
             } else {
-                // Converte objeto para JSON
                 wsRef.current.send(JSON.stringify(message));
             }
         } else {
@@ -154,9 +155,9 @@ export const useLiveStreamWebSocket = (showId, userId, role) => {
     return {
         isConnected,
         error,
-        connect,      // Exporta connect para uso manual
+        connect,
         disconnect,
-        sendMessage,  // Agora envia tanto texto quanto binário
+        sendMessage,
         onMessage
     };
 };
