@@ -21,12 +21,7 @@ const DashboardFinances = ({ artist }) => {
     const minWithdraw = 50;
     const canWithdraw = currentBalance >= minWithdraw;
 
-    // Dados mockados para exemplo (substituir com dados reais do backend)
-    const mockTransactions = [
-        { id: 1, type: 'income', description: 'Gorjeta - Pedido de Música', amount: 10.00, date: '2025-12-01T14:30:00' },
-        { id: 2, type: 'income', description: 'Gorjeta - Pedido de Música', amount: 5.00, date: '2025-12-01T13:15:00' },
-        { id: 3, type: 'income', description: 'Show - Bar do João', amount: 150.00, date: '2025-11-30T22:00:00' },
-    ];
+    const mockTransactions = [];
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
