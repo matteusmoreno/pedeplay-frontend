@@ -72,7 +72,7 @@ const DashboardFinances = ({ artist }) => {
                     </div>
                     <div className="finances-stat-content">
                         <span className="finances-stat-label">Ganhos do Mês</span>
-                        <span className="finances-stat-value">{formatCurrency(165.00)}</span>
+                        <span className="finances-stat-value">{formatCurrency(0)}</span>
                         <span className="finances-stat-info">
                             <FaClock /> Dezembro 2025
                         </span>
