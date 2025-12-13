@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8383';
+const API_URL = 'https://pedeplay.onrender.com';
 
 const api = axios.create({
     baseURL: API_URL,
