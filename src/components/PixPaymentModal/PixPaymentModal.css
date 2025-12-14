@@ -1,0 +1,309 @@
+/* ========================================
+ * PIX PAYMENT MODAL - DESIGN MODERNO
+ * ======================================== */
+
+.pix-payment-modal {
+    padding: 2.5rem;
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Header */
+.pix-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.pix-header .pix-icon {
+    font-size: 3rem;
+    color: #00b894;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.pix-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.75rem;
+    color: #fff;
+}
+
+.payment-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00b894;
+    margin-top: 0.5rem;
+}
+
+/* Timer Section */
+.timer-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.timer-section svg {
+    font-size: 1.2rem;
+}
+
+/* QR Code Section */
+.qr-code-section {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.qr-code-container {
+    display: inline-block;
+    padding: 1.5rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1rem;
+}
+
+.qr-code-image {
+    width: 250px;
+    height: 250px;
+    display: block;
+}
+
+.qr-instruction {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+}
+
+/* Divider */
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.divider span {
+    position: relative;
+    display: inline-block;
+    padding: 0 1rem;
+    background: #1e1e2e;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Copy Paste Section */
+.copy-paste-section {
+    margin-bottom: 1.5rem;
+}
+
+.copy-instruction {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.pix-code-container {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.pix-code-input {
+    flex: 1;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.copy-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.copy-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.copy-button.copied {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+}
+
+/* Payment Status */
+.payment-status {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.payment-status .spinner {
+    font-size: 2rem;
+    color: #667eea;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.payment-status p {
+    margin: 0 0 0.5rem 0;
+    color: #fff;
+    font-weight: 600;
+}
+
+.payment-status small {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+/* Info Box */
+.info-box {
+    background: rgba(255, 193, 7, 0.1);
+    border-left: 3px solid #ffc107;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.info-box p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.info-box strong {
+    color: #ffc107;
+}
+
+/* Payment Confirmed */
+.payment-confirmed {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.payment-confirmed .success-icon {
+    font-size: 4rem;
+    color: #00b894;
+    margin-bottom: 1.5rem;
+    animation: successPop 0.5s ease-out;
+}
+
+@keyframes successPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.payment-confirmed h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #00b894;
+}
+
+.payment-confirmed p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Close Button */
+.close-button {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .pix-payment-modal {
+        padding: 1.5rem;
+    }
+
+    .qr-code-image {
+        width: 200px;
+        height: 200px;
+    }
+
+    .payment-amount {
+        font-size: 1.5rem;
+    }
+
+    .pix-code-container {
+        flex-direction: column;
+    }
+
+    .copy-button {
+        width: 100%;
+        justify-content: center;
+    }
+}

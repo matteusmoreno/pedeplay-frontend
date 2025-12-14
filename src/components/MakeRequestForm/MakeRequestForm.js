@@ -5,6 +5,7 @@
  */
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { makeSongRequest } from '../../services/showService';
+import PixPaymentModal from '../PixPaymentModal/PixPaymentModal';
 import './MakeRequestForm.css';
 import {
     FaDollarSign,
@@ -26,6 +27,10 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    
+    // Estados para controle do pagamento PIX
+    const [showPixModal, setShowPixModal] = useState(false);
+    const [paymentData, setPaymentData] = useState(null);
 
     const searchRef = useRef(null);
 
@@ -82,21 +87,32 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
         };
 
         try {
-            await makeSongRequest(requestData);
-            setSuccess('Seu pedido foi enviado com sucesso!');
+            const response = await makeSongRequest(requestData);
+            
+            // Verifica se há dados de pagamento PIX na resposta
+            if (response.payment && response.payment.paymentId) {
+                // Tem pagamento PIX - abre modal
+                setPaymentData(response.payment);
+                setShowPixModal(true);
+                setSuccess('Escaneie o QR Code para confirmar o pagamento.');
+            } else {
+                // Pedido gratuito - sucesso imediato
+                setSuccess('Seu pedido foi enviado com sucesso!');
+                
+                // Recarrega os dados da fila
+                if (onSubmissionSuccess) {
+                    onSubmissionSuccess();
+                }
 
-            // --- INÍCIO DA CORREÇÃO ---
-            // 2. Chamar a função do pai para recarregar os dados da fila
-            if (onSubmissionSuccess) {
-                onSubmissionSuccess();
+                // Limpa o formulário após 2 segundos
+                setTimeout(() => {
+                    setSongId('');
+                    setSearchTerm('');
+                    setTipAmount('');
+                    setClientMessage('');
+                    setSuccess(null);
+                }, 2000);
             }
-            // --- FIM DA CORREÇÃO ---
-
-            // Limpa o formulário
-            setSongId('');
-            setSearchTerm('');
-            setTipAmount('');
-            setClientMessage('');
         } catch (err) {
             setError(err.message || 'Erro ao enviar pedido.');
         } finally {
@@ -189,6 +205,27 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
                     {isLoading ? 'Enviando...' : 'Enviar Pedido'}
                 </button>
             </form>
+
+            {/* Modal de Pagamento PIX */}
+            <PixPaymentModal
+                isOpen={showPixModal}
+                onClose={() => {
+                    setShowPixModal(false);
+                    setPaymentData(null);
+                    // Limpa o formulário
+                    setSongId('');
+                    setSearchTerm('');
+                    setTipAmount('');
+                    setClientMessage('');
+                    setSuccess(null);
+                    // Recarrega a fila
+                    if (onSubmissionSuccess) {
+                        onSubmissionSuccess();
+                    }
+                }}
+                paymentData={paymentData}
+                tipAmount={parseFloat(tipAmount) || 0}
+            />
         </div>
     );
 };

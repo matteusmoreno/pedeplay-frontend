@@ -16,6 +16,7 @@ const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false 
     }).format(tipAmount || 0);
 
     const isPending = status === 'PENDING';
+    const isPendingPayment = status === 'PENDING_PAYMENT';
 
     // Limite de caracteres para mensagem
     const MAX_CHARS = 100;
@@ -24,8 +25,20 @@ const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false 
         ? clientMessage.slice(0, MAX_CHARS) + '...' 
         : clientMessage;
 
+    // Tradução de status para português
+    const getStatusLabel = (status) => {
+        const statusMap = {
+            'PENDING': 'Pendente',
+            'PENDING_PAYMENT': 'Aguardando Pagamento',
+            'PLAYED': 'Tocada',
+            'CANCELED': 'Cancelada',
+            'REJECTED': 'Rejeitada'
+        };
+        return statusMap[status] || status;
+    };
+
     return (
-        <div className={`song-request-card ${status.toLowerCase()} ${isPublicView ? 'public-view' : ''}`}>
+        <div className={`song-request-card ${status.toLowerCase().replace('_', '-')} ${isPublicView ? 'public-view' : ''}`}>
             <div className="card-header">
                 <h3 className="song-title">{songTitle}</h3>
                 <span className="song-artist">{songArtist}</span>
@@ -50,9 +63,16 @@ const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false 
                     {tipAmount > 0 ? `Gorjeta: ${formattedTip}` : 'Pedido gratuito'}
                 </span>
                 <span className="request-status">
-                    Status: {status}
+                    Status: {getStatusLabel(status)}
                 </span>
             </div>
+
+            {/* Aviso especial para pagamento pendente */}
+            {isPendingPayment && (
+                <div className="payment-warning">
+                    ⏳ Aguardando confirmação do pagamento PIX
+                </div>
+            )}
 
             {/* --- 3. Condição para esconder botões --- */}
             {/* Só mostra botões se for PENDENTE e NÃO for 'isPublicView' */}
