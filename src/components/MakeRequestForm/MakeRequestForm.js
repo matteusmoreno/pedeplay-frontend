@@ -244,6 +244,15 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
                 }}
                 paymentData={paymentData}
                 tipAmount={parseFloat(tipAmount) || 0}
+                artistId={artistId}
+                showId={showId}
+                onPaymentConfirmed={() => {
+                    // Callback quando pagamento é confirmado
+                    console.log('✅ Pagamento confirmado! Recarregando fila...');
+                    if (onSubmissionSuccess) {
+                        onSubmissionSuccess();
+                    }
+                }}
             />
         </div>
     );

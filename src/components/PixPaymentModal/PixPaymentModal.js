@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
 import './PixPaymentModal.css';
 import { FaCopy, FaCheckCircle, FaQrcode, FaClock, FaSpinner, FaMobileAlt, FaInfoCircle } from 'react-icons/fa';
+import { useWebSocket } from '../../hooks/useWebSocket';
 
-const PixPaymentModal = ({ isOpen, onClose, paymentData, tipAmount, onPaymentConfirmed }) => {
+const PixPaymentModal = ({ isOpen, onClose, paymentData, tipAmount, onPaymentConfirmed, artistId, showId }) => {
     const [copied, setCopied] = useState(false);
     const [timeLeft, setTimeLeft] = useState(1800); // 30 minutos em segundos
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
     const [activeTab, setActiveTab] = useState('qrcode'); // 'qrcode' ou 'copypaste'
+
+    // WebSocket para escutar atualizações em tempo real
+    const { lastMessage } = useWebSocket(artistId);
 
     useEffect(() => {
         if (!isOpen) {
@@ -38,6 +42,87 @@ const PixPaymentModal = ({ isOpen, onClose, paymentData, tipAmount, onPaymentCon
 
         return () => clearInterval(timer);
     }, [isOpen, paymentData]);
+
+    // Escuta atualizações via WebSocket para detectar confirmação de pagamento
+    useEffect(() => {
+        if (!isOpen || !lastMessage || !paymentData?.paymentId) return;
+
+        console.log('📩 [PixPaymentModal] Mensagem WebSocket recebida:', lastMessage);
+
+        // Verifica se é uma notificação de novo pedido ou atualização de status
+        const messageType = lastMessage.type;
+        
+        if (messageType === 'NEW_REQUEST' || messageType === 'new-song-request') {
+            // Novo pedido foi confirmado (significa que o pagamento foi aprovado)
+            console.log('✅ [PixPaymentModal] Novo pedido detectado - Pagamento confirmado!');
+            setPaymentConfirmed(true);
+            
+            // Fecha automaticamente após 3 segundos
+            setTimeout(() => {
+                if (onPaymentConfirmed) onPaymentConfirmed();
+                onClose();
+            }, 3000);
+        }
+
+        if (messageType === 'REQUEST_STATUS_UPDATE' || messageType === 'request-status-updated') {
+            const newStatus = lastMessage.newStatus || lastMessage.status;
+            console.log('📝 [PixPaymentModal] Status atualizado:', newStatus);
+            
+            // Se mudou de PENDING_PAYMENT para PENDING = pagamento aprovado
+            if (newStatus === 'PENDING') {
+                console.log('✅ [PixPaymentModal] Pagamento confirmado via atualização de status!');
+                setPaymentConfirmed(true);
+                
+                setTimeout(() => {
+                    if (onPaymentConfirmed) onPaymentConfirmed();
+                    onClose();
+                }, 3000);
+            }
+        }
+    }, [lastMessage, isOpen, paymentData, onPaymentConfirmed, onClose]);
+
+    // Polling como fallback (verifica a cada 5 segundos se o pedido apareceu na fila)
+    useEffect(() => {
+        if (!isOpen || !showId || !paymentData?.paymentId) return;
+
+        const checkPaymentStatus = async () => {
+            try {
+                // Importa o serviço dinamicamente para evitar circular dependency
+                const { getShowDetails } = await import('../../services/showService');
+                const show = await getShowDetails(showId);
+                
+                // Procura o pedido com o paymentId atual
+                const request = show.requests?.find(req => 
+                    req.paymentId === String(paymentData.paymentId)
+                );
+
+                if (request) {
+                    console.log('🔍 [PixPaymentModal] Pedido encontrado via polling:', request);
+                    
+                    // Se o status mudou de PENDING_PAYMENT para PENDING
+                    if (request.status === 'PENDING') {
+                        console.log('✅ [PixPaymentModal] Pagamento confirmado via polling!');
+                        setPaymentConfirmed(true);
+                        
+                        setTimeout(() => {
+                            if (onPaymentConfirmed) onPaymentConfirmed();
+                            onClose();
+                        }, 3000);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ [PixPaymentModal] Erro ao verificar status:', error);
+            }
+        };
+
+        // Verifica a cada 5 segundos
+        const pollingInterval = setInterval(checkPaymentStatus, 5000);
+
+        // Primeira verificação imediata
+        checkPaymentStatus();
+
+        return () => clearInterval(pollingInterval);
+    }, [isOpen, showId, paymentData, onPaymentConfirmed, onClose]);
 
     const handleCopyPixCode = () => {
         if (paymentData?.qrCodeCopyPaste) {
