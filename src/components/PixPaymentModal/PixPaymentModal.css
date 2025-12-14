@@ -1,419 +1,134 @@
 /* ========================================
- * PIX PAYMENT MODAL - DESIGN MODERNO 2.0
- * UX Melhorado | Responsivo | Animações Suaves
+ * PIX PAYMENT MODAL - SIMPLES E RESPONSIVO
  * ======================================== */
 
 .pix-payment-modal {
-    padding: 0;
-    max-width: 520px;
     width: 100%;
+    max-width: 420px;
     background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
-    border-radius: 24px;
+    border-radius: 20px;
     overflow: hidden;
-    animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: fadeIn 0.3s ease;
 }
 
-@keyframes modalSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-/* ========================================
- * HEADER - Valor e Timer
- * ======================================== */
-
+/* Header */
 .pix-header {
     background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-    padding: 2rem;
+    padding: 1.5rem;
     text-align: center;
-    position: relative;
-    overflow: hidden;
 }
 
-.pix-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: headerGlow 3s ease-in-out infinite;
-}
-
-@keyframes headerGlow {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(10%, 10%); }
-}
-
-.pix-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    position: relative;
-    z-index: 1;
-}
-
-.pix-brand {
-    width: 32px;
-    height: 32px;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
-}
-
-.pix-title {
+.pix-header h3 {
+    margin: 0 0 0.75rem 0;
     font-size: 1.25rem;
     font-weight: 600;
     color: #fff;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.payment-value {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    position: relative;
-    z-index: 1;
-}
-
-.payment-value .currency {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.payment-value .amount {
-    font-size: 3rem;
+.payment-amount {
+    font-size: 2rem;
     font-weight: 700;
     color: #fff;
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
-    letter-spacing: -1px;
+    margin-bottom: 0.5rem;
 }
 
-.timer-badge {
+.timer-info {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
-    padding: 0.5rem 1rem;
-    border-radius: 100px;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
     color: #fff;
-    font-weight: 600;
-    font-size: 0.95rem;
-    position: relative;
-    z-index: 1;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
-/* ========================================
- * TABS - Seleção de Método
- * ======================================== */
-
-.payment-tabs {
-    display: flex;
-    gap: 0;
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+/* Conteúdo */
+.pix-content {
+    padding: 1.5rem;
 }
 
-.payment-tabs .tab {
-    flex: 1;
+/* QR Code */
+.qr-section {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.instruction {
+    margin: 0 0 1rem 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.qr-code-box {
+    display: inline-block;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.qr-image {
+    width: 200px;
+    height: 200px;
+    display: block;
+    border-radius: 8px;
+}
+
+/* Botão copiar */
+.copy-btn {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     padding: 1rem;
-    background: transparent;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
     border: none;
     border-radius: 12px;
-    color: rgba(255, 255, 255, 0.6);
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    position: relative;
+    margin-bottom: 1.25rem;
 }
 
-.payment-tabs .tab svg {
-    font-size: 1.1rem;
+.copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-.payment-tabs .tab:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.8);
+.copy-btn.copied {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
 }
 
-.payment-tabs .tab.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
-}
-
-.payment-tabs .tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -0.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid #667eea;
-}
-
-/* ========================================
- * TAB CONTENT - Área de Conteúdo
- * ======================================== */
-
-.tab-content {
-    padding: 2rem;
-    min-height: 400px;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.instruction-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid rgba(102, 126, 234, 0.3);
-    border-radius: 16px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 2rem;
-}
-
-.instruction-card .instruction-icon {
-    font-size: 1.5rem;
-    color: #667eea;
-    flex-shrink: 0;
-}
-
-.instruction-card p {
-    margin: 0;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-/* ========================================
- * QR CODE - Visualização
- * ======================================== */
-
-.qr-code-section {
-    text-align: center;
-}
-
-.qr-code-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-}
-
-.qr-code-container {
-    position: relative;
-    padding: 1.5rem;
-    background: #fff;
-    border-radius: 24px;
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease;
-}
-
-.qr-code-container:hover {
-    transform: scale(1.02);
-}
-
-.qr-code-image {
-    width: 240px;
-    height: 240px;
-    display: block;
-    border-radius: 12px;
-}
-
-.qr-code-overlay {
-    position: absolute;
-    top: 1.5rem;
-    left: 1.5rem;
-    right: 1.5rem;
-    bottom: 1.5rem;
-    pointer-events: none;
-}
-
-.qr-corner {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    border: 3px solid #00b894;
-}
-
-.qr-corner-tl {
-    top: 0;
-    left: 0;
-    border-right: none;
-    border-bottom: none;
-    border-radius: 12px 0 0 0;
-}
-
-.qr-corner-tr {
-    top: 0;
-    right: 0;
-    border-left: none;
-    border-bottom: none;
-    border-radius: 0 12px 0 0;
-}
-
-.qr-corner-bl {
-    bottom: 0;
-    left: 0;
-    border-right: none;
-    border-top: none;
-    border-radius: 0 0 0 12px;
-}
-
-.qr-corner-br {
-    bottom: 0;
-    right: 0;
-    border-left: none;
-    border-top: none;
-    border-radius: 0 0 12px 0;
-}
-
-/* ========================================
- * COPY PASTE - Código Copia e Cola
- * ======================================== */
-
-.copy-paste-section {
-    text-align: center;
-}
-
-.pix-code-wrapper {
-    margin-bottom: 1.5rem;
-}
-
-.pix-code-display {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-.pix-code-display code {
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.6;
-    word-break: break-all;
-}
-
-.copy-button-large {
-    width: 100%;
+/* Status */
+.status-bar {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    padding: 1.25rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.15);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
 }
 
-.copy-button-large:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
-}
-
-.copy-button-large:active {
-    transform: translateY(0);
-}
-
-.copy-button-large.copied {
-    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-    box-shadow: 0 4px 16px rgba(0, 184, 148, 0.4);
-}
-
-.copy-button-large .icon {
-    font-size: 1.25rem;
-}
-
-/* ========================================
- * PAYMENT STATUS - Status de Pagamento
- * ======================================== */
-
-.payment-status {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 1.5rem 2rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.status-icon {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 50%;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
-}
-
-.status-icon .spinner {
-    font-size: 1.5rem;
-    color: #fff;
+.status-bar .spinner {
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
-}
-
-.status-text {
-    flex: 1;
-    text-align: left;
-}
-
-.status-title {
-    margin: 0 0 0.25rem 0;
-    color: #fff;
-    font-weight: 600;
-    font-size: 1rem;
-}
-
-.status-subtitle {
-    margin: 0;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.85rem;
-    line-height: 1.4;
 }
 
 /* ========================================
@@ -444,137 +159,39 @@
     line-height: 1.5;
 }
 
-/* ========================================
- * PAYMENT CONFIRMED - Tela de Sucesso
- * ======================================== */
-
-.payment-confirmed {
+/* Tela de sucesso */
+.payment-success {
     text-align: center;
-    padding: 4rem 2rem;
+    padding: 3rem 2rem;
 }
 
-.success-animation {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 2rem;
+.success-icon-wrapper {
+    margin-bottom: 1.5rem;
 }
 
 .success-icon {
-    font-size: 5rem;
+    font-size: 4rem;
     color: #00b894;
-    position: relative;
-    z-index: 2;
-    animation: successBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: successPop 0.5s ease-out;
 }
 
-@keyframes successBounce {
-    0% {
-        transform: scale(0) rotate(0deg);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.2) rotate(10deg);
-    }
-    100% {
-        transform: scale(1) rotate(0deg);
-        opacity: 1;
-    }
+@keyframes successPop {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-.success-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100px;
-    height: 100px;
-    border: 3px solid #00b894;
-    border-radius: 50%;
-    opacity: 0;
-    animation: ringExpand 0.8s ease-out 0.3s;
-}
-
-@keyframes ringExpand {
-    0% {
-        width: 80px;
-        height: 80px;
-        opacity: 0.8;
-    }
-    100% {
-        width: 150px;
-        height: 150px;
-        opacity: 0;
-    }
-}
-
-.payment-confirmed h3 {
-    margin: 0 0 0.75rem 0;
-    font-size: 1.75rem;
+.payment-success h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #fff;
 }
 
-.payment-confirmed p {
-    margin: 0 0 2rem 0;
+.payment-success p {
+    margin: 0;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 1rem;
-    line-height: 1.6;
-}
-
-.success-button {
-    width: 100%;
-    max-width: 300px;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(0, 184, 148, 0.4);
-}
-
-.success-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 184, 148, 0.5);
-}
-
-.success-button:active {
-    transform: translateY(0);
-}
-
-/* ========================================
- * CANCEL BUTTON - Botão Cancelar
- * ======================================== */
-
-.cancel-button {
-    width: calc(100% - 4rem);
-    margin: 0 2rem 2rem 2rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.cancel-button:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #fff;
-}
-
-/* ========================================
- * RESPONSIVE - Adaptação Mobile
- * ======================================== */
-
-@media (max-width: 768px) {
-    .pix-payment-modal {
-        max-width: 100%;
+    font-size: 0.95remth: 100%;
         border-radius: 24px 24px 0 0;
     }
 
@@ -657,134 +274,75 @@
         font-size: 0.75rem;
     }
 
-    .tab-content {
+   Responsivo */
+@media (max-width: 480px) {
+    .pix-payment-modal {
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .pix-header {
         padding: 1.25rem;
-        min-height: 320px;
     }
 
-    .instruction-card {
-        padding: 0.85rem 1rem;
-        gap: 0.75rem;
-    }
-
-    .instruction-card .instruction-icon {
-        font-size: 1.25rem;
-    }
-
-    .instruction-card p {
-        font-size: 0.85rem;
-    }
-
-    .qr-code-container {
-        padding: 1rem;
-    }
-
-    .qr-code-image {
-        width: 200px;
-        height: 200px;
-    }
-
-    .qr-corner {
-        width: 30px;
-        height: 30px;
-        border-width: 2px;
-    }
-
-    .pix-code-display {
-        padding: 1rem;
-    }
-
-    .pix-code-display code {
-        font-size: 0.75rem;
-    }
-
-    .copy-button-large {
-        padding: 1rem;
-        font-size: 0.95rem;
-    }
-
-    .payment-status {
-        padding: 1rem 1.25rem;
-        gap: 1rem;
-    }
-
-    .status-icon {
-        width: 40px;
-        height: 40px;
-    }
-
-    .status-icon .spinner {
-        font-size: 1.25rem;
-    }
-
-    .status-title {
-        font-size: 0.95rem;
-    }
-
-    .status-subtitle {
-        font-size: 0.8rem;
-    }
-
-    .info-box {
-        margin: 1.25rem;
-        padding: 0.85rem 1rem;
-    }
-
-    .info-box svg {
+    .pix-header h3 {
         font-size: 1.1rem;
     }
 
-    .info-box p {
-        font-size: 0.8rem;
+    .payment-amount {
+        font-size: 1.75rem;
     }
 
-    .cancel-button {
+    .timer-info {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.75rem;
+    }
+
+    .pix-content {
+        padding: 1.25rem;
+    }
+
+    .qr-code-box {
+        padding: 0.75rem;
+    }
+
+    .qr-image {
+        width: 180px;
+        height: 180px;
+    }
+
+    .instruction {
+        font-size: 0.85rem;
+    }
+
+    .copy-btn {
+        padding: 0.85rem;
+        font-size: 0.9rem;
+    }
+
+    .status-bar {
+        padding: 0.85rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-cancel {
         width: calc(100% - 2.5rem);
         margin: 0 1.25rem 1.25rem 1.25rem;
-        padding: 0.85rem;
-        font-size: 0.95rem;
+        padding: 0.75rem;
+        font-size: 0.9rem;
     }
 
-    .payment-confirmed {
-        padding: 2.5rem 1.25rem;
+    .payment-success {
+        padding: 2.5rem 1.5rem;
     }
 
     .success-icon {
         font-size: 3.5rem;
     }
 
-    .payment-confirmed h3 {
-        font-size: 1.5rem;
+    .payment-success h3 {
+        font-size: 1.35rem;
     }
 
-    .payment-confirmed p {
-        font-size: 0.95rem;
-    }
-
-    .success-button {
-        max-width: 100%;
-        padding: 0.85rem 1.5rem;
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .payment-value .amount {
-        font-size: 1.75rem;
-    }
-
-    .qr-code-image {
-        width: 180px;
-        height: 180px;
-    }
-
-    .payment-tabs .tab {
-        flex-direction: column;
-        gap: 0.25rem;
-        padding: 0.65rem 0.4rem;
-    }
-
-    .payment-tabs .tab svg {
-        font-size: 1.1rem;
-    }
-}
+    .payment-success p {
+        font-size: 0.9
