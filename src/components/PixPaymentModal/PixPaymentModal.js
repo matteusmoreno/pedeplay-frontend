@@ -5,7 +5,7 @@ import { FaCopy, FaCheckCircle, FaQrcode, FaClock, FaSpinner, FaMobileAlt, FaInf
 
 const PixPaymentModal = ({ isOpen, onClose, paymentData, tipAmount, onPaymentConfirmed }) => {
     const [copied, setCopied] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(600); // 10 minutos em segundos
+    const [timeLeft, setTimeLeft] = useState(1800); // 30 minutos em segundos
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
     const [activeTab, setActiveTab] = useState('qrcode'); // 'qrcode' ou 'copypaste'
 
@@ -13,11 +13,19 @@ const PixPaymentModal = ({ isOpen, onClose, paymentData, tipAmount, onPaymentCon
         if (!isOpen) {
             // Reset states quando modal fecha
             setPaymentConfirmed(false);
-            setTimeLeft(600);
+            setTimeLeft(1800);
             return;
         }
 
-        // Timer de expiração (10 minutos)
+        // Calcula tempo restante baseado na data de expiração do backend
+        if (paymentData?.expirationDate) {
+            const expirationTime = new Date(paymentData.expirationDate).getTime();
+            const now = new Date().getTime();
+            const secondsLeft = Math.max(0, Math.floor((expirationTime - now) / 1000));
+            setTimeLeft(secondsLeft);
+        }
+
+        // Timer de expiração
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
@@ -29,7 +37,7 @@ const PixPaymentModal = ({ isOpen, onClose, paymentData, tipAmount, onPaymentCon
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [isOpen]);
+    }, [isOpen, paymentData]);
 
     const handleCopyPixCode = () => {
         if (paymentData?.qrCodeCopyPaste) {

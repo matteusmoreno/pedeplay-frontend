@@ -24,6 +24,7 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
 
     const [tipAmount, setTipAmount] = useState('');
     const [clientMessage, setClientMessage] = useState('');
+    const [clientEmail, setClientEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
@@ -84,6 +85,7 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
             songId: songId,
             tipAmount: tipAmount ? parseFloat(tipAmount) : 0,
             clientMessage: clientMessage,
+            clientEmail: clientEmail || null,
         };
 
         try {
@@ -110,6 +112,7 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
                     setSearchTerm('');
                     setTipAmount('');
                     setClientMessage('');
+                    setClientEmail('');
                     setSuccess(null);
                 }, 2000);
             }
@@ -187,6 +190,21 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
                     <small className="tip-info">Pedidos com gorjeta têm prioridade na fila!</small>
                 </div>
 
+                {/* Campo de email aparece apenas se houver gorjeta */}
+                {tipAmount && parseFloat(tipAmount) > 0 && (
+                    <div className="form-group email-group">
+                        <label htmlFor="clientEmail">Seu Email (Opcional)</label>
+                        <input
+                            type="email"
+                            id="clientEmail"
+                            placeholder="seu@email.com"
+                            value={clientEmail}
+                            onChange={(e) => setClientEmail(e.target.value)}
+                        />
+                        <small className="email-info">Para receber confirmação do pagamento</small>
+                    </div>
+                )}
+
                 <div className="form-group">
                     <label htmlFor="clientMessage">Mensagem (Opcional)</label>
                     <textarea
@@ -216,6 +234,7 @@ const MakeRequestForm = ({ artistId, showId, repertoire, onSubmissionSuccess }) 
                     setSongId('');
                     setSearchTerm('');
                     setTipAmount('');
+                    setClientEmail('');
                     setClientMessage('');
                     setSuccess(null);
                     // Recarrega a fila

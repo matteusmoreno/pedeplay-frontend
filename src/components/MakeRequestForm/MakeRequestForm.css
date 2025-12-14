@@ -293,6 +293,57 @@
  * ELEMENTOS DO FORMULÁRIO
  * ======================================== */
 
+/* ========================================
+ * EMAIL GROUP - Campo de Email
+ * ======================================== */
+
+.email-group {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 100px;
+    }
+}
+
+.email-group input[type="email"] {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.email-group input[type="email"]:focus {
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    outline: none;
+}
+
+.email-group input[type="email"]::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.email-info {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
 .tip-info {
     display: block;
     font-size: 0.9rem;

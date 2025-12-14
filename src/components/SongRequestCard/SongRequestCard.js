@@ -32,10 +32,12 @@ const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false 
             'PENDING_PAYMENT': 'Aguardando Pagamento',
             'PLAYED': 'Tocada',
             'CANCELED': 'Cancelada',
-            'REJECTED': 'Rejeitada'
+            'REJECTED': 'Pagamento Rejeitado'
         };
         return statusMap[status] || status;
     };
+
+    const isRejected = status === 'REJECTED';
 
     return (
         <div className={`song-request-card ${status.toLowerCase().replace('_', '-')} ${isPublicView ? 'public-view' : ''}`}>
@@ -71,6 +73,13 @@ const SongRequestCard = ({ request, onUpdateRequestStatus, isPublicView = false 
             {isPendingPayment && (
                 <div className="payment-warning">
                     ⏳ Aguardando confirmação do pagamento PIX
+                </div>
+            )}
+
+            {/* Aviso para pagamento rejeitado */}
+            {isRejected && (
+                <div className="payment-rejected">
+                    ❌ O pagamento foi rejeitado ou cancelado
                 </div>
             )}
 
