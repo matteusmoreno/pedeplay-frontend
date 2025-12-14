@@ -131,32 +131,23 @@
     to { transform: rotate(360deg); }
 }
 
-/* ========================================
- * INFO BOX - Avisos
- * ======================================== */
-
-.info-box {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: rgba(255, 193, 7, 0.1);
-    border: 1px solid rgba(255, 193, 7, 0.3);
+/* Botão cancelar */
+.btn-cancel {
+    width: calc(100% - 3rem);
+    margin: 0 1.5rem 1.5rem 1.5rem;
+    padding: 0.85rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    padding: 1rem 1.25rem;
-    margin: 1.5rem 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.info-box svg {
-    font-size: 1.25rem;
-    color: #ffc107;
-    flex-shrink: 0;
-}
-
-.info-box p {
-    margin: 0;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.85rem;
-    line-height: 1.5;
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
 /* Tela de sucesso */
@@ -191,90 +182,10 @@
 .payment-success p {
     margin: 0;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.95remth: 100%;
-        border-radius: 24px 24px 0 0;
-    }
-
-    .payment-value .amount {
-        font-size: 2.5rem;
-    }
-
-    .payment-tabs .tab span {
-        font-size: 0.85rem;
-    }
-
-    .tab-content {
-        padding: 1.5rem;
-        min-height: 350px;
-    }
-
-    .qr-code-image {
-        width: 220px;
-        height: 220px;
-    }
-
-    .payment-status {
-        padding: 1.25rem 1.5rem;
-    }
-
-    .info-box {
-        margin: 1.5rem 1.5rem;
-    }
-
-    .cancel-button {
-        width: calc(100% - 3rem);
-        margin: 0 1.5rem 1.5rem 1.5rem;
-    }
-
-    .payment-confirmed {
-        padding: 3rem 1.5rem;
-    }
-
-    .success-icon {
-        font-size: 4rem;
-    }
+    font-size: 0.95rem;
 }
 
-@media (max-width: 480px) {
-    .pix-header {
-        padding: 1.5rem;
-    }
-
-    .pix-title {
-        font-size: 1.1rem;
-    }
-
-    .payment-value .currency {
-        font-size: 1.25rem;
-    }
-
-    .payment-value .amount {
-        font-size: 2rem;
-    }
-
-    .timer-badge {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.75rem;
-    }
-
-    .payment-tabs {
-        padding: 0.4rem;
-    }
-
-    .payment-tabs .tab {
-        padding: 0.75rem 0.5rem;
-        gap: 0.4rem;
-    }
-
-    .payment-tabs .tab svg {
-        font-size: 1rem;
-    }
-
-    .payment-tabs .tab span {
-        font-size: 0.75rem;
-    }
-
-   Responsivo */
+/* Responsivo */
 @media (max-width: 480px) {
     .pix-payment-modal {
         max-width: 100%;
@@ -345,4 +256,6 @@
     }
 
     .payment-success p {
-        font-size: 0.9
+        font-size: 0.9rem;
+    }
+}
